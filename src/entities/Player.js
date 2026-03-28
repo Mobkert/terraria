@@ -1,4 +1,5 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
+import { getItemTexture, getToolData } from '../data/items.js';
 
 export default class Player {
   constructor(scene, x, y, tileManager, inventory) {
@@ -32,6 +33,14 @@ export default class Player {
     });
 
     this.jumpPressed = false;
+
+    this.heldItem = scene.add.image(x, y, 'player');
+    this.heldItem.setDisplaySize(20, 20);
+    this.heldItem.setOrigin(0.5, 0.5);
+    this.heldItem.setDepth(11);
+    this.heldItem.setVisible(false);
+    this.heldItemType = null;
+    this.HELD_OFFSET = 20;
   }
 
   update(delta) {
@@ -59,6 +68,42 @@ export default class Player {
 
     if (this.vx < 0) this.sprite.setFlipX(true);
     else if (this.vx > 0) this.sprite.setFlipX(false);
+
+    this.updateHeldItem();
+  }
+
+  updateHeldItem() {
+    const selected = this.inventory.getSelectedItem();
+
+    if (!selected || this.inventory.isOpen) {
+      this.heldItem.setVisible(false);
+      this.heldItemType = null;
+      return;
+    }
+
+    if (this.heldItemType !== selected.type) {
+      this.heldItemType = selected.type;
+      this.heldItem.setTexture(getItemTexture(selected.type));
+      const isTool = getToolData(selected.type) !== null;
+      const size = isTool ? TILE_SIZE : 20;
+      this.heldItem.setDisplaySize(size, size);
+    }
+
+    const pointer = this.scene.input.activePointer;
+    const worldX = pointer.worldX;
+    const worldY = pointer.worldY;
+
+    const handY = this.y - this.height * 0.45;
+    const angle = Math.atan2(worldY - handY, worldX - this.x);
+
+    const hx = this.x + Math.cos(angle) * this.HELD_OFFSET;
+    const hy = handY + Math.sin(angle) * this.HELD_OFFSET;
+
+    this.heldItem.setPosition(Math.round(hx), Math.round(hy));
+    this.heldItem.setRotation(angle);
+    const facingLeft = worldX < this.x;
+    this.heldItem.setFlipY(facingLeft);
+    this.heldItem.setVisible(true);
   }
 
   moveAxis(dt) {

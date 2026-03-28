@@ -32,6 +32,7 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 - Collision detection against the tile grid with edge-snapping resolution
 - Camera smoothly follows the player
 - Spawn point found at world center on the surface
+- Held item display: selected hotbar item appears near the player's hand, rotates to follow the cursor. Tools render at full size, blocks at a smaller size
 
 **Key files:** `src/entities/Player.js`, `README.md`
 
