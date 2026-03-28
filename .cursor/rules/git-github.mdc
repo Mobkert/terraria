@@ -1,0 +1,13 @@
+---
+description: Git and GitHub configuration for this project
+alwaysApply: true
+---
+
+# Git & GitHub
+
+- **GitHub username**: Mobkert
+- **Repository**: https://github.com/Mobkert/terraria
+- **Git email**: erik@thewalter.net
+- **Git name**: Mobkert
+- **Default branch**: master
+- **Remote**: origin (HTTPS)
