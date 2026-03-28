@@ -1,0 +1,29 @@
+---
+description: Keep PLAN.md updated when making key changes to architecture, design, or gameplay
+alwaysApply: true
+---
+
+# Update PLAN.md on Key Changes
+
+When you make changes that affect **architecture**, **game design**, or **gameplay mechanics**, update `PLAN.md` at the project root to reflect those changes.
+
+## When to Update
+
+- Adding or removing a major system (e.g., new entity type, new UI panel, new manager class)
+- Changing how core systems interact (e.g., physics, rendering, inventory flow)
+- Adding new block types, item types, or crafting recipes that represent a new feature
+- Changing controls or player mechanics
+- Adding new biomes, world generation features, or visual systems
+
+## When NOT to Update
+
+- Bug fixes that don't change design
+- Code refactors that keep the same behavior
+- Minor tweaks to values (e.g., adjusting block hardness or loot weights)
+
+## How to Update
+
+- Edit the relevant phase section in `PLAN.md` or add a new section if it's a new feature
+- Keep descriptions concise (1-2 sentences per bullet)
+- List key files involved
+- Update the Controls Summary table if controls change
