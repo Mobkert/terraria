@@ -6,6 +6,7 @@ import {
   WORLD_HEIGHT,
 } from '../world/WorldGenerator.js';
 import TileManager from '../world/TileManager.js';
+import Player from '../entities/Player.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +17,6 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#87CEEB');
 
     this.worldData = generateWorld(42);
-
     this.tileManager = new TileManager(this, this.worldData);
 
     this.cameras.main.setBounds(
@@ -27,27 +27,12 @@ export default class GameScene extends Phaser.Scene {
     );
 
     const spawn = findSpawnPoint(this.worldData);
+    const spawnX = spawn.x * TILE_SIZE + TILE_SIZE / 2;
+    const spawnY = this.worldData.surfaceHeights[spawn.x] * TILE_SIZE;
 
-    this.playerSprite = this.add.image(
-      spawn.x * TILE_SIZE + TILE_SIZE / 2,
-      spawn.y * TILE_SIZE,
-      'player',
-    );
-    this.playerSprite.setOrigin(0.5, 1);
-    this.playerSprite.setDepth(10);
+    this.player = new Player(this, spawnX, spawnY, this.tileManager);
 
-    this.cameras.main.centerOn(
-      spawn.x * TILE_SIZE,
-      spawn.y * TILE_SIZE,
-    );
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.wasd = this.input.keyboard.addKeys({
-      up: 'W',
-      down: 'S',
-      left: 'A',
-      right: 'D',
-    });
+    this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0.1);
 
     this.tileManager.update();
 
@@ -62,24 +47,15 @@ export default class GameScene extends Phaser.Scene {
       .setDepth(100);
   }
 
-  update() {
-    const speed = 10;
-    const cam = this.cameras.main;
-
-    if (this.cursors.left.isDown || this.wasd.left.isDown) cam.scrollX -= speed;
-    if (this.cursors.right.isDown || this.wasd.right.isDown)
-      cam.scrollX += speed;
-    if (this.cursors.up.isDown || this.wasd.up.isDown) cam.scrollY -= speed;
-    if (this.cursors.down.isDown || this.wasd.down.isDown)
-      cam.scrollY += speed;
-
+  update(time, delta) {
+    this.player.update(delta);
     this.tileManager.update();
 
-    const tileX = Math.floor((cam.scrollX + cam.width / 2) / TILE_SIZE);
-    const tileY = Math.floor((cam.scrollY + cam.height / 2) / TILE_SIZE);
-    const biome = this.worldData.biomes[tileX] || '?';
+    const tx = this.player.getTileX();
+    const ty = this.player.getTileY();
+    const biome = this.worldData.biomes[tx] || '?';
     this.infoText.setText(
-      `Pos: ${tileX},${tileY} | Biome: ${biome} | Tiles: ${this.tileManager.sprites.size} | WASD/Arrows to explore`,
+      `Pos: ${tx},${ty} | Biome: ${biome} | A/D move, SPACE jump`,
     );
   }
 }
