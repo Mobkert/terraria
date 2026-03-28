@@ -1,0 +1,98 @@
+export const TILE_SIZE = 32;
+
+export const BlockTypes = {
+  AIR: 0,
+  GRASS: 1,
+  DIRT: 2,
+  STONE: 3,
+  DEEPSLATE: 4,
+  SAND: 5,
+  SANDSTONE: 6,
+  WOOD: 7,
+  LEAVES: 8,
+  JUNGLE_GRASS: 9,
+  PLANKS: 10,
+  WORKBENCH: 11,
+  CHEST: 12,
+};
+
+export const BlockData = {
+  [BlockTypes.GRASS]: {
+    name: 'Grass',
+    color: 0x4a8c2a,
+    topColor: 0x5cb338,
+    hardness: 1,
+    tool: 'shovel',
+    drops: BlockTypes.DIRT,
+  },
+  [BlockTypes.DIRT]: {
+    name: 'Dirt',
+    color: 0x8b6914,
+    hardness: 1,
+    tool: 'shovel',
+  },
+  [BlockTypes.STONE]: {
+    name: 'Stone',
+    color: 0x808080,
+    hardness: 3,
+    tool: 'pickaxe',
+  },
+  [BlockTypes.DEEPSLATE]: {
+    name: 'Deepslate',
+    color: 0x4a4a4a,
+    hardness: 5,
+    tool: 'pickaxe',
+  },
+  [BlockTypes.SAND]: {
+    name: 'Sand',
+    color: 0xdbc67b,
+    hardness: 1,
+    tool: 'shovel',
+  },
+  [BlockTypes.SANDSTONE]: {
+    name: 'Sandstone',
+    color: 0xc4a35a,
+    hardness: 2,
+    tool: 'pickaxe',
+  },
+  [BlockTypes.WOOD]: {
+    name: 'Wood',
+    color: 0x6b4226,
+    hardness: 2,
+    tool: 'axe',
+  },
+  [BlockTypes.LEAVES]: {
+    name: 'Leaves',
+    color: 0x2d7a2d,
+    hardness: 0.5,
+    tool: 'none',
+  },
+  [BlockTypes.JUNGLE_GRASS]: {
+    name: 'Jungle Grass',
+    color: 0x2d6b2d,
+    topColor: 0x3a8a3a,
+    hardness: 1,
+    tool: 'shovel',
+    drops: BlockTypes.DIRT,
+  },
+  [BlockTypes.PLANKS]: {
+    name: 'Wood Planks',
+    color: 0xa0724a,
+    hardness: 2,
+    tool: 'axe',
+  },
+  [BlockTypes.WORKBENCH]: {
+    name: 'Workbench',
+    color: 0x8b5e3c,
+    hardness: 2,
+    tool: 'axe',
+    interactable: true,
+  },
+  [BlockTypes.CHEST]: {
+    name: 'Chest',
+    color: 0x9c7a3c,
+    hardness: 2,
+    tool: 'axe',
+    interactable: true,
+  },
+};
