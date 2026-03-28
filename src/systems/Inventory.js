@@ -5,6 +5,7 @@ export default class Inventory {
     this.selectedSlot = 0;
     this.MAX_STACK = 99;
     this.dirty = true;
+    this.isOpen = false;
   }
 
   addItem(type, count = 1) {

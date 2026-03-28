@@ -1,9 +1,10 @@
 import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
 
 export default class Player {
-  constructor(scene, x, y, tileManager) {
+  constructor(scene, x, y, tileManager, inventory) {
     this.scene = scene;
     this.tileManager = tileManager;
+    this.inventory = inventory;
 
     this.sprite = scene.add.image(x, y, 'player');
     this.sprite.setOrigin(0.5, 1);
@@ -37,11 +38,13 @@ export default class Player {
     const dt = delta / 1000;
 
     this.vx = 0;
-    if (this.keys.left.isDown) this.vx = -this.MOVE_SPEED;
-    if (this.keys.right.isDown) this.vx = this.MOVE_SPEED;
+    if (!this.inventory.isOpen) {
+      if (this.keys.left.isDown) this.vx = -this.MOVE_SPEED;
+      if (this.keys.right.isDown) this.vx = this.MOVE_SPEED;
 
-    if (this.keys.jump.isDown && this.onGround && !this.jumpPressed) {
-      this.vy = -this.JUMP_SPEED;
+      if (this.keys.jump.isDown && this.onGround && !this.jumpPressed) {
+        this.vy = -this.JUMP_SPEED;
+      }
     }
     this.jumpPressed = this.keys.jump.isDown;
 

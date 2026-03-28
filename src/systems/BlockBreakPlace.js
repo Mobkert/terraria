@@ -26,6 +26,14 @@ export default class BlockBreakPlace {
   }
 
   update(delta) {
+    this.updateDroppedItems(delta);
+
+    if (this.inventory.isOpen) {
+      this.resetBreaking();
+      this.cursorHighlight.clear();
+      return;
+    }
+
     const pointer = this.scene.input.activePointer;
     const worldX = pointer.worldX;
     const worldY = pointer.worldY;
@@ -47,8 +55,6 @@ export default class BlockBreakPlace {
     if (pointer.rightButtonDown() && inRange && this.placeCooldown <= 0) {
       this.handlePlacing(tileX, tileY);
     }
-
-    this.updateDroppedItems(delta);
   }
 
   isInRange(tileX, tileY) {
