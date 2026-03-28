@@ -9,6 +9,7 @@ export default class Inventory {
     this.dirty = true;
     this.isOpen = false;
     this.craftingRequest = null;
+    this.chestRequest = null;
   }
 
   addItem(type, count = 1) {

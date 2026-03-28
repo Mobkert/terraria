@@ -3,11 +3,12 @@ import { getToolData } from '../data/items.js';
 import DroppedItem from '../entities/DroppedItem.js';
 
 export default class BlockBreakPlace {
-  constructor(scene, tileManager, player, inventory) {
+  constructor(scene, tileManager, player, inventory, chestManager) {
     this.scene = scene;
     this.tileManager = tileManager;
     this.player = player;
     this.inventory = inventory;
+    this.chestManager = chestManager;
 
     this.REACH = 6;
 
@@ -57,7 +58,7 @@ export default class BlockBreakPlace {
       const targetBlock = this.tileManager.getBlock(tileX, tileY);
       const targetData = BlockData[targetBlock];
       if (targetData && targetData.interactable) {
-        this.handleInteract(targetBlock);
+        this.handleInteract(targetBlock, tileX, tileY);
         this.placeCooldown = this.PLACE_DELAY;
       } else {
         this.handlePlacing(tileX, tileY);
@@ -176,13 +177,33 @@ export default class BlockBreakPlace {
     this.tileManager.setBlock(tileX, tileY, BlockTypes.AIR);
     this.resetBreaking();
 
+    const dropX = tileX * TILE_SIZE + TILE_SIZE / 2;
+    const dropY = tileY * TILE_SIZE + TILE_SIZE / 2;
+
+    if (blockType === BlockTypes.CHEST && this.chestManager) {
+      const chestSlots = this.chestManager.getChest(tileX, tileY);
+      for (const slot of chestSlots) {
+        if (slot) {
+          for (let i = 0; i < slot.count; i++) {
+            const item = new DroppedItem(
+              this.scene,
+              dropX + (Math.random() - 0.5) * 10,
+              dropY,
+              slot.type,
+              this.tileManager,
+            );
+            this.droppedItems.push(item);
+          }
+        }
+      }
+      this.chestManager.removeChest(tileX, tileY);
+    }
+
     const blockData = BlockData[blockType];
     const dropType =
       blockData.drops !== undefined ? blockData.drops : blockType;
 
     if (dropType !== BlockTypes.AIR && dropType !== 0) {
-      const dropX = tileX * TILE_SIZE + TILE_SIZE / 2;
-      const dropY = tileY * TILE_SIZE + TILE_SIZE / 2;
       const item = new DroppedItem(
         this.scene,
         dropX,
@@ -232,9 +253,11 @@ export default class BlockBreakPlace {
     return !(tr <= pl || tl >= pr || tb <= pt || tt >= pb);
   }
 
-  handleInteract(blockType) {
+  handleInteract(blockType, tileX, tileY) {
     if (blockType === BlockTypes.WORKBENCH) {
       this.inventory.craftingRequest = 'workbench';
+    } else if (blockType === BlockTypes.CHEST) {
+      this.inventory.chestRequest = { x: tileX, y: tileY };
     }
   }
 

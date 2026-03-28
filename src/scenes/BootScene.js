@@ -251,6 +251,39 @@ export default class BootScene extends Phaser.Scene {
       ctx.fillStyle = '#8B5E3C';
       ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
     });
+
+    this.makeItemTexture(ItemTypes.STONE_PICKAXE, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.9);
+      ctx.lineTo(s * 0.5, s * 0.35);
+      ctx.stroke();
+      ctx.fillStyle = '#808080';
+      ctx.fillRect(s * 0.2, s * 0.1, s * 0.6, s * 0.18);
+      ctx.fillStyle = '#666666';
+      ctx.fillRect(s * 0.18, s * 0.08, s * 0.08, s * 0.24);
+      ctx.fillRect(s * 0.74, s * 0.08, s * 0.08, s * 0.24);
+    });
+
+    this.makeItemTexture(ItemTypes.STONE_AXE, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.45, s * 0.9);
+      ctx.lineTo(s * 0.45, s * 0.3);
+      ctx.stroke();
+      ctx.fillStyle = '#808080';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.45, s * 0.1);
+      ctx.lineTo(s * 0.82, s * 0.22);
+      ctx.lineTo(s * 0.82, s * 0.42);
+      ctx.lineTo(s * 0.45, s * 0.38);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#666666';
+      ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
+    });
   }
 
   makeItemTexture(itemType, drawFn) {

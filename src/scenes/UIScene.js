@@ -1,6 +1,7 @@
 import HotbarUI from '../ui/HotbarUI.js';
 import InventoryUI from '../ui/InventoryUI.js';
 import CraftingUI from '../ui/CraftingUI.js';
+import ChestUI from '../ui/ChestUI.js';
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -9,12 +10,14 @@ export default class UIScene extends Phaser.Scene {
 
   init(data) {
     this.inventory = data.inventory;
+    this.chestManager = data.chestManager;
   }
 
   create() {
     this.hotbarUI = new HotbarUI(this, this.inventory);
     this.inventoryUI = new InventoryUI(this, this.inventory);
     this.craftingUI = new CraftingUI(this, this.inventory);
+    this.chestUI = new ChestUI(this, this.inventory, this.inventoryUI);
 
     this.input.keyboard.on('keydown-E', () => {
       if (this.inventoryUI.isOpen) {
@@ -52,10 +55,21 @@ export default class UIScene extends Phaser.Scene {
     this.craftingUI.show(hasWorkbench);
   }
 
+  openChest(x, y) {
+    const chestSlots = this.chestManager.getChest(x, y);
+    if (!this.inventoryUI.isOpen) {
+      this.inventoryUI.toggle();
+    }
+    this.hotbarUI.setVisible(false);
+    this.craftingUI.hide();
+    this.chestUI.show(chestSlots);
+  }
+
   closeInventory() {
     this.inventoryUI.toggle();
     this.hotbarUI.setVisible(true);
     this.craftingUI.hide();
+    this.chestUI.hide();
   }
 
   update() {
@@ -67,9 +81,18 @@ export default class UIScene extends Phaser.Scene {
       }
     }
 
+    if (this.inventory.chestRequest) {
+      const { x, y } = this.inventory.chestRequest;
+      this.inventory.chestRequest = null;
+      if (!this.inventoryUI.isOpen) {
+        this.openChest(x, y);
+      }
+    }
+
     this.hotbarUI.update();
     this.inventoryUI.update();
     this.craftingUI.update();
+    this.chestUI.update();
     this.inventory.dirty = false;
   }
 }

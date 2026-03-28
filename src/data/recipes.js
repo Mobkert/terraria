@@ -33,4 +33,25 @@ export const Recipes = [
     ],
     workbench: true,
   },
+  {
+    result: { type: ItemTypes.STONE_PICKAXE, count: 1 },
+    ingredients: [
+      { type: BlockTypes.STONE, count: 3 },
+      { type: ItemTypes.STICK, count: 2 },
+    ],
+    workbench: true,
+  },
+  {
+    result: { type: ItemTypes.STONE_AXE, count: 1 },
+    ingredients: [
+      { type: BlockTypes.STONE, count: 3 },
+      { type: ItemTypes.STICK, count: 2 },
+    ],
+    workbench: true,
+  },
+  {
+    result: { type: BlockTypes.CHEST, count: 1 },
+    ingredients: [{ type: BlockTypes.PLANKS, count: 8 }],
+    workbench: true,
+  },
 ];

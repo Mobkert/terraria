@@ -5,6 +5,8 @@ export const ItemTypes = {
   STICK: 13,
   WOODEN_PICKAXE: 14,
   WOODEN_AXE: 15,
+  STONE_PICKAXE: 18,
+  STONE_AXE: 19,
 };
 
 export const ItemData = {
@@ -23,6 +25,18 @@ export const ItemData = {
     stackSize: 1,
     toolType: 'axe',
     toolSpeed: 3,
+  },
+  [ItemTypes.STONE_PICKAXE]: {
+    name: 'Stone Pickaxe',
+    stackSize: 1,
+    toolType: 'pickaxe',
+    toolSpeed: 5,
+  },
+  [ItemTypes.STONE_AXE]: {
+    name: 'Stone Axe',
+    stackSize: 1,
+    toolType: 'axe',
+    toolSpeed: 5,
   },
 };
 

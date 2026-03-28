@@ -6,7 +6,7 @@ export const WORLD_WIDTH = 2400;
 export const WORLD_HEIGHT = 800;
 const SURFACE_BASE_Y = 100;
 
-function mulberry32(seed) {
+export function mulberry32(seed) {
   return function () {
     seed |= 0;
     seed = (seed + 0x6d2b79f5) | 0;

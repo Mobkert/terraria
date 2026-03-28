@@ -3,6 +3,7 @@ import { getItemName } from '../data/items.js';
 import {
   generateWorld,
   findSpawnPoint,
+  mulberry32,
   WORLD_WIDTH,
   WORLD_HEIGHT,
 } from '../world/WorldGenerator.js';
@@ -10,6 +11,7 @@ import TileManager from '../world/TileManager.js';
 import Player from '../entities/Player.js';
 import Inventory from '../systems/Inventory.js';
 import BlockBreakPlace from '../systems/BlockBreakPlace.js';
+import ChestManager from '../systems/ChestManager.js';
 
 const BIOME_TINTS = {
   forest: { color: 0x000000, alpha: 0 },
@@ -40,18 +42,24 @@ export default class GameScene extends Phaser.Scene {
 
     this.inventory = new Inventory();
     this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory);
+    this.chestManager = new ChestManager(this.worldData, mulberry32(42 + 999));
+
     this.blockSystem = new BlockBreakPlace(
       this,
       this.tileManager,
       this.player,
       this.inventory,
+      this.chestManager,
     );
 
     this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0.1);
 
     this.tileManager.update();
 
-    this.scene.launch('UIScene', { inventory: this.inventory });
+    this.scene.launch('UIScene', {
+      inventory: this.inventory,
+      chestManager: this.chestManager,
+    });
 
     this.biomeTint = this.add.rectangle(
       this.cameras.main.width / 2,
