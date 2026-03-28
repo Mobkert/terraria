@@ -33,12 +33,12 @@ export function getItemName(type) {
 }
 
 export function getItemTexture(type) {
-  if (type >= 1 && type <= 12) return `block_${type}`;
+  if (BlockData[type]) return `block_${type}`;
   return `item_${type}`;
 }
 
 export function isBlock(type) {
-  return type >= 1 && type <= 12;
+  return BlockData[type] !== undefined;
 }
 
 export function getMaxStack(type) {

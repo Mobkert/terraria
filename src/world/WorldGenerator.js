@@ -28,6 +28,19 @@ function selectBiome(noiseValue) {
   return Biomes.FOREST;
 }
 
+function getTransitionBlend(noiseValue, rng) {
+  const BLEND_WIDTH = 0.12;
+  if (Math.abs(noiseValue - (-0.3)) < BLEND_WIDTH) {
+    const t = (noiseValue - (-0.3) + BLEND_WIDTH) / (BLEND_WIDTH * 2);
+    return rng() < t ? Biomes.FOREST : Biomes.DESERT;
+  }
+  if (Math.abs(noiseValue - 0.3) < BLEND_WIDTH) {
+    const t = (noiseValue - 0.3 + BLEND_WIDTH) / (BLEND_WIDTH * 2);
+    return rng() < t ? Biomes.JUNGLE : Biomes.FOREST;
+  }
+  return null;
+}
+
 function getSurfaceBlock(biome) {
   switch (biome) {
     case Biomes.DESERT:
@@ -69,6 +82,8 @@ export function generateWorld(seed = Date.now()) {
     surfaceHeights[x] = Math.floor(SURFACE_BASE_Y + h1 + h2 + h3);
 
     const sy = surfaceHeights[x];
+    const blendBiome = getTransitionBlend(bn, rng);
+    const surfaceBiome = blendBiome || biomes[x];
 
     for (let y = 0; y < WORLD_HEIGHT; y++) {
       const depth = y - sy;
@@ -76,9 +91,9 @@ export function generateWorld(seed = Date.now()) {
       if (depth < 0) {
         tiles[y * WORLD_WIDTH + x] = BlockTypes.AIR;
       } else if (depth === 0) {
-        tiles[y * WORLD_WIDTH + x] = getSurfaceBlock(biomes[x]);
+        tiles[y * WORLD_WIDTH + x] = getSurfaceBlock(surfaceBiome);
       } else if (depth <= 15) {
-        tiles[y * WORLD_WIDTH + x] = getSubSurfaceBlock(biomes[x]);
+        tiles[y * WORLD_WIDTH + x] = getSubSurfaceBlock(surfaceBiome);
       } else if (depth <= 75) {
         tiles[y * WORLD_WIDTH + x] = BlockTypes.STONE;
       } else {
@@ -89,6 +104,8 @@ export function generateWorld(seed = Date.now()) {
 
   generateCaves(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
   placeTrees(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
+  placeCacti(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
+  placeVines(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
   placeChests(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
 
   return { tiles, width: WORLD_WIDTH, height: WORLD_HEIGHT, surfaceHeights, biomes };
@@ -144,6 +161,52 @@ function placeTrees(tiles, w, h, surfaceHeights, biomes, rng) {
     }
 
     lastTreeX = x;
+  }
+}
+
+function placeCacti(tiles, w, h, surfaceHeights, biomes, rng) {
+  let lastCactusX = -8;
+
+  for (let x = 2; x < w - 2; x++) {
+    if (biomes[x] !== Biomes.DESERT) continue;
+    if (x - lastCactusX < 6) continue;
+    if (rng() > 0.15) continue;
+
+    const sy = surfaceHeights[x];
+    if (sy <= 5 || sy >= h - 10) continue;
+
+    const leftH = surfaceHeights[Math.max(0, x - 1)];
+    const rightH = surfaceHeights[Math.min(w - 1, x + 1)];
+    if (Math.abs(leftH - sy) > 0 || Math.abs(rightH - sy) > 0) continue;
+
+    const height = 2 + Math.floor(rng() * 3);
+    for (let cy = sy - height; cy < sy; cy++) {
+      if (cy >= 0 && cy < h) {
+        tiles[cy * w + x] = BlockTypes.CACTUS;
+      }
+    }
+
+    lastCactusX = x;
+  }
+}
+
+function placeVines(tiles, w, h, surfaceHeights, biomes, rng) {
+  for (let x = 0; x < w; x++) {
+    if (biomes[x] !== Biomes.JUNGLE) continue;
+
+    for (let y = 1; y < h - 1; y++) {
+      const idx = y * w + x;
+      const aboveIdx = (y - 1) * w + x;
+
+      if (tiles[idx] !== BlockTypes.AIR) continue;
+
+      const above = tiles[aboveIdx];
+      if (above !== BlockTypes.LEAVES && above !== BlockTypes.VINE) continue;
+
+      if (rng() < 0.65) {
+        tiles[idx] = BlockTypes.VINE;
+      }
+    }
   }
 }
 

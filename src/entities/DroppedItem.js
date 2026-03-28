@@ -1,4 +1,11 @@
-import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
+import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
+import { getItemTexture } from '../data/items.js';
+
+function isSolid(block) {
+  if (block === BlockTypes.AIR) return false;
+  const data = BlockData[block];
+  return !data || data.solid !== false;
+}
 
 export default class DroppedItem {
   constructor(scene, x, y, blockType, tileManager) {
@@ -6,7 +13,7 @@ export default class DroppedItem {
     this.tileManager = tileManager;
     this.blockType = blockType;
 
-    this.sprite = scene.add.image(x, y, `block_${blockType}`);
+    this.sprite = scene.add.image(x, y, getItemTexture(blockType));
     this.sprite.setScale(0.5);
     this.sprite.setDepth(5);
 
@@ -36,7 +43,7 @@ export default class DroppedItem {
     const newX = this.x + this.vx * dt;
     const txNew = Math.floor(newX / TILE_SIZE);
     const tyMid = Math.floor(this.y / TILE_SIZE);
-    if (this.tileManager.getBlock(txNew, tyMid) === BlockTypes.AIR) {
+    if (!isSolid(this.tileManager.getBlock(txNew, tyMid))) {
       this.x = newX;
     } else {
       this.vx = 0;
@@ -45,7 +52,7 @@ export default class DroppedItem {
     const newY = this.y + this.vy * dt;
     const txMid = Math.floor(this.x / TILE_SIZE);
     const tyNew = Math.floor(newY / TILE_SIZE);
-    if (this.tileManager.getBlock(txMid, tyNew) === BlockTypes.AIR) {
+    if (!isSolid(this.tileManager.getBlock(txMid, tyNew))) {
       this.y = newY;
     } else {
       if (this.vy > 0) {

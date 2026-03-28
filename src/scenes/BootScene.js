@@ -10,6 +10,7 @@ export default class BootScene extends Phaser.Scene {
     this.generateBlockTextures();
     this.generatePlayerTexture();
     this.generateItemTextures();
+    this.generateSkyGradient();
     this.scene.start('GameScene');
   }
 
@@ -134,6 +135,27 @@ export default class BootScene extends Phaser.Scene {
         ctx.fillRect(13, 12, 6, 6);
         break;
       }
+      case BlockTypes.CACTUS: {
+        ctx.fillStyle = 'rgba(20,60,20,0.3)';
+        ctx.fillRect(4, 0, 2, s);
+        ctx.fillRect(s - 6, 0, 2, s);
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        const spines = [[6,4],[20,8],[8,16],[22,22],[10,28],[24,14]];
+        for (const [sx, sy] of spines) {
+          ctx.fillRect(sx, sy, 2, 2);
+        }
+        break;
+      }
+      case BlockTypes.VINE: {
+        ctx.fillStyle = 'rgba(10,80,20,0.5)';
+        ctx.fillRect(6, 0, 3, s);
+        ctx.fillRect(16, 2, 2, s - 2);
+        ctx.fillRect(24, 1, 3, s - 1);
+        ctx.fillStyle = 'rgba(30,120,40,0.3)';
+        ctx.fillRect(10, 4, 2, 8);
+        ctx.fillRect(20, 12, 2, 10);
+        break;
+      }
     }
   }
 
@@ -239,6 +261,29 @@ export default class BootScene extends Phaser.Scene {
     const ctx = canvas.getContext('2d');
     drawFn(ctx);
     this.textures.addCanvas(`item_${itemType}`, canvas);
+  }
+
+  generateSkyGradient() {
+    const w = 1;
+    const h = 512;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, '#0a1628');
+    grad.addColorStop(0.08, '#1a3366');
+    grad.addColorStop(0.16, '#4488cc');
+    grad.addColorStop(0.21, '#87CEEB');
+    grad.addColorStop(0.28, '#6d8a7a');
+    grad.addColorStop(0.40, '#5a4030');
+    grad.addColorStop(0.70, '#2a1a0a');
+    grad.addColorStop(1.0, '#0a0a0a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    this.textures.addCanvas('sky_gradient', canvas);
   }
 }
 

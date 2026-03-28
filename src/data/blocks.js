@@ -14,6 +14,8 @@ export const BlockTypes = {
   PLANKS: 10,
   WORKBENCH: 11,
   CHEST: 12,
+  CACTUS: 16,
+  VINE: 17,
 };
 
 export const BlockData = {
@@ -94,5 +96,19 @@ export const BlockData = {
     hardness: 2,
     tool: 'axe',
     interactable: true,
+  },
+  [BlockTypes.CACTUS]: {
+    name: 'Cactus',
+    color: 0x2d8a3e,
+    hardness: 1,
+    tool: 'axe',
+  },
+  [BlockTypes.VINE]: {
+    name: 'Vine',
+    color: 0x1a6b2a,
+    hardness: 0.2,
+    tool: 'none',
+    drops: 0,
+    solid: false,
   },
 };

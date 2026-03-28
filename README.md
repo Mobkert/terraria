@@ -29,6 +29,11 @@ This starts a local dev server. Open **http://localhost:3000** in your browser t
 | A | Move left |
 | D | Move right |
 | SPACE | Jump |
+| LMB | Break block |
+| RMB | Place block / interact |
+| E | Open inventory / crafting |
+| 1-9 | Select hotbar slot |
+| Scroll | Cycle hotbar |
 
 ## Building for Production
 

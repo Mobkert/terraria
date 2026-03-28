@@ -1,4 +1,4 @@
-import { getMaxStack } from '../data/items.js';
+import { getMaxStack, isBlock } from '../data/items.js';
 
 export default class Inventory {
   constructor() {
@@ -96,6 +96,6 @@ export default class Inventory {
   }
 
   isBlock(type) {
-    return type >= 1 && type <= 12;
+    return isBlock(type);
   }
 }

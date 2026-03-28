@@ -1,4 +1,4 @@
-import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
+import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
 
 export default class Player {
   constructor(scene, x, y, tileManager, inventory) {
@@ -112,8 +112,10 @@ export default class Player {
 
     for (let tx = tLeft; tx <= tRight; tx++) {
       for (let ty = tTop; ty <= tBottom; ty++) {
-        if (this.tileManager.getBlock(tx, ty) !== BlockTypes.AIR) {
-          return true;
+        const block = this.tileManager.getBlock(tx, ty);
+        if (block !== BlockTypes.AIR) {
+          const data = BlockData[block];
+          if (!data || data.solid !== false) return true;
         }
       }
     }
