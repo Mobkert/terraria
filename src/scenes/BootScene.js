@@ -1,4 +1,5 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
+import { ItemTypes } from '../data/items.js';
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
@@ -8,6 +9,7 @@ export default class BootScene extends Phaser.Scene {
   create() {
     this.generateBlockTextures();
     this.generatePlayerTexture();
+    this.generateItemTextures();
     this.scene.start('GameScene');
   }
 
@@ -175,6 +177,68 @@ export default class BootScene extends Phaser.Scene {
     ctx.fill();
 
     this.textures.addCanvas('player', canvas);
+  }
+
+  generateItemTextures() {
+    const s = TILE_SIZE;
+
+    this.makeItemTexture(ItemTypes.STICK, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.35, s * 0.15);
+      ctx.lineTo(s * 0.65, s * 0.85);
+      ctx.stroke();
+      ctx.strokeStyle = '#6B4226';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.37, s * 0.15);
+      ctx.lineTo(s * 0.67, s * 0.85);
+      ctx.stroke();
+    });
+
+    this.makeItemTexture(ItemTypes.WOODEN_PICKAXE, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.9);
+      ctx.lineTo(s * 0.5, s * 0.35);
+      ctx.stroke();
+      ctx.fillStyle = '#A0724A';
+      ctx.fillRect(s * 0.2, s * 0.1, s * 0.6, s * 0.18);
+      ctx.fillStyle = '#8B5E3C';
+      ctx.fillRect(s * 0.18, s * 0.08, s * 0.08, s * 0.24);
+      ctx.fillRect(s * 0.74, s * 0.08, s * 0.08, s * 0.24);
+    });
+
+    this.makeItemTexture(ItemTypes.WOODEN_AXE, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.45, s * 0.9);
+      ctx.lineTo(s * 0.45, s * 0.3);
+      ctx.stroke();
+      ctx.fillStyle = '#A0724A';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.45, s * 0.1);
+      ctx.lineTo(s * 0.82, s * 0.22);
+      ctx.lineTo(s * 0.82, s * 0.42);
+      ctx.lineTo(s * 0.45, s * 0.38);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#8B5E3C';
+      ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
+    });
+  }
+
+  makeItemTexture(itemType, drawFn) {
+    const s = TILE_SIZE;
+    const canvas = document.createElement('canvas');
+    canvas.width = s;
+    canvas.height = s;
+    const ctx = canvas.getContext('2d');
+    drawFn(ctx);
+    this.textures.addCanvas(`item_${itemType}`, canvas);
   }
 }
 

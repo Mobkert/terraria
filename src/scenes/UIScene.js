@@ -1,5 +1,6 @@
 import HotbarUI from '../ui/HotbarUI.js';
 import InventoryUI from '../ui/InventoryUI.js';
+import CraftingUI from '../ui/CraftingUI.js';
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -13,13 +14,13 @@ export default class UIScene extends Phaser.Scene {
   create() {
     this.hotbarUI = new HotbarUI(this, this.inventory);
     this.inventoryUI = new InventoryUI(this, this.inventory);
+    this.craftingUI = new CraftingUI(this, this.inventory);
 
     this.input.keyboard.on('keydown-E', () => {
-      this.inventoryUI.toggle();
       if (this.inventoryUI.isOpen) {
-        this.hotbarUI.setVisible(false);
+        this.closeInventory();
       } else {
-        this.hotbarUI.setVisible(true);
+        this.openInventory(false);
       }
     });
 
@@ -45,9 +46,30 @@ export default class UIScene extends Phaser.Scene {
     });
   }
 
+  openInventory(hasWorkbench) {
+    this.inventoryUI.toggle();
+    this.hotbarUI.setVisible(false);
+    this.craftingUI.show(hasWorkbench);
+  }
+
+  closeInventory() {
+    this.inventoryUI.toggle();
+    this.hotbarUI.setVisible(true);
+    this.craftingUI.hide();
+  }
+
   update() {
+    if (this.inventory.craftingRequest) {
+      const mode = this.inventory.craftingRequest;
+      this.inventory.craftingRequest = null;
+      if (!this.inventoryUI.isOpen) {
+        this.openInventory(mode === 'workbench');
+      }
+    }
+
     this.hotbarUI.update();
     this.inventoryUI.update();
+    this.craftingUI.update();
     this.inventory.dirty = false;
   }
 }

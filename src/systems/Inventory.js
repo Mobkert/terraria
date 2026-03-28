@@ -1,3 +1,5 @@
+import { getMaxStack } from '../data/items.js';
+
 export default class Inventory {
   constructor() {
     this.hotbar = new Array(9).fill(null);
@@ -6,28 +8,31 @@ export default class Inventory {
     this.MAX_STACK = 99;
     this.dirty = true;
     this.isOpen = false;
+    this.craftingRequest = null;
   }
 
   addItem(type, count = 1) {
+    const maxStack = getMaxStack(type);
     let remaining = count;
-    remaining = this._stackInto(this.hotbar, type, remaining);
+
+    remaining = this._stackInto(this.hotbar, type, remaining, maxStack);
     if (remaining <= 0) { this.dirty = true; return true; }
 
-    remaining = this._stackInto(this.slots, type, remaining);
+    remaining = this._stackInto(this.slots, type, remaining, maxStack);
     if (remaining <= 0) { this.dirty = true; return true; }
 
-    remaining = this._addToEmpty(this.hotbar, type, remaining);
+    remaining = this._addToEmpty(this.hotbar, type, remaining, maxStack);
     if (remaining <= 0) { this.dirty = true; return true; }
 
-    remaining = this._addToEmpty(this.slots, type, remaining);
+    remaining = this._addToEmpty(this.slots, type, remaining, maxStack);
     this.dirty = true;
     return remaining <= 0;
   }
 
-  _stackInto(arr, type, count) {
+  _stackInto(arr, type, count, maxStack) {
     for (let i = 0; i < arr.length && count > 0; i++) {
-      if (arr[i] && arr[i].type === type && arr[i].count < this.MAX_STACK) {
-        const toAdd = Math.min(count, this.MAX_STACK - arr[i].count);
+      if (arr[i] && arr[i].type === type && arr[i].count < maxStack) {
+        const toAdd = Math.min(count, maxStack - arr[i].count);
         arr[i].count += toAdd;
         count -= toAdd;
       }
@@ -35,12 +40,43 @@ export default class Inventory {
     return count;
   }
 
-  _addToEmpty(arr, type, count) {
+  _addToEmpty(arr, type, count, maxStack) {
     for (let i = 0; i < arr.length && count > 0; i++) {
       if (!arr[i]) {
-        const toAdd = Math.min(count, this.MAX_STACK);
+        const toAdd = Math.min(count, maxStack);
         arr[i] = { type, count: toAdd };
         count -= toAdd;
+      }
+    }
+    return count;
+  }
+
+  countItem(type) {
+    let total = 0;
+    for (const slot of this.hotbar) {
+      if (slot && slot.type === type) total += slot.count;
+    }
+    for (const slot of this.slots) {
+      if (slot && slot.type === type) total += slot.count;
+    }
+    return total;
+  }
+
+  removeItem(type, count) {
+    let remaining = count;
+    remaining = this._removeFrom(this.slots, type, remaining);
+    if (remaining > 0) remaining = this._removeFrom(this.hotbar, type, remaining);
+    this.dirty = true;
+    return remaining <= 0;
+  }
+
+  _removeFrom(arr, type, count) {
+    for (let i = 0; i < arr.length && count > 0; i++) {
+      if (arr[i] && arr[i].type === type) {
+        const toRemove = Math.min(count, arr[i].count);
+        arr[i].count -= toRemove;
+        count -= toRemove;
+        if (arr[i].count <= 0) arr[i] = null;
       }
     }
     return count;

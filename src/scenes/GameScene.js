@@ -1,4 +1,5 @@
-import { BlockData, TILE_SIZE } from '../data/blocks.js';
+import { TILE_SIZE } from '../data/blocks.js';
+import { getItemName } from '../data/items.js';
 import {
   generateWorld,
   findSpawnPoint,
@@ -67,7 +68,7 @@ export default class GameScene extends Phaser.Scene {
     const ty = this.player.getTileY();
     const biome = this.worldData.biomes[tx] || '?';
     const selected = this.inventory.getSelectedItem();
-    const itemName = selected ? BlockData[selected.type]?.name || '?' : 'Empty';
+    const itemName = selected ? getItemName(selected.type) : 'Empty';
     this.infoText.setText(
       `Pos: ${tx},${ty} | Biome: ${biome} | Hand: ${itemName}`,
     );

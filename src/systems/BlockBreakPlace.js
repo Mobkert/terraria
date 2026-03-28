@@ -1,4 +1,5 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
+import { getToolData } from '../data/items.js';
 import DroppedItem from '../entities/DroppedItem.js';
 
 export default class BlockBreakPlace {
@@ -53,7 +54,14 @@ export default class BlockBreakPlace {
     if (this.placeCooldown > 0) this.placeCooldown -= delta;
 
     if (pointer.rightButtonDown() && inRange && this.placeCooldown <= 0) {
-      this.handlePlacing(tileX, tileY);
+      const targetBlock = this.tileManager.getBlock(tileX, tileY);
+      const targetData = BlockData[targetBlock];
+      if (targetData && targetData.interactable) {
+        this.handleInteract(targetBlock);
+        this.placeCooldown = this.PLACE_DELAY;
+      } else {
+        this.handlePlacing(tileX, tileY);
+      }
     }
   }
 
@@ -102,7 +110,18 @@ export default class BlockBreakPlace {
     }
 
     const blockData = BlockData[blockType];
-    const breakTime = blockData.hardness * 0.5;
+    const baseTime = blockData.hardness * 0.5;
+
+    let speedMult = 1;
+    const held = this.inventory.getSelectedItem();
+    if (held) {
+      const tool = getToolData(held.type);
+      if (tool && tool.toolType === blockData.tool) {
+        speedMult = tool.toolSpeed;
+      }
+    }
+
+    const breakTime = baseTime / speedMult;
     const dt = delta / 1000;
     this.breakProgress += dt / breakTime;
 
@@ -211,6 +230,12 @@ export default class BlockBreakPlace {
     const pb = this.player.y;
 
     return !(tr <= pl || tl >= pr || tb <= pt || tt >= pb);
+  }
+
+  handleInteract(blockType) {
+    if (blockType === BlockTypes.WORKBENCH) {
+      this.inventory.craftingRequest = 'workbench';
+    }
   }
 
   updateDroppedItems(delta) {

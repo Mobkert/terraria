@@ -1,4 +1,5 @@
 import { TILE_SIZE } from '../data/blocks.js';
+import { getItemTexture } from '../data/items.js';
 
 const SLOT_SIZE = 44;
 const GAP = 4;
@@ -64,7 +65,7 @@ export default class HotbarUI {
 
       const item = this.inventory.hotbar[i];
       if (item) {
-        this.icons[i].setTexture(`block_${item.type}`);
+        this.icons[i].setTexture(getItemTexture(item.type));
         this.icons[i].setVisible(true);
         this.counts[i].setText(item.count > 1 ? String(item.count) : '');
       } else {

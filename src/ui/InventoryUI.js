@@ -1,4 +1,5 @@
 import { BlockData, TILE_SIZE } from '../data/blocks.js';
+import { getItemTexture } from '../data/items.js';
 
 const SLOT = 44;
 const GAP = 4;
@@ -257,7 +258,7 @@ export default class InventoryUI {
     const pointer = this.scene.input.activePointer;
 
     if (this.cursorItem) {
-      this.cursorIcon.setTexture(`block_${this.cursorItem.type}`);
+      this.cursorIcon.setTexture(getItemTexture(this.cursorItem.type));
       this.cursorIcon.setPosition(pointer.x + 12, pointer.y + 12);
       this.cursorIcon.setVisible(true);
       this.cursorCount.setPosition(pointer.x + 26, pointer.y + 26);
@@ -280,7 +281,7 @@ export default class InventoryUI {
       s.bg.setStrokeStyle(1, isSel ? 0xffff00 : 0x555577);
 
       if (item) {
-        s.icon.setTexture(`block_${item.type}`);
+        s.icon.setTexture(getItemTexture(item.type));
         s.icon.setVisible(true);
         s.count.setText(item.count > 1 ? String(item.count) : '');
       } else {
