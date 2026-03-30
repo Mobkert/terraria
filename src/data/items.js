@@ -9,6 +9,13 @@ export const ItemTypes = {
   STONE_AXE: 19,
   GRASS_ESSENCE: 20,
   COAL: 22,
+  RAW_IRON: 26,
+  IRON_INGOT: 27,
+  IRON_PICKAXE: 28,
+  IRON_AXE: 29,
+  WOODEN_SWORD: 30,
+  STONE_SWORD: 31,
+  IRON_SWORD: 32,
 };
 
 export const ItemData = {
@@ -21,6 +28,7 @@ export const ItemData = {
     stackSize: 1,
     toolType: 'pickaxe',
     toolSpeed: 3,
+    toolTier: 1,
   },
   [ItemTypes.WOODEN_AXE]: {
     name: 'Wooden Axe',
@@ -33,6 +41,7 @@ export const ItemData = {
     stackSize: 1,
     toolType: 'pickaxe',
     toolSpeed: 5,
+    toolTier: 2,
   },
   [ItemTypes.STONE_AXE]: {
     name: 'Stone Axe',
@@ -49,6 +58,45 @@ export const ItemData = {
   [ItemTypes.COAL]: {
     name: 'Coal',
     stackSize: 99,
+  },
+  [ItemTypes.RAW_IRON]: {
+    name: 'Raw Iron',
+    stackSize: 99,
+  },
+  [ItemTypes.IRON_INGOT]: {
+    name: 'Iron Ingot',
+    stackSize: 99,
+  },
+  [ItemTypes.IRON_PICKAXE]: {
+    name: 'Iron Pickaxe',
+    stackSize: 1,
+    toolType: 'pickaxe',
+    toolSpeed: 8,
+    toolTier: 3,
+  },
+  [ItemTypes.IRON_AXE]: {
+    name: 'Iron Axe',
+    stackSize: 1,
+    toolType: 'axe',
+    toolSpeed: 8,
+  },
+  [ItemTypes.WOODEN_SWORD]: {
+    name: 'Wooden Sword',
+    stackSize: 1,
+    toolType: 'sword',
+    damage: 10,
+  },
+  [ItemTypes.STONE_SWORD]: {
+    name: 'Stone Sword',
+    stackSize: 1,
+    toolType: 'sword',
+    damage: 15,
+  },
+  [ItemTypes.IRON_SWORD]: {
+    name: 'Iron Sword',
+    stackSize: 1,
+    toolType: 'sword',
+    damage: 20,
   },
 };
 

@@ -3,12 +3,13 @@ import { getToolData, getConsumableData } from '../data/items.js';
 import DroppedItem from '../entities/DroppedItem.js';
 
 export default class BlockBreakPlace {
-  constructor(scene, tileManager, player, inventory, chestManager) {
+  constructor(scene, tileManager, player, inventory, chestManager, furnaceManager) {
     this.scene = scene;
     this.tileManager = tileManager;
     this.player = player;
     this.inventory = inventory;
     this.chestManager = chestManager;
+    this.furnaceManager = furnaceManager;
 
     this.REACH = 6;
 
@@ -127,15 +128,22 @@ export default class BlockBreakPlace {
     }
 
     const blockData = BlockData[blockType];
+    const held = this.inventory.getSelectedItem();
+    const tool = held ? getToolData(held.type) : null;
+
+    if (blockData.minTier) {
+      const tier = (tool && tool.toolType === blockData.tool) ? (tool.toolTier || 0) : 0;
+      if (tier < blockData.minTier) {
+        this.resetBreaking();
+        return;
+      }
+    }
+
     const baseTime = blockData.hardness * 0.5;
 
     let speedMult = 1;
-    const held = this.inventory.getSelectedItem();
-    if (held) {
-      const tool = getToolData(held.type);
-      if (tool && tool.toolType === blockData.tool) {
-        speedMult = tool.toolSpeed;
-      }
+    if (tool && tool.toolType === blockData.tool) {
+      speedMult = tool.toolSpeed;
     }
 
     const breakTime = baseTime / speedMult;
@@ -213,6 +221,25 @@ export default class BlockBreakPlace {
         }
       }
       this.chestManager.removeChest(tileX, tileY);
+    }
+
+    if (blockType === BlockTypes.FURNACE && this.furnaceManager) {
+      const f = this.furnaceManager.getFurnace(tileX, tileY);
+      for (const slotName of ['inputSlot', 'fuelSlot', 'outputSlot']) {
+        const slot = f[slotName];
+        if (slot) {
+          for (let i = 0; i < slot.count; i++) {
+            this.droppedItems.push(new DroppedItem(
+              this.scene,
+              dropX + (Math.random() - 0.5) * 10,
+              dropY,
+              slot.type,
+              this.tileManager,
+            ));
+          }
+        }
+      }
+      this.furnaceManager.removeFurnace(tileX, tileY);
     }
 
     const blockData = BlockData[blockType];
@@ -328,6 +355,8 @@ export default class BlockBreakPlace {
       this.inventory.craftingRequest = 'workbench';
     } else if (blockType === BlockTypes.CHEST) {
       this.inventory.chestRequest = { x: tileX, y: tileY };
+    } else if (blockType === BlockTypes.FURNACE) {
+      this.inventory.furnaceRequest = { x: tileX, y: tileY };
     }
   }
 

@@ -156,6 +156,44 @@ export default class BootScene extends Phaser.Scene {
         ctx.fillRect(20, 12, 2, 10);
         break;
       }
+      case BlockTypes.COAL_ORE: {
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        const stoneSpots = [[4,6],[12,3],[22,10],[8,20],[26,24],[16,18]];
+        for (const [x, y] of stoneSpots) ctx.fillRect(x, y, 3, 2);
+        ctx.fillStyle = '#222222';
+        const oreSpots = [[8,8],[18,14],[10,20],[22,6],[14,24],[24,18]];
+        for (const [x, y] of oreSpots) {
+          ctx.fillRect(x, y, 4, 3);
+          ctx.fillRect(x + 1, y - 1, 2, 1);
+        }
+        break;
+      }
+      case BlockTypes.IRON_ORE: {
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        const stSpots = [[4,6],[12,3],[22,10],[8,20],[26,24],[16,18]];
+        for (const [x, y] of stSpots) ctx.fillRect(x, y, 3, 2);
+        ctx.fillStyle = '#cc9966';
+        const ironSpots = [[7,10],[20,6],[12,20],[24,16],[16,8],[8,26]];
+        for (const [x, y] of ironSpots) {
+          ctx.fillRect(x, y, 4, 3);
+          ctx.fillRect(x + 1, y - 1, 2, 1);
+        }
+        break;
+      }
+      case BlockTypes.FURNACE: {
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(0, 0, s, s);
+        ctx.fillStyle = '#555555';
+        ctx.fillRect(2, 2, s - 4, s - 4);
+        ctx.fillStyle = '#6a6a6a';
+        ctx.fillRect(3, 3, s - 6, s - 6);
+        ctx.fillStyle = '#1a1a1a';
+        ctx.fillRect(s * 0.25, s * 0.4, s * 0.5, s * 0.45);
+        ctx.fillStyle = '#cc4400';
+        ctx.fillRect(s * 0.3, s * 0.65, s * 0.15, s * 0.12);
+        ctx.fillRect(s * 0.55, s * 0.6, s * 0.1, s * 0.15);
+        break;
+      }
       case BlockTypes.TORCH: {
         ctx.clearRect(0, 0, s, s);
         ctx.fillStyle = '#8B6914';
@@ -326,6 +364,138 @@ export default class BootScene extends Phaser.Scene {
       ctx.fillStyle = '#3a3a3a';
       ctx.fillRect(s * 0.3, s * 0.35, s * 0.15, s * 0.12);
       ctx.fillRect(s * 0.55, s * 0.5, s * 0.1, s * 0.1);
+    });
+
+    this.makeItemTexture(ItemTypes.RAW_IRON, (ctx) => {
+      ctx.fillStyle = '#cc9966';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.3, s * 0.7);
+      ctx.lineTo(s * 0.2, s * 0.4);
+      ctx.lineTo(s * 0.45, s * 0.25);
+      ctx.lineTo(s * 0.75, s * 0.35);
+      ctx.lineTo(s * 0.8, s * 0.6);
+      ctx.lineTo(s * 0.55, s * 0.75);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#b8844a';
+      ctx.fillRect(s * 0.35, s * 0.4, s * 0.15, s * 0.12);
+      ctx.fillRect(s * 0.55, s * 0.5, s * 0.1, s * 0.08);
+    });
+
+    this.makeItemTexture(ItemTypes.IRON_INGOT, (ctx) => {
+      ctx.fillStyle = '#d4d4d4';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.15, s * 0.6);
+      ctx.lineTo(s * 0.3, s * 0.35);
+      ctx.lineTo(s * 0.7, s * 0.35);
+      ctx.lineTo(s * 0.85, s * 0.6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#aaaaaa';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.15, s * 0.6);
+      ctx.lineTo(s * 0.85, s * 0.6);
+      ctx.lineTo(s * 0.75, s * 0.72);
+      ctx.lineTo(s * 0.25, s * 0.72);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillRect(s * 0.4, s * 0.4, s * 0.12, s * 0.06);
+    });
+
+    this.makeItemTexture(ItemTypes.IRON_PICKAXE, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.9);
+      ctx.lineTo(s * 0.5, s * 0.35);
+      ctx.stroke();
+      ctx.fillStyle = '#d4d4d4';
+      ctx.fillRect(s * 0.2, s * 0.1, s * 0.6, s * 0.18);
+      ctx.fillStyle = '#aaaaaa';
+      ctx.fillRect(s * 0.18, s * 0.08, s * 0.08, s * 0.24);
+      ctx.fillRect(s * 0.74, s * 0.08, s * 0.08, s * 0.24);
+    });
+
+    this.makeItemTexture(ItemTypes.IRON_AXE, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.45, s * 0.9);
+      ctx.lineTo(s * 0.45, s * 0.3);
+      ctx.stroke();
+      ctx.fillStyle = '#d4d4d4';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.45, s * 0.1);
+      ctx.lineTo(s * 0.82, s * 0.22);
+      ctx.lineTo(s * 0.82, s * 0.42);
+      ctx.lineTo(s * 0.45, s * 0.38);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#aaaaaa';
+      ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
+    });
+
+    this.makeItemTexture(ItemTypes.WOODEN_SWORD, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.88);
+      ctx.lineTo(s * 0.5, s * 0.62);
+      ctx.stroke();
+      ctx.fillStyle = '#A0724A';
+      ctx.fillRect(s * 0.35, s * 0.58, s * 0.3, s * 0.06);
+      ctx.fillStyle = '#c4a060';
+      ctx.fillRect(s * 0.44, s * 0.12, s * 0.12, s * 0.48);
+      ctx.fillStyle = '#b0904a';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.44, s * 0.12);
+      ctx.lineTo(s * 0.5, s * 0.04);
+      ctx.lineTo(s * 0.56, s * 0.12);
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    this.makeItemTexture(ItemTypes.STONE_SWORD, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.88);
+      ctx.lineTo(s * 0.5, s * 0.62);
+      ctx.stroke();
+      ctx.fillStyle = '#A0724A';
+      ctx.fillRect(s * 0.35, s * 0.58, s * 0.3, s * 0.06);
+      ctx.fillStyle = '#888888';
+      ctx.fillRect(s * 0.44, s * 0.12, s * 0.12, s * 0.48);
+      ctx.fillStyle = '#777777';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.44, s * 0.12);
+      ctx.lineTo(s * 0.5, s * 0.04);
+      ctx.lineTo(s * 0.56, s * 0.12);
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    this.makeItemTexture(ItemTypes.IRON_SWORD, (ctx) => {
+      ctx.strokeStyle = '#8B5E3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.88);
+      ctx.lineTo(s * 0.5, s * 0.62);
+      ctx.stroke();
+      ctx.fillStyle = '#A0724A';
+      ctx.fillRect(s * 0.35, s * 0.58, s * 0.3, s * 0.06);
+      ctx.fillStyle = '#d4d4d4';
+      ctx.fillRect(s * 0.44, s * 0.12, s * 0.12, s * 0.48);
+      ctx.fillStyle = '#bbbbbb';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.44, s * 0.12);
+      ctx.lineTo(s * 0.5, s * 0.04);
+      ctx.lineTo(s * 0.56, s * 0.12);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillRect(s * 0.47, s * 0.18, s * 0.04, s * 0.1);
     });
   }
 

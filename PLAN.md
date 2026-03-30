@@ -134,6 +134,22 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/world/TileManager.js` (light map, BFS, darkness overlay), `src/data/blocks.js` (TORCH), `src/data/items.js` (COAL), `src/data/recipes.js`, `src/data/lootTables.js`
 
+## Phase 12: Ores, Furnace, Iron Tools, and Swords (COMPLETED)
+
+- **Ore generation**: Coal ore veins (3-8 blocks) in stone layer, iron ore veins (2-5 blocks) in deep stone/deepslate layer. Placed using random walker algorithm
+- **Mining tiers**: Coal and iron ore require a stone pickaxe (tier 2) or better to mine. Wooden pickaxe cannot break them
+- **Coal ore** drops coal; **iron ore** drops raw iron
+- **Furnace block**: craftable from 8 stone at workbench, interactable. Right-click to open smelting UI
+- **Smelting system**: `FurnaceManager` tracks per-furnace state (input, fuel, output, progress). Place raw iron in input + coal as fuel → iron ingot after 3 seconds. Smelting continues automatically while input and fuel remain
+- **FurnaceUI**: Three-slot panel (input, fuel, output) with progress arrow and flame indicator. Full click interactions (left/right/shift-click)
+- **Iron tools**: Iron Pickaxe (8x speed, tier 3), Iron Axe (8x speed). Crafted from 3 iron ingots + 2 sticks at workbench
+- **Swords**: Wooden Sword (10 dmg), Stone Sword (15 dmg), Iron Sword (20 dmg). Crafted from material + stick at workbench
+- **New items**: Raw Iron, Iron Ingot added to item system with textures
+- Breaking a furnace drops all its contents (input, fuel, output)
+- Raw iron and iron ingots added to medium/deep chest loot tables
+
+**Key files:** `src/systems/FurnaceManager.js`, `src/ui/FurnaceUI.js`, `src/world/WorldGenerator.js` (ore gen), `src/data/blocks.js`, `src/data/items.js`, `src/data/recipes.js`
+
 ## Controls Summary
 
 | Key | Action |

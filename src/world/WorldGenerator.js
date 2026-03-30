@@ -103,12 +103,54 @@ export function generateWorld(seed = Date.now()) {
   }
 
   generateCaves(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
+  placeOres(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
   placeTrees(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
   placeCacti(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
   placeVines(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
   placeChests(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
 
   return { tiles, width: WORLD_WIDTH, height: WORLD_HEIGHT, surfaceHeights, biomes };
+}
+
+function placeOres(tiles, w, h, surfaceHeights, rng) {
+  const STONE_DEPTH = 16;
+
+  function placeVein(startX, startY, oreType, veinSize) {
+    let x = startX;
+    let y = startY;
+    for (let i = 0; i < veinSize; i++) {
+      if (x >= 0 && x < w && y >= 0 && y < h) {
+        const idx = y * w + x;
+        const existing = tiles[idx];
+        if (existing === BlockTypes.STONE || existing === BlockTypes.DEEPSLATE) {
+          tiles[idx] = oreType;
+        }
+      }
+      const dir = Math.floor(rng() * 4);
+      if (dir === 0) x++;
+      else if (dir === 1) x--;
+      else if (dir === 2) y++;
+      else y--;
+    }
+  }
+
+  for (let x = 0; x < w; x += 4) {
+    for (let y = 0; y < h; y += 4) {
+      const sy = surfaceHeights[Math.min(x, w - 1)];
+      const depth = y - sy;
+      if (depth < STONE_DEPTH) continue;
+
+      if (rng() < 0.04) {
+        const size = 3 + Math.floor(rng() * 6);
+        placeVein(x, y, BlockTypes.COAL_ORE, size);
+      }
+
+      if (depth >= 30 && rng() < 0.025) {
+        const size = 2 + Math.floor(rng() * 4);
+        placeVein(x, y, BlockTypes.IRON_ORE, size);
+      }
+    }
+  }
 }
 
 function placeTrees(tiles, w, h, surfaceHeights, biomes, rng) {

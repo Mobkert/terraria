@@ -17,6 +17,9 @@ export const BlockTypes = {
   CACTUS: 16,
   VINE: 17,
   TORCH: 21,
+  COAL_ORE: 23,
+  IRON_ORE: 24,
+  FURNACE: 25,
 };
 
 export const BlockData = {
@@ -123,5 +126,28 @@ export const BlockData = {
     tool: 'none',
     solid: false,
     lightLevel: 12,
+  },
+  [BlockTypes.COAL_ORE]: {
+    name: 'Coal Ore',
+    color: 0x808080,
+    hardness: 4,
+    tool: 'pickaxe',
+    minTier: 2,
+    drops: 22,
+  },
+  [BlockTypes.IRON_ORE]: {
+    name: 'Iron Ore',
+    color: 0x808080,
+    hardness: 5,
+    tool: 'pickaxe',
+    minTier: 2,
+    drops: 26,
+  },
+  [BlockTypes.FURNACE]: {
+    name: 'Furnace',
+    color: 0x6a6a6a,
+    hardness: 4,
+    tool: 'pickaxe',
+    interactable: true,
   },
 };

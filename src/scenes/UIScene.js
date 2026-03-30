@@ -2,6 +2,7 @@ import HotbarUI from '../ui/HotbarUI.js';
 import InventoryUI from '../ui/InventoryUI.js';
 import CraftingUI from '../ui/CraftingUI.js';
 import ChestUI from '../ui/ChestUI.js';
+import FurnaceUI from '../ui/FurnaceUI.js';
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -11,6 +12,7 @@ export default class UIScene extends Phaser.Scene {
   init(data) {
     this.inventory = data.inventory;
     this.chestManager = data.chestManager;
+    this.furnaceManager = data.furnaceManager;
     this.player = data.player;
   }
 
@@ -19,6 +21,7 @@ export default class UIScene extends Phaser.Scene {
     this.inventoryUI = new InventoryUI(this, this.inventory);
     this.craftingUI = new CraftingUI(this, this.inventory);
     this.chestUI = new ChestUI(this, this.inventory, this.inventoryUI);
+    this.furnaceUI = new FurnaceUI(this, this.inventory, this.inventoryUI);
 
     this.input.keyboard.on('keydown-E', () => {
       if (this.inventoryUI.isOpen) {
@@ -63,7 +66,19 @@ export default class UIScene extends Phaser.Scene {
     }
     this.hotbarUI.setVisible(false);
     this.craftingUI.hide();
+    this.furnaceUI.hide();
     this.chestUI.show(chestSlots);
+  }
+
+  openFurnace(x, y) {
+    const furnace = this.furnaceManager.getFurnace(x, y);
+    if (!this.inventoryUI.isOpen) {
+      this.inventoryUI.toggle();
+    }
+    this.hotbarUI.setVisible(false);
+    this.craftingUI.hide();
+    this.chestUI.hide();
+    this.furnaceUI.show(furnace);
   }
 
   closeInventory() {
@@ -71,6 +86,7 @@ export default class UIScene extends Phaser.Scene {
     this.hotbarUI.setVisible(true);
     this.craftingUI.hide();
     this.chestUI.hide();
+    this.furnaceUI.hide();
   }
 
   update() {
@@ -90,10 +106,19 @@ export default class UIScene extends Phaser.Scene {
       }
     }
 
+    if (this.inventory.furnaceRequest) {
+      const { x, y } = this.inventory.furnaceRequest;
+      this.inventory.furnaceRequest = null;
+      if (!this.inventoryUI.isOpen) {
+        this.openFurnace(x, y);
+      }
+    }
+
     this.hotbarUI.update();
     this.inventoryUI.update();
     this.craftingUI.update();
     this.chestUI.update();
+    this.furnaceUI.update();
     this.inventory.dirty = false;
   }
 }

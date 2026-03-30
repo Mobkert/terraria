@@ -1,5 +1,5 @@
 import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
-import { getItemName } from '../data/items.js';
+import { ItemTypes, getItemName } from '../data/items.js';
 import {
   generateWorld,
   findSpawnPoint,
@@ -12,6 +12,7 @@ import Player from '../entities/Player.js';
 import Inventory from '../systems/Inventory.js';
 import BlockBreakPlace from '../systems/BlockBreakPlace.js';
 import ChestManager from '../systems/ChestManager.js';
+import FurnaceManager from '../systems/FurnaceManager.js';
 
 const BIOME_TINTS = {
   forest: { color: 0x000000, alpha: 0 },
@@ -41,9 +42,18 @@ export default class GameScene extends Phaser.Scene {
     const spawnY = this.worldData.surfaceHeights[spawn.x] * TILE_SIZE;
 
     this.inventory = new Inventory();
-    this.inventory.addItem(BlockTypes.TORCH, 20);
+    this.inventory.addItem(ItemTypes.RAW_IRON, 10);
+    this.inventory.addItem(ItemTypes.IRON_INGOT, 10);
+    this.inventory.addItem(ItemTypes.COAL, 20);
+    this.inventory.addItem(BlockTypes.FURNACE, 1);
+    this.inventory.addItem(ItemTypes.IRON_PICKAXE, 1);
+    this.inventory.addItem(ItemTypes.IRON_AXE, 1);
+    this.inventory.addItem(ItemTypes.WOODEN_SWORD, 1);
+    this.inventory.addItem(ItemTypes.STONE_SWORD, 1);
+    this.inventory.addItem(ItemTypes.IRON_SWORD, 1);
     this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory);
     this.chestManager = new ChestManager(this.worldData, mulberry32(42 + 999));
+    this.furnaceManager = new FurnaceManager();
 
     this.blockSystem = new BlockBreakPlace(
       this,
@@ -51,6 +61,7 @@ export default class GameScene extends Phaser.Scene {
       this.player,
       this.inventory,
       this.chestManager,
+      this.furnaceManager,
     );
 
     this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0.1);
@@ -60,6 +71,7 @@ export default class GameScene extends Phaser.Scene {
     this.scene.launch('UIScene', {
       inventory: this.inventory,
       chestManager: this.chestManager,
+      furnaceManager: this.furnaceManager,
       player: this.player,
     });
 
@@ -129,6 +141,7 @@ export default class GameScene extends Phaser.Scene {
   update(time, delta) {
     this.player.update(delta);
     this.blockSystem.update(delta);
+    this.furnaceManager.update(delta);
     this.tileManager.update();
 
     this.updateSkyPosition();

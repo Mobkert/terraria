@@ -10,6 +10,7 @@ export default class Inventory {
     this.isOpen = false;
     this.craftingRequest = null;
     this.chestRequest = null;
+    this.furnaceRequest = null;
   }
 
   addItem(type, count = 1) {
