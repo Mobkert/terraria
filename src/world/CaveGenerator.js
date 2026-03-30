@@ -1,39 +1,65 @@
-import { createNoise2D } from 'simplex-noise';
 import { BlockTypes } from '../data/blocks.js';
 
 export function generateCaves(tiles, width, height, surfaceHeights, rng) {
-  const largeCaveNoise = createNoise2D(rng);
-  const tunnelNoise = createNoise2D(rng);
-  const veinNoise = createNoise2D(rng);
+  const STONE_DEPTH = 16;
+  const numWorms = 60 + Math.floor(rng() * 40);
 
-  for (let x = 0; x < width; x++) {
-    const sy = surfaceHeights[x];
-    const caveStartY = sy + 5;
+  for (let i = 0; i < numWorms; i++) {
+    const startX = Math.floor(rng() * width);
+    const minY = surfaceHeights[startX] + STONE_DEPTH;
+    if (minY >= height - 5) continue;
+    const startY = minY + Math.floor(rng() * (height - minY - 5));
 
-    for (let y = caveStartY; y < height; y++) {
-      const idx = y * width + x;
-      if (tiles[idx] === BlockTypes.AIR) continue;
+    carveTunnel(tiles, width, height, surfaceHeights, rng, startX, startY, STONE_DEPTH);
+  }
+}
 
-      const depth = y - sy;
-      const depthFactor = Math.min(1, depth / 120);
+function carveTunnel(tiles, w, h, surfaceHeights, rng, startX, startY, stoneDepth) {
+  let x = startX;
+  let y = startY;
+  let angle = rng() * Math.PI * 2;
+  const length = 80 + Math.floor(rng() * 200);
+  let radius = 1.5 + rng() * 1.5;
+  let roomCooldown = 30 + Math.floor(rng() * 40);
 
-      const n1 = largeCaveNoise(x * 0.03, y * 0.03);
-      const n2 = tunnelNoise(x * 0.07, y * 0.07);
-      const n3 = veinNoise(x * 0.15, y * 0.15);
+  for (let step = 0; step < length; step++) {
+    carveCircle(tiles, w, h, surfaceHeights, stoneDepth, Math.round(x), Math.round(y), radius);
 
-      const largeCaveThreshold = 0.38 - depthFactor * 0.08;
-      if (n1 > largeCaveThreshold) {
-        tiles[idx] = BlockTypes.AIR;
-        continue;
-      }
+    roomCooldown--;
+    if (roomCooldown <= 0 && rng() < 0.3) {
+      const roomRadius = 4 + Math.floor(rng() * 8);
+      carveCircle(tiles, w, h, surfaceHeights, stoneDepth, Math.round(x), Math.round(y), roomRadius);
+      roomCooldown = 40 + Math.floor(rng() * 50);
+    }
 
-      const tunnelThreshold = 0.42 - depthFactor * 0.06;
-      if (n2 > tunnelThreshold) {
-        tiles[idx] = BlockTypes.AIR;
-        continue;
-      }
+    angle += (rng() - 0.5) * 1.2;
+    radius += (rng() - 0.5) * 0.3;
+    radius = Math.max(1, Math.min(3, radius));
 
-      if (depth > 40 && Math.abs(n3) < 0.04 + depthFactor * 0.02) {
+    x += Math.cos(angle) * 2;
+    y += Math.sin(angle) * 1.5;
+
+    if (x < 2 || x >= w - 2 || y < 2 || y >= h - 2) break;
+  }
+}
+
+function carveCircle(tiles, w, h, surfaceHeights, stoneDepth, cx, cy, radius) {
+  const r = Math.ceil(radius);
+
+  for (let dy = -r; dy <= r; dy++) {
+    for (let dx = -r; dx <= r; dx++) {
+      if (dx * dx + dy * dy > radius * radius) continue;
+
+      const tx = cx + dx;
+      const ty = cy + dy;
+      if (tx < 1 || tx >= w - 1 || ty < 1 || ty >= h - 1) continue;
+
+      const surface = surfaceHeights[tx];
+      if (ty <= surface + stoneDepth) continue;
+
+      const idx = ty * w + tx;
+      const block = tiles[idx];
+      if (block === BlockTypes.STONE || block === BlockTypes.DEEPSLATE) {
         tiles[idx] = BlockTypes.AIR;
       }
     }

@@ -110,6 +110,16 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/entities/Player.js`, `src/ui/HotbarUI.js`, `src/systems/BlockBreakPlace.js`, `src/data/items.js`
 
+## Phase 10: Cave Generation Overhaul (COMPLETED)
+
+- Caves now only generate in stone and deepslate layers (depth > 16 blocks below surface), no more caves in dirt or sandstone
+- Replaced noise-blob algorithm with worm/agent-based tunnel system: 60-100 random walkers carve 2-3 block wide tunnels through stone
+- Tunnels change direction and width organically as they progress
+- Large rooms (4-12 block radius) generate occasionally along tunnels, creating open caverns
+- Chests restricted to cave areas in stone/deepslate with slightly increased spawn rate
+
+**Key files:** `src/world/CaveGenerator.js`, `src/world/WorldGenerator.js`
+
 ## Controls Summary
 
 | Key | Action |

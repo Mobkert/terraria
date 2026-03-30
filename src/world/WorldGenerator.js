@@ -213,7 +213,7 @@ function placeVines(tiles, w, h, surfaceHeights, biomes, rng) {
 function placeChests(tiles, w, h, surfaceHeights, rng) {
   for (let x = 5; x < w - 5; x += 3) {
     for (let y = 0; y < h - 1; y++) {
-      if (y <= surfaceHeights[x] + 15) continue;
+      if (y <= surfaceHeights[x] + 16) continue;
 
       const idx = y * w + x;
       const aboveIdx = (y - 1) * w + x;
@@ -224,7 +224,7 @@ function placeChests(tiles, w, h, surfaceHeights, rng) {
         tiles[aboveIdx] === BlockTypes.AIR &&
         tiles[belowIdx] !== BlockTypes.AIR
       ) {
-        if (rng() < 0.03) {
+        if (rng() < 0.04) {
           tiles[idx] = BlockTypes.CHEST;
         }
       }
