@@ -33,7 +33,7 @@ export default class BootScene extends Phaser.Scene {
 
       this.addBlockDetail(ctx, parseInt(id), data, s);
 
-      this.addBorderShading(ctx, s);
+      if (data.solid !== false) this.addBorderShading(ctx, s);
 
       this.textures.addCanvas(`block_${id}`, canvas);
     }
@@ -154,6 +154,24 @@ export default class BootScene extends Phaser.Scene {
         ctx.fillStyle = 'rgba(30,120,40,0.3)';
         ctx.fillRect(10, 4, 2, 8);
         ctx.fillRect(20, 12, 2, 10);
+        break;
+      }
+      case BlockTypes.TORCH: {
+        ctx.clearRect(0, 0, s, s);
+        ctx.fillStyle = '#8B6914';
+        ctx.fillRect(s * 0.44, s * 0.35, s * 0.12, s * 0.55);
+        ctx.fillStyle = '#FFAA22';
+        ctx.beginPath();
+        ctx.ellipse(s * 0.5, s * 0.3, s * 0.14, s * 0.18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FFDD44';
+        ctx.beginPath();
+        ctx.ellipse(s * 0.5, s * 0.28, s * 0.08, s * 0.1, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FFFFAA';
+        ctx.beginPath();
+        ctx.ellipse(s * 0.5, s * 0.26, s * 0.03, s * 0.05, 0, 0, Math.PI * 2);
+        ctx.fill();
         break;
       }
     }
@@ -298,6 +316,16 @@ export default class BootScene extends Phaser.Scene {
       ctx.beginPath();
       ctx.ellipse(s * 0.4, s * 0.35, s * 0.06, s * 0.08, -0.4, 0, Math.PI * 2);
       ctx.fill();
+    });
+
+    this.makeItemTexture(ItemTypes.COAL, (ctx) => {
+      ctx.fillStyle = '#222222';
+      ctx.beginPath();
+      ctx.ellipse(s * 0.5, s * 0.52, s * 0.32, s * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#3a3a3a';
+      ctx.fillRect(s * 0.3, s * 0.35, s * 0.15, s * 0.12);
+      ctx.fillRect(s * 0.55, s * 0.5, s * 0.1, s * 0.1);
     });
   }
 

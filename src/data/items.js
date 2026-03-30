@@ -8,6 +8,7 @@ export const ItemTypes = {
   STONE_PICKAXE: 18,
   STONE_AXE: 19,
   GRASS_ESSENCE: 20,
+  COAL: 22,
 };
 
 export const ItemData = {
@@ -44,6 +45,10 @@ export const ItemData = {
     stackSize: 99,
     consumable: true,
     healAmount: 15,
+  },
+  [ItemTypes.COAL]: {
+    name: 'Coal',
+    stackSize: 99,
   },
 };
 

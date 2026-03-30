@@ -120,6 +120,20 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/world/CaveGenerator.js`, `src/world/WorldGenerator.js`
 
+## Phase 11: Lighting System and Torches (COMPLETED)
+
+- Full dynamic lighting system with a per-tile light map (0-15 light levels)
+- Sunlight: all tiles with a clear vertical path to the sky receive maximum light (15)
+- BFS flood-fill propagation: light spreads from sources, decaying by 1 per tile, blocked by solid blocks
+- Darkness overlay: semi-transparent black rectangles drawn over every visible tile based on its light level (fully transparent at 15, nearly opaque at 0)
+- Torch block: placeable light source (light level 12), non-solid, craftable from 1 coal + 1 stick = 4 torches
+- Coal item: found in cave chest loot at all depths, used for torch crafting
+- Incremental light updates: placing or breaking any block recalculates light in a 32-tile radius, including boundary seeding from surrounding light
+- Torches also appear in chest loot tables at all depths
+- Non-solid blocks (torches, vines) can be placed where the player is standing
+
+**Key files:** `src/world/TileManager.js` (light map, BFS, darkness overlay), `src/data/blocks.js` (TORCH), `src/data/items.js` (COAL), `src/data/recipes.js`, `src/data/lootTables.js`
+
 ## Controls Summary
 
 | Key | Action |

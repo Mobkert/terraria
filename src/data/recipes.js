@@ -54,4 +54,12 @@ export const Recipes = [
     ingredients: [{ type: BlockTypes.PLANKS, count: 8 }],
     workbench: true,
   },
+  {
+    result: { type: BlockTypes.TORCH, count: 4 },
+    ingredients: [
+      { type: ItemTypes.COAL, count: 1 },
+      { type: ItemTypes.STICK, count: 1 },
+    ],
+    workbench: false,
+  },
 ];

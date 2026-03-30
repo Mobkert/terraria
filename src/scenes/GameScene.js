@@ -1,4 +1,4 @@
-import { TILE_SIZE } from '../data/blocks.js';
+import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
 import { getItemName } from '../data/items.js';
 import {
   generateWorld,
@@ -41,6 +41,7 @@ export default class GameScene extends Phaser.Scene {
     const spawnY = this.worldData.surfaceHeights[spawn.x] * TILE_SIZE;
 
     this.inventory = new Inventory();
+    this.inventory.addItem(BlockTypes.TORCH, 20);
     this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory);
     this.chestManager = new ChestManager(this.worldData, mulberry32(42 + 999));
 

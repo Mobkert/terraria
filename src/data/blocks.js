@@ -16,6 +16,7 @@ export const BlockTypes = {
   CHEST: 12,
   CACTUS: 16,
   VINE: 17,
+  TORCH: 21,
 };
 
 export const BlockData = {
@@ -114,5 +115,13 @@ export const BlockData = {
     tool: 'none',
     drops: 0,
     solid: false,
+  },
+  [BlockTypes.TORCH]: {
+    name: 'Torch',
+    color: 0xffaa22,
+    hardness: 0.1,
+    tool: 'none',
+    solid: false,
+    lightLevel: 12,
   },
 };

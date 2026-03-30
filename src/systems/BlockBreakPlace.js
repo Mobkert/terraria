@@ -250,7 +250,9 @@ export default class BlockBreakPlace {
 
     if (!this.hasAdjacentBlock(tileX, tileY)) return;
 
-    if (this.overlapsPlayer(tileX, tileY)) return;
+    const placingData = BlockData[selected.type];
+    const isSolid = !placingData || placingData.solid !== false;
+    if (isSolid && this.overlapsPlayer(tileX, tileY)) return;
 
     this.tileManager.setBlock(tileX, tileY, selected.type);
     this.inventory.consumeSelected(1);
