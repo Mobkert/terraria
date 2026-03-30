@@ -8,6 +8,7 @@ const SHALLOW = [
   { type: BlockTypes.DIRT, count: [5, 15], weight: 3 },
   { type: ItemTypes.WOODEN_PICKAXE, count: [1, 1], weight: 2 },
   { type: ItemTypes.WOODEN_AXE, count: [1, 1], weight: 2 },
+  { type: ItemTypes.GRASS_ESSENCE, count: [1, 3], weight: 3 },
 ];
 
 const MEDIUM = [
@@ -19,6 +20,7 @@ const MEDIUM = [
   { type: ItemTypes.STONE_PICKAXE, count: [1, 1], weight: 2 },
   { type: ItemTypes.STONE_AXE, count: [1, 1], weight: 1 },
   { type: BlockTypes.WORKBENCH, count: [1, 1], weight: 1 },
+  { type: ItemTypes.GRASS_ESSENCE, count: [2, 5], weight: 3 },
 ];
 
 const DEEP = [
@@ -28,6 +30,7 @@ const DEEP = [
   { type: ItemTypes.STONE_AXE, count: [1, 1], weight: 3 },
   { type: BlockTypes.PLANKS, count: [6, 16], weight: 2 },
   { type: BlockTypes.WORKBENCH, count: [1, 1], weight: 2 },
+  { type: ItemTypes.GRASS_ESSENCE, count: [3, 6], weight: 3 },
 ];
 
 export function getLootTable(depth) {

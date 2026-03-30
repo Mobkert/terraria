@@ -7,6 +7,7 @@ export const ItemTypes = {
   WOODEN_AXE: 15,
   STONE_PICKAXE: 18,
   STONE_AXE: 19,
+  GRASS_ESSENCE: 20,
 };
 
 export const ItemData = {
@@ -38,6 +39,12 @@ export const ItemData = {
     toolType: 'axe',
     toolSpeed: 5,
   },
+  [ItemTypes.GRASS_ESSENCE]: {
+    name: 'Grass Essence',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 15,
+  },
 };
 
 export function getItemName(type) {
@@ -62,4 +69,8 @@ export function getMaxStack(type) {
 
 export function getToolData(type) {
   return ItemData[type]?.toolType ? ItemData[type] : null;
+}
+
+export function getConsumableData(type) {
+  return ItemData[type]?.consumable ? ItemData[type] : null;
 }

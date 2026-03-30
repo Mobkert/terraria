@@ -26,6 +26,8 @@ export const BlockData = {
     hardness: 1,
     tool: 'shovel',
     drops: BlockTypes.DIRT,
+    extraDropChance: 0.1,
+    extraDrop: 20,
   },
   [BlockTypes.DIRT]: {
     name: 'Dirt',
@@ -76,6 +78,8 @@ export const BlockData = {
     hardness: 1,
     tool: 'shovel',
     drops: BlockTypes.DIRT,
+    extraDropChance: 0.1,
+    extraDrop: 20,
   },
   [BlockTypes.PLANKS]: {
     name: 'Wood Planks',

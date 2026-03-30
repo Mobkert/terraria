@@ -21,6 +21,15 @@ export default class Player {
 
     this.onGround = false;
 
+    this.health = 100;
+    this.maxHealth = 100;
+    this.dead = false;
+    this.invincibleTimer = 0;
+    this.fallStartY = null;
+
+    this.spawnX = x;
+    this.spawnY = y;
+
     this.MOVE_SPEED = 220;
     this.JUMP_SPEED = 400;
     this.GRAVITY = 720;
@@ -44,7 +53,15 @@ export default class Player {
   }
 
   update(delta) {
+    if (this.dead) return;
+
     const dt = delta / 1000;
+
+    if (this.invincibleTimer > 0) {
+      this.invincibleTimer -= dt;
+      this.sprite.setAlpha(Math.sin(this.invincibleTimer * 10) > 0 ? 1 : 0.3);
+      if (this.invincibleTimer <= 0) this.sprite.setAlpha(1);
+    }
 
     this.vx = 0;
     if (!this.inventory.isOpen) {
@@ -60,9 +77,28 @@ export default class Player {
     this.vy += this.GRAVITY * dt;
     if (this.vy > this.MAX_FALL) this.vy = this.MAX_FALL;
 
+    const wasOnGround = this.onGround;
+
+    if (!wasOnGround && this.fallStartY === null) {
+      this.fallStartY = this.y;
+    }
+
     this.moveAxis(dt);
 
     this.onGround = this.collidesAt(this.x, this.y + 1);
+
+    if (this.onGround && !wasOnGround && this.fallStartY !== null) {
+      const fallDist = (this.y - this.fallStartY) / TILE_SIZE;
+      if (fallDist > 3) {
+        const damage = Math.floor((fallDist - 3) * 10);
+        this.takeDamage(damage);
+      }
+      this.fallStartY = null;
+    }
+
+    if (this.onGround) {
+      this.fallStartY = null;
+    }
 
     this.sprite.setPosition(Math.round(this.x), Math.round(this.y));
 
@@ -70,6 +106,42 @@ export default class Player {
     else if (this.vx > 0) this.sprite.setFlipX(false);
 
     this.updateHeldItem();
+  }
+
+  takeDamage(amount) {
+    if (this.invincibleTimer > 0 || this.dead) return;
+    this.health = Math.max(0, this.health - amount);
+    this.invincibleTimer = 1;
+    this.inventory.dirty = true;
+    if (this.health <= 0) this.die();
+  }
+
+  heal(amount) {
+    this.health = Math.min(this.maxHealth, this.health + amount);
+    this.inventory.dirty = true;
+  }
+
+  die() {
+    this.dead = true;
+    this.sprite.setAlpha(0.3);
+    this.heldItem.setVisible(false);
+
+    this.scene.time.delayedCall(1500, () => {
+      this.respawn();
+    });
+  }
+
+  respawn() {
+    this.health = this.maxHealth;
+    this.dead = false;
+    this.x = this.spawnX;
+    this.y = this.spawnY;
+    this.vx = 0;
+    this.vy = 0;
+    this.fallStartY = null;
+    this.invincibleTimer = 2;
+    this.sprite.setAlpha(1);
+    this.inventory.dirty = true;
   }
 
   updateHeldItem() {

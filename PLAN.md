@@ -98,6 +98,18 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/data/lootTables.js`, `src/systems/ChestManager.js`, `src/ui/ChestUI.js`
 
+## Phase 9: Health System, Fall Damage, and Grass Essence (COMPLETED)
+
+- Player has 100 HP, displayed as a health bar above the hotbar (green/yellow/red based on HP)
+- Fall damage: falls greater than 3 blocks deal `(fallBlocks - 3) * 10` damage
+- 1-second invincibility frames after taking damage (player flashes)
+- Death at 0 HP: player fades, respawns at spawn point after 1.5 seconds with full health
+- Grass Essence item: heals 15 HP, 10% drop chance from grass/jungle grass blocks
+- Grass Essence found in cave chest loot at all depths
+- Consumable system: hold right-click for 2 seconds with a consumable selected to use it (progress bar shown)
+
+**Key files:** `src/entities/Player.js`, `src/ui/HotbarUI.js`, `src/systems/BlockBreakPlace.js`, `src/data/items.js`
+
 ## Controls Summary
 
 | Key | Action |
@@ -106,7 +118,7 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 | D | Move right |
 | SPACE | Jump |
 | LMB | Break block |
-| RMB | Place block / interact |
+| RMB | Place block / interact / use consumable (hold 2s) |
 | E | Open inventory / crafting |
 | 1-9 | Select hotbar slot |
 | Scroll | Cycle hotbar |

@@ -1,5 +1,5 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
-import { getToolData } from '../data/items.js';
+import { getToolData, getConsumableData } from '../data/items.js';
 import DroppedItem from '../entities/DroppedItem.js';
 
 export default class BlockBreakPlace {
@@ -23,6 +23,10 @@ export default class BlockBreakPlace {
 
     this.placeCooldown = 0;
     this.PLACE_DELAY = 200;
+
+    this.consumeProgress = 0;
+    this.CONSUME_TIME = 2000;
+    this.consumeOverlay = null;
 
     scene.input.mouse.disableContextMenu();
   }
@@ -54,15 +58,27 @@ export default class BlockBreakPlace {
 
     if (this.placeCooldown > 0) this.placeCooldown -= delta;
 
-    if (pointer.rightButtonDown() && inRange && this.placeCooldown <= 0) {
-      const targetBlock = this.tileManager.getBlock(tileX, tileY);
-      const targetData = BlockData[targetBlock];
-      if (targetData && targetData.interactable) {
-        this.handleInteract(targetBlock, tileX, tileY);
-        this.placeCooldown = this.PLACE_DELAY;
+    if (pointer.rightButtonDown() && this.placeCooldown <= 0) {
+      const selected = this.inventory.getSelectedItem();
+      const consumable = selected ? getConsumableData(selected.type) : null;
+
+      if (consumable && this.player.health < this.player.maxHealth) {
+        this.handleConsuming(delta, consumable);
       } else {
-        this.handlePlacing(tileX, tileY);
+        this.resetConsuming();
+        if (inRange) {
+          const targetBlock = this.tileManager.getBlock(tileX, tileY);
+          const targetData = BlockData[targetBlock];
+          if (targetData && targetData.interactable) {
+            this.handleInteract(targetBlock, tileX, tileY);
+            this.placeCooldown = this.PLACE_DELAY;
+          } else {
+            this.handlePlacing(tileX, tileY);
+          }
+        }
       }
+    } else {
+      this.resetConsuming();
     }
   }
 
@@ -213,6 +229,17 @@ export default class BlockBreakPlace {
       );
       this.droppedItems.push(item);
     }
+
+    if (blockData.extraDrop && Math.random() < (blockData.extraDropChance || 0)) {
+      const extra = new DroppedItem(
+        this.scene,
+        dropX + (Math.random() - 0.5) * 8,
+        dropY,
+        blockData.extraDrop,
+        this.tileManager,
+      );
+      this.droppedItems.push(extra);
+    }
   }
 
   handlePlacing(tileX, tileY) {
@@ -251,6 +278,47 @@ export default class BlockBreakPlace {
     const pb = this.player.y;
 
     return !(tr <= pl || tl >= pr || tb <= pt || tt >= pb);
+  }
+
+  handleConsuming(delta, consumable) {
+    this.consumeProgress += delta;
+    this.drawConsumeBar();
+
+    if (this.consumeProgress >= this.CONSUME_TIME) {
+      this.player.heal(consumable.healAmount);
+      this.inventory.consumeSelected(1);
+      this.resetConsuming();
+    }
+  }
+
+  resetConsuming() {
+    if (this.consumeProgress > 0) {
+      this.consumeProgress = 0;
+      if (this.consumeOverlay) this.consumeOverlay.clear();
+    }
+  }
+
+  drawConsumeBar() {
+    if (!this.consumeOverlay) {
+      this.consumeOverlay = this.scene.add.graphics();
+      this.consumeOverlay.setScrollFactor(0);
+      this.consumeOverlay.setDepth(199);
+    }
+    this.consumeOverlay.clear();
+
+    const cam = this.scene.cameras.main;
+    const barW = 80;
+    const barH = 8;
+    const barX = cam.width / 2 - barW / 2;
+    const barY = cam.height / 2 + 40;
+    const ratio = this.consumeProgress / this.CONSUME_TIME;
+
+    this.consumeOverlay.fillStyle(0x000000, 0.6);
+    this.consumeOverlay.fillRect(barX, barY, barW, barH);
+    this.consumeOverlay.fillStyle(0x44cc44, 1);
+    this.consumeOverlay.fillRect(barX + 1, barY + 1, (barW - 2) * ratio, barH - 2);
+    this.consumeOverlay.lineStyle(1, 0x888888, 1);
+    this.consumeOverlay.strokeRect(barX, barY, barW, barH);
   }
 
   handleInteract(blockType, tileX, tileY) {

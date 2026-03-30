@@ -11,10 +11,11 @@ export default class UIScene extends Phaser.Scene {
   init(data) {
     this.inventory = data.inventory;
     this.chestManager = data.chestManager;
+    this.player = data.player;
   }
 
   create() {
-    this.hotbarUI = new HotbarUI(this, this.inventory);
+    this.hotbarUI = new HotbarUI(this, this.inventory, this.player);
     this.inventoryUI = new InventoryUI(this, this.inventory);
     this.craftingUI = new CraftingUI(this, this.inventory);
     this.chestUI = new ChestUI(this, this.inventory, this.inventoryUI);

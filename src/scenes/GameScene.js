@@ -59,6 +59,7 @@ export default class GameScene extends Phaser.Scene {
     this.scene.launch('UIScene', {
       inventory: this.inventory,
       chestManager: this.chestManager,
+      player: this.player,
     });
 
     this.biomeTint = this.add.rectangle(

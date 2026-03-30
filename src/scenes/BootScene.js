@@ -284,6 +284,21 @@ export default class BootScene extends Phaser.Scene {
       ctx.fillStyle = '#666666';
       ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
     });
+
+    this.makeItemTexture(ItemTypes.GRASS_ESSENCE, (ctx) => {
+      ctx.fillStyle = '#3aaa3a';
+      ctx.beginPath();
+      ctx.ellipse(s * 0.5, s * 0.5, s * 0.3, s * 0.35, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#5cdd5c';
+      ctx.beginPath();
+      ctx.ellipse(s * 0.45, s * 0.4, s * 0.12, s * 0.15, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.beginPath();
+      ctx.ellipse(s * 0.4, s * 0.35, s * 0.06, s * 0.08, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 
   makeItemTexture(itemType, drawFn) {
