@@ -150,6 +150,20 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/systems/FurnaceManager.js`, `src/ui/FurnaceUI.js`, `src/world/WorldGenerator.js` (ore gen), `src/data/blocks.js`, `src/data/items.js`, `src/data/recipes.js`
 
+## Phase 13: Enemies and Combat (COMPLETED)
+
+- **Enemy base class** with tile-based physics, gravity, collision, AI movement, health, damage, knockback, and hurt flash
+- **Zombie**: walks toward the player, melee contact damage (15 dmg, 40 HP), auto-jumps over 1-block walls
+- **Skeleton**: keeps distance from the player, shoots arrow projectiles every 2.5s (8 dmg, 30 HP), has 250px shoot range
+- **Bomb Zombie**: sprints at the player (fastest enemy, 85 speed), starts a 1.5s fuse when close, then explodes destroying blocks in a 3-tile radius (40 dmg, 25 HP). Flashes red/white during fuse
+- **Arrow projectile**: fired by skeletons, affected by gravity, collides with solid blocks and the player, 5-second lifetime
+- **Enemy spawner**: spawns enemies dynamically when the player is underground (5+ blocks below surface), only in dark areas (light level < 7), 15-25 tiles away from the player, max 6 enemies alive, 4-6 second cooldown. Spawn weights: 50% Zombie, 30% Skeleton, 20% Bomb Zombie
+- **Sword combat**: left-click with a sword equipped attacks the nearest enemy in the aim direction within 60px range, 400ms attack cooldown. Deals knockback on hit
+- **Despawn**: enemies more than 800px from the player are automatically removed
+- Programmatic textures for all three enemy types and arrow projectile
+
+**Key files:** `src/entities/Enemy.js`, `src/entities/Arrow.js`, `src/systems/EnemySpawner.js`, `src/systems/BlockBreakPlace.js` (combat), `src/scenes/GameScene.js`
+
 ## Controls Summary
 
 | Key | Action |
@@ -157,7 +171,7 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 | A | Move left |
 | D | Move right |
 | SPACE | Jump |
-| LMB | Break block |
+| LMB | Break block / sword attack |
 | RMB | Place block / interact / use consumable (hold 2s) |
 | E | Open inventory / crafting |
 | 1-9 | Select hotbar slot |

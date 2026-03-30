@@ -1,5 +1,6 @@
-import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
-import { ItemTypes, getItemName } from '../data/items.js';
+import { TILE_SIZE } from '../data/blocks.js';
+import { getItemName } from '../data/items.js';
+import Enemy from '../entities/Enemy.js';
 import {
   generateWorld,
   findSpawnPoint,
@@ -13,6 +14,8 @@ import Inventory from '../systems/Inventory.js';
 import BlockBreakPlace from '../systems/BlockBreakPlace.js';
 import ChestManager from '../systems/ChestManager.js';
 import FurnaceManager from '../systems/FurnaceManager.js';
+import EnemySpawner from '../systems/EnemySpawner.js';
+import Arrow from '../entities/Arrow.js';
 
 const BIOME_TINTS = {
   forest: { color: 0x000000, alpha: 0 },
@@ -42,18 +45,13 @@ export default class GameScene extends Phaser.Scene {
     const spawnY = this.worldData.surfaceHeights[spawn.x] * TILE_SIZE;
 
     this.inventory = new Inventory();
-    this.inventory.addItem(ItemTypes.RAW_IRON, 10);
-    this.inventory.addItem(ItemTypes.IRON_INGOT, 10);
-    this.inventory.addItem(ItemTypes.COAL, 20);
-    this.inventory.addItem(BlockTypes.FURNACE, 1);
-    this.inventory.addItem(ItemTypes.IRON_PICKAXE, 1);
-    this.inventory.addItem(ItemTypes.IRON_AXE, 1);
-    this.inventory.addItem(ItemTypes.WOODEN_SWORD, 1);
-    this.inventory.addItem(ItemTypes.STONE_SWORD, 1);
-    this.inventory.addItem(ItemTypes.IRON_SWORD, 1);
     this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory);
     this.chestManager = new ChestManager(this.worldData, mulberry32(42 + 999));
     this.furnaceManager = new FurnaceManager();
+
+    this.enemies = [];
+    this.arrows = [];
+    this.enemySpawner = new EnemySpawner(this, this.tileManager, this.worldData);
 
     this.blockSystem = new BlockBreakPlace(
       this,
@@ -63,6 +61,11 @@ export default class GameScene extends Phaser.Scene {
       this.chestManager,
       this.furnaceManager,
     );
+    this.blockSystem.enemies = this.enemies;
+
+    const bombX = spawnX + 100;
+    const bombY = spawnY;
+    this.enemies.push(new Enemy(this, bombX, bombY, 'BOMB_ZOMBIE', this.tileManager));
 
     this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0.1);
 
@@ -142,6 +145,9 @@ export default class GameScene extends Phaser.Scene {
     this.player.update(delta);
     this.blockSystem.update(delta);
     this.furnaceManager.update(delta);
+    this.enemySpawner.update(delta, this.player, this.enemies);
+    this.updateEnemies(delta);
+    this.updateArrows(delta);
     this.tileManager.update();
 
     this.updateSkyPosition();
@@ -155,6 +161,41 @@ export default class GameScene extends Phaser.Scene {
     this.infoText.setText(
       `Pos: ${tx},${ty} | Biome: ${biome} | Hand: ${itemName}`,
     );
+  }
+
+  spawnArrow(x, y, angle, damage) {
+    const arrow = new Arrow(this, x, y, angle, damage, this.tileManager);
+    this.arrows.push(arrow);
+  }
+
+  updateEnemies(delta) {
+    const spawnArrowFn = (x, y, angle, dmg) => this.spawnArrow(x, y, angle, dmg);
+
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const enemy = this.enemies[i];
+      enemy.update(delta, this.player, this.enemies, spawnArrowFn);
+
+      if (enemy.dead) {
+        this.enemies.splice(i, 1);
+        continue;
+      }
+
+      const dx = this.player.x - enemy.x;
+      const dy = this.player.y - enemy.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 800) {
+        enemy.die();
+        this.enemies.splice(i, 1);
+      }
+    }
+  }
+
+  updateArrows(delta) {
+    for (let i = this.arrows.length - 1; i >= 0; i--) {
+      const arrow = this.arrows[i];
+      arrow.update(delta, this.player);
+      if (arrow.dead) this.arrows.splice(i, 1);
+    }
   }
 
   updateSkyPosition() {

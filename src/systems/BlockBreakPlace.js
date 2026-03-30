@@ -29,6 +29,11 @@ export default class BlockBreakPlace {
     this.CONSUME_TIME = 2000;
     this.consumeOverlay = null;
 
+    this.enemies = [];
+    this.attackCooldown = 0;
+    this.ATTACK_DELAY = 400;
+    this.ATTACK_RANGE = 60;
+
     scene.input.mouse.disableContextMenu();
   }
 
@@ -51,8 +56,19 @@ export default class BlockBreakPlace {
 
     this.drawCursorHighlight(tileX, tileY, inRange);
 
-    if (pointer.leftButtonDown() && inRange) {
-      this.handleBreaking(tileX, tileY, delta);
+    if (this.attackCooldown > 0) this.attackCooldown -= delta;
+
+    if (pointer.leftButtonDown()) {
+      const held = this.inventory.getSelectedItem();
+      const tool = held ? getToolData(held.type) : null;
+      if (tool && tool.toolType === 'sword') {
+        this.resetBreaking();
+        this.handleSwordAttack();
+      } else if (inRange) {
+        this.handleBreaking(tileX, tileY, delta);
+      } else {
+        this.resetBreaking();
+      }
     } else {
       this.resetBreaking();
     }
@@ -348,6 +364,37 @@ export default class BlockBreakPlace {
     this.consumeOverlay.fillRect(barX + 1, barY + 1, (barW - 2) * ratio, barH - 2);
     this.consumeOverlay.lineStyle(1, 0x888888, 1);
     this.consumeOverlay.strokeRect(barX, barY, barW, barH);
+  }
+
+  handleSwordAttack() {
+    if (this.attackCooldown > 0) return;
+
+    const held = this.inventory.getSelectedItem();
+    const tool = held ? getToolData(held.type) : null;
+    if (!tool || tool.toolType !== 'sword') return;
+
+    const pointer = this.scene.input.activePointer;
+    const aimX = pointer.worldX;
+    const px = this.player.x;
+    const py = this.player.y - this.player.height / 2;
+    const dir = aimX >= px ? 1 : -1;
+
+    for (const enemy of this.enemies) {
+      if (enemy.dead) continue;
+      const ex = enemy.x;
+      const ey = enemy.y - enemy.height / 2;
+      const dx = ex - px;
+      const dy = ey - py;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < this.ATTACK_RANGE && dx * dir >= 0) {
+        enemy.takeDamage(tool.damage, dir);
+        this.attackCooldown = this.ATTACK_DELAY;
+        return;
+      }
+    }
+
+    this.attackCooldown = this.ATTACK_DELAY;
   }
 
   handleInteract(blockType, tileX, tileY) {

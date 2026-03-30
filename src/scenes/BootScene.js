@@ -10,6 +10,7 @@ export default class BootScene extends Phaser.Scene {
     this.generateBlockTextures();
     this.generatePlayerTexture();
     this.generateItemTextures();
+    this.generateEnemyTextures();
     this.generateSkyGradient();
     this.scene.start('GameScene');
   }
@@ -507,6 +508,93 @@ export default class BootScene extends Phaser.Scene {
     const ctx = canvas.getContext('2d');
     drawFn(ctx);
     this.textures.addCanvas(`item_${itemType}`, canvas);
+  }
+
+  generateEnemyTextures() {
+    const w = TILE_SIZE;
+    const h = TILE_SIZE * 2;
+
+    const makeEnemy = (name, bodyColor, eyeColor, detail) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = bodyColor;
+      ctx.beginPath();
+      ctx.ellipse(w / 2, h / 2, w / 2 - 2, h / 2 - 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = eyeColor;
+      ctx.beginPath();
+      ctx.ellipse(w / 2 - 5, h / 2 - 10, 3, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(w / 2 + 5, h / 2 - 10, 3, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.ellipse(w / 2 - 4, h / 2 - 10, 1.5, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(w / 2 + 6, h / 2 - 10, 1.5, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (detail) detail(ctx, w, h);
+
+      this.textures.addCanvas(name, canvas);
+    };
+
+    makeEnemy('enemy_zombie', '#44884a', '#cc2222', (ctx, w, h) => {
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.fillRect(w * 0.25, h * 0.6, w * 0.5, h * 0.15);
+    });
+
+    makeEnemy('enemy_skeleton', '#ddddcc', '#1a1a1a', (ctx, w, h) => {
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const ry = h * 0.35 + i * (h * 0.1);
+        ctx.beginPath();
+        ctx.moveTo(w * 0.25, ry);
+        ctx.lineTo(w * 0.75, ry);
+        ctx.stroke();
+      }
+    });
+
+    makeEnemy('enemy_bomb', '#cc4422', '#ffcc00', (ctx, w, h) => {
+      ctx.fillStyle = '#ff6600';
+      ctx.beginPath();
+      ctx.ellipse(w / 2, h / 2 + 5, w / 2 - 6, h / 2 - 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#333333';
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 2, h * 0.08);
+      ctx.lineTo(w / 2 + 2, h * 0.08);
+      ctx.lineTo(w / 2 + 1, h * 0.2);
+      ctx.lineTo(w / 2 - 1, h * 0.2);
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    const arrowCanvas = document.createElement('canvas');
+    arrowCanvas.width = 16;
+    arrowCanvas.height = 6;
+    const ac = arrowCanvas.getContext('2d');
+    ac.fillStyle = '#8B5E3C';
+    ac.fillRect(0, 2, 12, 2);
+    ac.fillStyle = '#aaaaaa';
+    ac.beginPath();
+    ac.moveTo(12, 0);
+    ac.lineTo(16, 3);
+    ac.lineTo(12, 6);
+    ac.closePath();
+    ac.fill();
+    ac.fillStyle = '#cccccc';
+    ac.fillRect(0, 1, 2, 4);
+    ac.fillRect(2, 0, 1, 6);
+    this.textures.addCanvas('arrow', arrowCanvas);
   }
 
   generateSkyGradient() {
