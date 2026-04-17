@@ -229,33 +229,88 @@ export default class BootScene extends Phaser.Scene {
   generatePlayerTexture() {
     const w = TILE_SIZE;
     const h = TILE_SIZE * 2;
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#4488ff';
-    ctx.beginPath();
-    ctx.ellipse(w / 2, h / 2, w / 2 - 2, h / 2 - 2, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // --- Front view (idle) ---
+    const front = document.createElement('canvas');
+    front.width = w;
+    front.height = h;
+    const fc = front.getContext('2d');
 
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.ellipse(w / 2 - 5, h / 2 - 10, 4, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(w / 2 + 5, h / 2 - 10, 4, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
+    fc.fillStyle = '#2255aa';
+    fc.beginPath();
+    fc.ellipse(w / 2, h / 2, w / 2 - 1, h / 2 - 1, 0, 0, Math.PI * 2);
+    fc.fill();
+    fc.fillStyle = '#4488ff';
+    fc.beginPath();
+    fc.ellipse(w / 2, h / 2, w / 2 - 3, h / 2 - 3, 0, 0, Math.PI * 2);
+    fc.fill();
+    fc.fillStyle = '#66aaff';
+    fc.beginPath();
+    fc.ellipse(w / 2, h * 0.58, w * 0.3, h * 0.22, 0, 0, Math.PI * 2);
+    fc.fill();
+    fc.fillStyle = 'rgba(255,255,255,0.35)';
+    fc.beginPath();
+    fc.ellipse(w * 0.35, h * 0.22, 5, 7, -0.4, 0, Math.PI * 2);
+    fc.fill();
+    fc.fillStyle = 'rgba(255,255,255,0.18)';
+    fc.beginPath();
+    fc.ellipse(w * 0.55, h * 0.18, 2, 3, 0, 0, Math.PI * 2);
+    fc.fill();
+    fc.fillStyle = '#ffffff';
+    fc.beginPath(); fc.ellipse(w * 0.36, h * 0.36, 5, 5.5, 0, 0, Math.PI * 2); fc.fill();
+    fc.beginPath(); fc.ellipse(w * 0.64, h * 0.36, 5, 5.5, 0, 0, Math.PI * 2); fc.fill();
+    fc.fillStyle = '#1122aa';
+    fc.beginPath(); fc.ellipse(w * 0.38, h * 0.37, 2.5, 3, 0, 0, Math.PI * 2); fc.fill();
+    fc.beginPath(); fc.ellipse(w * 0.66, h * 0.37, 2.5, 3, 0, 0, Math.PI * 2); fc.fill();
+    fc.fillStyle = '#fff';
+    fc.beginPath(); fc.arc(w * 0.36, h * 0.35, 1, 0, Math.PI * 2); fc.fill();
+    fc.beginPath(); fc.arc(w * 0.64, h * 0.35, 1, 0, Math.PI * 2); fc.fill();
+    fc.strokeStyle = '#1155aa';
+    fc.lineWidth = 1.5;
+    fc.beginPath();
+    fc.arc(w * 0.5, h * 0.42, 5, 0.3, Math.PI - 0.3);
+    fc.stroke();
 
-    ctx.fillStyle = '#000000';
-    ctx.beginPath();
-    ctx.ellipse(w / 2 - 4, h / 2 - 10, 2, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(w / 2 + 6, h / 2 - 10, 2, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
+    this.textures.addCanvas('player', front);
 
-    this.textures.addCanvas('player', canvas);
+    // --- Side view (walking) ---
+    const side = document.createElement('canvas');
+    side.width = w;
+    side.height = h;
+    const sc = side.getContext('2d');
+
+    sc.fillStyle = '#2255aa';
+    sc.beginPath();
+    sc.ellipse(w / 2 + 1, h / 2, w / 2 - 1, h / 2 - 1, 0.08, 0, Math.PI * 2);
+    sc.fill();
+    sc.fillStyle = '#4488ff';
+    sc.beginPath();
+    sc.ellipse(w / 2 + 1, h / 2, w / 2 - 3, h / 2 - 3, 0.08, 0, Math.PI * 2);
+    sc.fill();
+    sc.fillStyle = '#66aaff';
+    sc.beginPath();
+    sc.ellipse(w * 0.52, h * 0.58, w * 0.28, h * 0.22, 0, 0, Math.PI * 2);
+    sc.fill();
+    sc.fillStyle = 'rgba(255,255,255,0.35)';
+    sc.beginPath();
+    sc.ellipse(w * 0.37, h * 0.22, 5, 7, -0.4, 0, Math.PI * 2);
+    sc.fill();
+    sc.fillStyle = '#ffffff';
+    sc.beginPath(); sc.ellipse(w * 0.5, h * 0.36, 5, 5.5, 0, 0, Math.PI * 2); sc.fill();
+    sc.beginPath(); sc.ellipse(w * 0.76, h * 0.36, 4, 5, 0, 0, Math.PI * 2); sc.fill();
+    sc.fillStyle = '#1122aa';
+    sc.beginPath(); sc.ellipse(w * 0.53, h * 0.37, 2.5, 3, 0, 0, Math.PI * 2); sc.fill();
+    sc.beginPath(); sc.ellipse(w * 0.79, h * 0.37, 2, 2.5, 0, 0, Math.PI * 2); sc.fill();
+    sc.fillStyle = '#fff';
+    sc.beginPath(); sc.arc(w * 0.51, h * 0.35, 1, 0, Math.PI * 2); sc.fill();
+    sc.beginPath(); sc.arc(w * 0.77, h * 0.35, 1, 0, Math.PI * 2); sc.fill();
+    sc.strokeStyle = '#1155aa';
+    sc.lineWidth = 1.5;
+    sc.beginPath();
+    sc.arc(w * 0.58, h * 0.42, 4, 0.3, Math.PI - 0.3);
+    sc.stroke();
+
+    this.textures.addCanvas('player_side', side);
   }
 
   generateItemTextures() {
@@ -514,69 +569,162 @@ export default class BootScene extends Phaser.Scene {
     const w = TILE_SIZE;
     const h = TILE_SIZE * 2;
 
-    const makeEnemy = (name, bodyColor, eyeColor, detail) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
+    // --- Zombie: hunched, jagged cave creature with drool ---
+    const zombieCanvas = document.createElement('canvas');
+    zombieCanvas.width = w;
+    zombieCanvas.height = h;
+    const zctx = zombieCanvas.getContext('2d');
 
-      ctx.fillStyle = bodyColor;
-      ctx.beginPath();
-      ctx.ellipse(w / 2, h / 2, w / 2 - 2, h / 2 - 2, 0, 0, Math.PI * 2);
-      ctx.fill();
+    zctx.fillStyle = '#3a7a3a';
+    zctx.beginPath();
+    zctx.moveTo(w * 0.5, h * 0.06);
+    zctx.lineTo(w * 0.72, h * 0.12);
+    zctx.lineTo(w * 0.82, h * 0.3);
+    zctx.lineTo(w * 0.85, h * 0.5);
+    zctx.lineTo(w * 0.78, h * 0.72);
+    zctx.lineTo(w * 0.72, h * 0.92);
+    zctx.lineTo(w * 0.6, h * 0.96);
+    zctx.lineTo(w * 0.4, h * 0.96);
+    zctx.lineTo(w * 0.28, h * 0.92);
+    zctx.lineTo(w * 0.18, h * 0.7);
+    zctx.lineTo(w * 0.15, h * 0.48);
+    zctx.lineTo(w * 0.2, h * 0.28);
+    zctx.lineTo(w * 0.32, h * 0.1);
+    zctx.closePath();
+    zctx.fill();
 
-      ctx.fillStyle = eyeColor;
-      ctx.beginPath();
-      ctx.ellipse(w / 2 - 5, h / 2 - 10, 3, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(w / 2 + 5, h / 2 - 10, 3, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
+    zctx.fillStyle = '#2a5a2a';
+    zctx.beginPath(); zctx.arc(w * 0.6, h * 0.5, 5, 0, Math.PI * 2); zctx.fill();
+    zctx.beginPath(); zctx.arc(w * 0.35, h * 0.65, 4, 0, Math.PI * 2); zctx.fill();
+    zctx.beginPath(); zctx.arc(w * 0.55, h * 0.75, 3, 0, Math.PI * 2); zctx.fill();
 
-      ctx.fillStyle = '#000000';
-      ctx.beginPath();
-      ctx.ellipse(w / 2 - 4, h / 2 - 10, 1.5, 2.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(w / 2 + 6, h / 2 - 10, 1.5, 2.5, 0, 0, Math.PI * 2);
-      ctx.fill();
+    zctx.fillStyle = '#cc2222';
+    zctx.beginPath(); zctx.ellipse(w * 0.38, h * 0.2, 3, 4, -0.2, 0, Math.PI * 2); zctx.fill();
+    zctx.beginPath(); zctx.ellipse(w * 0.6, h * 0.18, 4, 3, 0.15, 0, Math.PI * 2); zctx.fill();
+    zctx.fillStyle = '#000';
+    zctx.beginPath(); zctx.arc(w * 0.38, h * 0.2, 1.5, 0, Math.PI * 2); zctx.fill();
+    zctx.beginPath(); zctx.arc(w * 0.61, h * 0.18, 1.5, 0, Math.PI * 2); zctx.fill();
 
-      if (detail) detail(ctx, w, h);
+    zctx.fillStyle = '#1a3a1a';
+    zctx.fillRect(w * 0.35, h * 0.28, w * 0.25, 3);
+    zctx.fillStyle = '#55bb55';
+    zctx.fillRect(w * 0.42, h * 0.31, 2, 5);
+    zctx.fillRect(w * 0.5, h * 0.31, 2, 7);
 
-      this.textures.addCanvas(name, canvas);
-    };
+    this.textures.addCanvas('enemy_zombie', zombieCanvas);
 
-    makeEnemy('enemy_zombie', '#44884a', '#cc2222', (ctx, w, h) => {
-      ctx.fillStyle = 'rgba(0,0,0,0.15)';
-      ctx.fillRect(w * 0.25, h * 0.6, w * 0.5, h * 0.15);
-    });
+    // --- Skeleton: tall spindly bone creature with glowing eyes and crossbow ---
+    const skelCanvas = document.createElement('canvas');
+    skelCanvas.width = w;
+    skelCanvas.height = h;
+    const sctx = skelCanvas.getContext('2d');
 
-    makeEnemy('enemy_skeleton', '#ddddcc', '#1a1a1a', (ctx, w, h) => {
-      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 4; i++) {
-        const ry = h * 0.35 + i * (h * 0.1);
-        ctx.beginPath();
-        ctx.moveTo(w * 0.25, ry);
-        ctx.lineTo(w * 0.75, ry);
-        ctx.stroke();
-      }
-    });
+    sctx.fillStyle = '#e8e0cc';
+    sctx.beginPath();
+    sctx.ellipse(w * 0.5, h * 0.13, 9, 10, 0, 0, Math.PI * 2);
+    sctx.fill();
 
-    makeEnemy('enemy_bomb', '#cc4422', '#ffcc00', (ctx, w, h) => {
-      ctx.fillStyle = '#ff6600';
-      ctx.beginPath();
-      ctx.ellipse(w / 2, h / 2 + 5, w / 2 - 6, h / 2 - 6, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#333333';
-      ctx.beginPath();
-      ctx.moveTo(w / 2 - 2, h * 0.08);
-      ctx.lineTo(w / 2 + 2, h * 0.08);
-      ctx.lineTo(w / 2 + 1, h * 0.2);
-      ctx.lineTo(w / 2 - 1, h * 0.2);
-      ctx.closePath();
-      ctx.fill();
-    });
+    sctx.fillStyle = '#d4cdb8';
+    sctx.fillRect(w * 0.32, h * 0.2, w * 0.36, 4);
+
+    sctx.fillStyle = '#0a0a0a';
+    sctx.beginPath(); sctx.ellipse(w * 0.38, h * 0.11, 3, 4, 0, 0, Math.PI * 2); sctx.fill();
+    sctx.beginPath(); sctx.ellipse(w * 0.62, h * 0.11, 3, 4, 0, 0, Math.PI * 2); sctx.fill();
+
+    sctx.fillStyle = '#cc3333';
+    sctx.beginPath(); sctx.arc(w * 0.38, h * 0.11, 1.5, 0, Math.PI * 2); sctx.fill();
+    sctx.beginPath(); sctx.arc(w * 0.62, h * 0.11, 1.5, 0, Math.PI * 2); sctx.fill();
+
+    sctx.fillStyle = '#2a2a1a';
+    sctx.beginPath(); sctx.arc(w * 0.5, h * 0.16, 1.5, 0, Math.PI * 2); sctx.fill();
+
+    sctx.fillStyle = '#ccccbb';
+    for (let i = 0; i < 5; i++) sctx.fillRect(w * 0.34 + i * 3, h * 0.2, 2, 3);
+
+    sctx.fillStyle = '#ccc8b0';
+    for (let i = 0; i < 6; i++) {
+      sctx.fillRect(w * 0.44, h * 0.26 + i * 6, w * 0.12, 4);
+    }
+
+    sctx.strokeStyle = '#d4cdb8';
+    sctx.lineWidth = 1.5;
+    for (let i = 0; i < 3; i++) {
+      const ry = h * 0.32 + i * 10;
+      sctx.beginPath(); sctx.arc(w * 0.5, ry, 8, Math.PI * 0.15, Math.PI * 0.85); sctx.stroke();
+    }
+
+    sctx.fillStyle = '#6b4226';
+    sctx.fillRect(w * 0.75, h * 0.28, 3, 18);
+    sctx.strokeStyle = '#888';
+    sctx.lineWidth = 1;
+    sctx.beginPath();
+    sctx.moveTo(w * 0.76, h * 0.27);
+    sctx.lineTo(w * 0.9, h * 0.32);
+    sctx.moveTo(w * 0.76, h * 0.43);
+    sctx.lineTo(w * 0.9, h * 0.38);
+    sctx.stroke();
+
+    sctx.fillStyle = '#d4cdb8';
+    sctx.fillRect(w * 0.34, h * 0.62, 3, h * 0.28);
+    sctx.fillRect(w * 0.62, h * 0.62, 3, h * 0.28);
+    sctx.fillRect(w * 0.44, h * 0.6, w * 0.12, 3);
+
+    this.textures.addCanvas('enemy_skeleton', skelCanvas);
+
+    // --- Bomb Zombie: round bomb-shaped body with stubby legs, fuse, and panicked eyes ---
+    const bombCanvas = document.createElement('canvas');
+    bombCanvas.width = w;
+    bombCanvas.height = h;
+    const bctx = bombCanvas.getContext('2d');
+
+    bctx.fillStyle = '#bb3318';
+    bctx.beginPath();
+    bctx.ellipse(w * 0.5, h * 0.45, w * 0.42, h * 0.3, 0, 0, Math.PI * 2);
+    bctx.fill();
+
+    bctx.fillStyle = '#dd6622';
+    bctx.beginPath();
+    bctx.ellipse(w * 0.5, h * 0.5, w * 0.25, h * 0.18, 0, 0, Math.PI * 2);
+    bctx.fill();
+
+    bctx.fillStyle = '#ff9944';
+    bctx.beginPath();
+    bctx.ellipse(w * 0.5, h * 0.48, w * 0.12, h * 0.08, 0, 0, Math.PI * 2);
+    bctx.fill();
+
+    bctx.fillStyle = '#ffee00';
+    bctx.beginPath(); bctx.ellipse(w * 0.36, h * 0.34, 4, 5, -0.2, 0, Math.PI * 2); bctx.fill();
+    bctx.beginPath(); bctx.ellipse(w * 0.64, h * 0.34, 4, 5, 0.2, 0, Math.PI * 2); bctx.fill();
+    bctx.fillStyle = '#000';
+    bctx.beginPath(); bctx.arc(w * 0.36, h * 0.34, 2, 0, Math.PI * 2); bctx.fill();
+    bctx.beginPath(); bctx.arc(w * 0.64, h * 0.34, 2, 0, Math.PI * 2); bctx.fill();
+
+    bctx.strokeStyle = '#1a0a0a';
+    bctx.lineWidth = 1.5;
+    bctx.beginPath();
+    bctx.arc(w * 0.5, h * 0.46, 4, 0.2, Math.PI - 0.2);
+    bctx.stroke();
+
+    bctx.strokeStyle = '#444';
+    bctx.lineWidth = 2;
+    bctx.beginPath();
+    bctx.moveTo(w * 0.5, h * 0.15);
+    bctx.quadraticCurveTo(w * 0.65, h * 0.08, w * 0.6, h * 0.02);
+    bctx.stroke();
+
+    bctx.fillStyle = '#ffff44';
+    bctx.beginPath(); bctx.arc(w * 0.6, h * 0.02, 3, 0, Math.PI * 2); bctx.fill();
+    bctx.fillStyle = '#ffaa00';
+    bctx.beginPath(); bctx.arc(w * 0.6, h * 0.02, 1.5, 0, Math.PI * 2); bctx.fill();
+
+    bctx.fillStyle = '#993018';
+    bctx.fillRect(w * 0.3, h * 0.74, w * 0.14, h * 0.2);
+    bctx.fillRect(w * 0.56, h * 0.74, w * 0.14, h * 0.2);
+    bctx.fillStyle = '#771a0a';
+    bctx.fillRect(w * 0.26, h * 0.9, w * 0.2, h * 0.06);
+    bctx.fillRect(w * 0.54, h * 0.9, w * 0.2, h * 0.06);
+
+    this.textures.addCanvas('enemy_bomb', bombCanvas);
 
     const arrowCanvas = document.createElement('canvas');
     arrowCanvas.width = 16;

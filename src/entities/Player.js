@@ -42,6 +42,7 @@ export default class Player {
     });
 
     this.jumpPressed = false;
+    this.currentTexture = 'player';
 
     this.heldItem = scene.add.image(x, y, 'player');
     this.heldItem.setDisplaySize(20, 20);
@@ -102,8 +103,19 @@ export default class Player {
 
     this.sprite.setPosition(Math.round(this.x), Math.round(this.y));
 
-    if (this.vx < 0) this.sprite.setFlipX(true);
-    else if (this.vx > 0) this.sprite.setFlipX(false);
+    if (this.vx !== 0) {
+      if (this.currentTexture !== 'player_side') {
+        this.sprite.setTexture('player_side');
+        this.currentTexture = 'player_side';
+      }
+      this.sprite.setFlipX(this.vx < 0);
+    } else {
+      if (this.currentTexture !== 'player') {
+        this.sprite.setTexture('player');
+        this.currentTexture = 'player';
+        this.sprite.setFlipX(false);
+      }
+    }
 
     this.updateHeldItem();
   }
