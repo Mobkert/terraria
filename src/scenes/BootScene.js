@@ -332,83 +332,57 @@ export default class BootScene extends Phaser.Scene {
     });
 
     this.makeItemTexture(ItemTypes.WOODEN_PICKAXE, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.5, s * 0.9);
-      ctx.lineTo(s * 0.5, s * 0.35);
-      ctx.stroke();
-      ctx.fillStyle = '#A0724A';
-      ctx.fillRect(s * 0.2, s * 0.1, s * 0.6, s * 0.18);
-      ctx.fillStyle = '#8B5E3C';
-      ctx.fillRect(s * 0.18, s * 0.08, s * 0.08, s * 0.24);
-      ctx.fillRect(s * 0.74, s * 0.08, s * 0.08, s * 0.24);
+      this.drawPickC(ctx, s, '#B08860', '#7a5535', '#d4b488', '#9a7040');
     });
 
     this.makeItemTexture(ItemTypes.WOODEN_AXE, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.45, s * 0.9);
-      ctx.lineTo(s * 0.45, s * 0.3);
-      ctx.stroke();
-      ctx.fillStyle = '#A0724A';
-      ctx.beginPath();
-      ctx.moveTo(s * 0.45, s * 0.1);
-      ctx.lineTo(s * 0.82, s * 0.22);
-      ctx.lineTo(s * 0.82, s * 0.42);
-      ctx.lineTo(s * 0.45, s * 0.38);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#8B5E3C';
-      ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
+      this.drawAxeC(ctx, s, '#B08860', '#7a5535', '#d4b488');
     });
 
     this.makeItemTexture(ItemTypes.STONE_PICKAXE, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.5, s * 0.9);
-      ctx.lineTo(s * 0.5, s * 0.35);
-      ctx.stroke();
-      ctx.fillStyle = '#808080';
-      ctx.fillRect(s * 0.2, s * 0.1, s * 0.6, s * 0.18);
-      ctx.fillStyle = '#666666';
-      ctx.fillRect(s * 0.18, s * 0.08, s * 0.08, s * 0.24);
-      ctx.fillRect(s * 0.74, s * 0.08, s * 0.08, s * 0.24);
+      this.drawPickC(ctx, s, '#8a8a8a', '#5a5a5a', '#b0b0b0', '#707070');
     });
 
     this.makeItemTexture(ItemTypes.STONE_AXE, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.45, s * 0.9);
-      ctx.lineTo(s * 0.45, s * 0.3);
-      ctx.stroke();
-      ctx.fillStyle = '#808080';
-      ctx.beginPath();
-      ctx.moveTo(s * 0.45, s * 0.1);
-      ctx.lineTo(s * 0.82, s * 0.22);
-      ctx.lineTo(s * 0.82, s * 0.42);
-      ctx.lineTo(s * 0.45, s * 0.38);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#666666';
-      ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
+      this.drawAxeC(ctx, s, '#8a8a8a', '#5a5a5a', '#b8b8b8');
     });
 
     this.makeItemTexture(ItemTypes.GRASS_ESSENCE, (ctx) => {
-      ctx.fillStyle = '#3aaa3a';
+      ctx.fillStyle = 'rgba(50,200,50,0.15)';
+      ctx.beginPath(); ctx.ellipse(s * 0.5, s * 0.52, s * 0.4, s * 0.44, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1a6a1a';
       ctx.beginPath();
-      ctx.ellipse(s * 0.5, s * 0.5, s * 0.3, s * 0.35, 0, 0, Math.PI * 2);
+      ctx.moveTo(s * 0.5, s * 0.18);
+      ctx.quadraticCurveTo(s * 0.82, s * 0.38, s * 0.78, s * 0.62);
+      ctx.quadraticCurveTo(s * 0.72, s * 0.88, s * 0.5, s * 0.9);
+      ctx.quadraticCurveTo(s * 0.28, s * 0.88, s * 0.22, s * 0.62);
+      ctx.quadraticCurveTo(s * 0.18, s * 0.38, s * 0.5, s * 0.18);
       ctx.fill();
-      ctx.fillStyle = '#5cdd5c';
+      ctx.fillStyle = '#33aa33';
       ctx.beginPath();
-      ctx.ellipse(s * 0.45, s * 0.4, s * 0.12, s * 0.15, -0.3, 0, Math.PI * 2);
+      ctx.moveTo(s * 0.5, s * 0.22);
+      ctx.quadraticCurveTo(s * 0.76, s * 0.4, s * 0.72, s * 0.6);
+      ctx.quadraticCurveTo(s * 0.68, s * 0.84, s * 0.5, s * 0.86);
+      ctx.quadraticCurveTo(s * 0.32, s * 0.84, s * 0.28, s * 0.6);
+      ctx.quadraticCurveTo(s * 0.24, s * 0.4, s * 0.5, s * 0.22);
       ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillStyle = '#88ff88';
+      ctx.beginPath(); ctx.arc(s * 0.42, s * 0.5, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.58, s * 0.62, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.5, s * 0.72, 1, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s * 0.38, s * 0.66, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.beginPath(); ctx.ellipse(s * 0.4, s * 0.4, 3, 7, -0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#886633';
+      ctx.fillRect(s * 0.44, s * 0.1, s * 0.12, s * 0.1);
+      ctx.fillStyle = '#aa8844';
+      ctx.fillRect(s * 0.45, s * 0.11, s * 0.1, s * 0.08);
+      ctx.fillStyle = '#44aa44';
       ctx.beginPath();
-      ctx.ellipse(s * 0.4, s * 0.35, s * 0.06, s * 0.08, -0.4, 0, Math.PI * 2);
+      ctx.moveTo(s * 0.5, s * 0.08);
+      ctx.quadraticCurveTo(s * 0.62, s * 0.02, s * 0.66, s * 0.06);
+      ctx.quadraticCurveTo(s * 0.6, s * 0.12, s * 0.5, s * 0.12);
+      ctx.closePath();
       ctx.fill();
     });
 
@@ -460,99 +434,147 @@ export default class BootScene extends Phaser.Scene {
     });
 
     this.makeItemTexture(ItemTypes.IRON_PICKAXE, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.5, s * 0.9);
-      ctx.lineTo(s * 0.5, s * 0.35);
-      ctx.stroke();
-      ctx.fillStyle = '#d4d4d4';
-      ctx.fillRect(s * 0.2, s * 0.1, s * 0.6, s * 0.18);
-      ctx.fillStyle = '#aaaaaa';
-      ctx.fillRect(s * 0.18, s * 0.08, s * 0.08, s * 0.24);
-      ctx.fillRect(s * 0.74, s * 0.08, s * 0.08, s * 0.24);
+      this.drawPickC(ctx, s, '#cccccc', '#909090', '#eaeaea', '#aaaaaa');
     });
 
     this.makeItemTexture(ItemTypes.IRON_AXE, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.45, s * 0.9);
-      ctx.lineTo(s * 0.45, s * 0.3);
-      ctx.stroke();
-      ctx.fillStyle = '#d4d4d4';
-      ctx.beginPath();
-      ctx.moveTo(s * 0.45, s * 0.1);
-      ctx.lineTo(s * 0.82, s * 0.22);
-      ctx.lineTo(s * 0.82, s * 0.42);
-      ctx.lineTo(s * 0.45, s * 0.38);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#aaaaaa';
-      ctx.fillRect(s * 0.42, s * 0.08, s * 0.06, s * 0.34);
+      this.drawAxeC(ctx, s, '#cccccc', '#909090', '#eeeeee');
     });
 
     this.makeItemTexture(ItemTypes.WOODEN_SWORD, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.5, s * 0.88);
-      ctx.lineTo(s * 0.5, s * 0.62);
-      ctx.stroke();
-      ctx.fillStyle = '#A0724A';
-      ctx.fillRect(s * 0.35, s * 0.58, s * 0.3, s * 0.06);
-      ctx.fillStyle = '#c4a060';
-      ctx.fillRect(s * 0.44, s * 0.12, s * 0.12, s * 0.48);
-      ctx.fillStyle = '#b0904a';
-      ctx.beginPath();
-      ctx.moveTo(s * 0.44, s * 0.12);
-      ctx.lineTo(s * 0.5, s * 0.04);
-      ctx.lineTo(s * 0.56, s * 0.12);
-      ctx.closePath();
-      ctx.fill();
+      this.drawSwordC(ctx, s, '#c4a060', '#9a7a40', '#ddcc88', '#88aa44');
     });
 
     this.makeItemTexture(ItemTypes.STONE_SWORD, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.5, s * 0.88);
-      ctx.lineTo(s * 0.5, s * 0.62);
-      ctx.stroke();
-      ctx.fillStyle = '#A0724A';
-      ctx.fillRect(s * 0.35, s * 0.58, s * 0.3, s * 0.06);
-      ctx.fillStyle = '#888888';
-      ctx.fillRect(s * 0.44, s * 0.12, s * 0.12, s * 0.48);
-      ctx.fillStyle = '#777777';
-      ctx.beginPath();
-      ctx.moveTo(s * 0.44, s * 0.12);
-      ctx.lineTo(s * 0.5, s * 0.04);
-      ctx.lineTo(s * 0.56, s * 0.12);
-      ctx.closePath();
-      ctx.fill();
+      this.drawSwordC(ctx, s, '#999999', '#707070', '#cccccc', '#6688aa');
     });
 
     this.makeItemTexture(ItemTypes.IRON_SWORD, (ctx) => {
-      ctx.strokeStyle = '#8B5E3C';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(s * 0.5, s * 0.88);
-      ctx.lineTo(s * 0.5, s * 0.62);
-      ctx.stroke();
-      ctx.fillStyle = '#A0724A';
-      ctx.fillRect(s * 0.35, s * 0.58, s * 0.3, s * 0.06);
-      ctx.fillStyle = '#d4d4d4';
-      ctx.fillRect(s * 0.44, s * 0.12, s * 0.12, s * 0.48);
-      ctx.fillStyle = '#bbbbbb';
-      ctx.beginPath();
-      ctx.moveTo(s * 0.44, s * 0.12);
-      ctx.lineTo(s * 0.5, s * 0.04);
-      ctx.lineTo(s * 0.56, s * 0.12);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#eeeeee';
-      ctx.fillRect(s * 0.47, s * 0.18, s * 0.04, s * 0.1);
+      this.drawSwordC(ctx, s, '#dddddd', '#a8a8a8', '#f8f8f8', '#4488dd');
     });
+  }
+
+  drawPickC(ctx, s, headColor, darkColor, lightColor, accentColor) {
+    ctx.fillStyle = '#5a3a1a';
+    ctx.fillRect(s * 0.48, s * 0.3, s * 0.04, s * 0.62);
+    ctx.fillStyle = '#8B5E3C';
+    ctx.fillRect(s * 0.485, s * 0.32, s * 0.03, s * 0.58);
+    ctx.fillStyle = '#aa8844';
+    for (let i = 0; i < 4; i++) ctx.fillRect(s * 0.46, s * 0.7 + i * 5, s * 0.08, 2);
+    ctx.fillStyle = darkColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.06, s * 0.14);
+    ctx.quadraticCurveTo(s * 0.06, s * 0.04, s * 0.2, s * 0.06);
+    ctx.lineTo(s * 0.48, s * 0.16);
+    ctx.lineTo(s * 0.52, s * 0.16);
+    ctx.lineTo(s * 0.8, s * 0.06);
+    ctx.quadraticCurveTo(s * 0.94, s * 0.04, s * 0.94, s * 0.14);
+    ctx.lineTo(s * 0.86, s * 0.22);
+    ctx.lineTo(s * 0.14, s * 0.22);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = headColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.1, s * 0.14);
+    ctx.quadraticCurveTo(s * 0.1, s * 0.07, s * 0.22, s * 0.08);
+    ctx.lineTo(s * 0.48, s * 0.17);
+    ctx.lineTo(s * 0.52, s * 0.17);
+    ctx.lineTo(s * 0.78, s * 0.08);
+    ctx.quadraticCurveTo(s * 0.9, s * 0.07, s * 0.9, s * 0.14);
+    ctx.lineTo(s * 0.84, s * 0.2);
+    ctx.lineTo(s * 0.16, s * 0.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = lightColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.16, s * 0.12);
+    ctx.quadraticCurveTo(s * 0.5, s * 0.08, s * 0.84, s * 0.12);
+    ctx.lineTo(s * 0.84, s * 0.14);
+    ctx.quadraticCurveTo(s * 0.5, s * 0.1, s * 0.16, s * 0.14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = accentColor;
+    ctx.fillRect(s * 0.06, s * 0.12, s * 0.06, s * 0.06);
+    ctx.fillRect(s * 0.88, s * 0.12, s * 0.06, s * 0.06);
+  }
+
+  drawAxeC(ctx, s, headColor, darkColor, lightColor) {
+    ctx.fillStyle = '#5a3a1a';
+    ctx.fillRect(s * 0.38, s * 0.3, s * 0.04, s * 0.62);
+    ctx.fillStyle = '#8B5E3C';
+    ctx.fillRect(s * 0.385, s * 0.32, s * 0.03, s * 0.58);
+    ctx.fillStyle = '#aa8844';
+    for (let i = 0; i < 4; i++) ctx.fillRect(s * 0.36, s * 0.7 + i * 5, s * 0.08, 2);
+    ctx.fillStyle = darkColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.38, s * 0.06);
+    ctx.lineTo(s * 0.38, s * 0.38);
+    ctx.quadraticCurveTo(s * 0.7, s * 0.42, s * 0.92, s * 0.28);
+    ctx.quadraticCurveTo(s * 0.94, s * 0.2, s * 0.92, s * 0.12);
+    ctx.quadraticCurveTo(s * 0.7, s * 0.02, s * 0.38, s * 0.06);
+    ctx.fill();
+    ctx.fillStyle = headColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.4, s * 0.08);
+    ctx.lineTo(s * 0.4, s * 0.36);
+    ctx.quadraticCurveTo(s * 0.68, s * 0.4, s * 0.88, s * 0.28);
+    ctx.quadraticCurveTo(s * 0.9, s * 0.2, s * 0.88, s * 0.14);
+    ctx.quadraticCurveTo(s * 0.68, s * 0.04, s * 0.4, s * 0.08);
+    ctx.fill();
+    ctx.strokeStyle = lightColor;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.88, s * 0.14);
+    ctx.quadraticCurveTo(s * 0.92, s * 0.22, s * 0.88, s * 0.3);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.44, s * 0.12);
+    ctx.quadraticCurveTo(s * 0.6, s * 0.08, s * 0.78, s * 0.18);
+    ctx.stroke();
+  }
+
+  drawSwordC(ctx, s, bladeColor, darkColor, lightColor, gemColor) {
+    ctx.fillStyle = '#5a3a1a';
+    ctx.fillRect(s * 0.46, s * 0.72, s * 0.08, s * 0.2);
+    ctx.fillStyle = '#7a5230';
+    ctx.fillRect(s * 0.47, s * 0.74, s * 0.06, s * 0.16);
+    ctx.fillStyle = '#aa8844';
+    ctx.fillRect(s * 0.44, s * 0.76, s * 0.12, s * 0.02);
+    ctx.fillRect(s * 0.44, s * 0.82, s * 0.12, s * 0.02);
+    ctx.fillRect(s * 0.44, s * 0.88, s * 0.12, s * 0.02);
+    ctx.fillStyle = '#777';
+    ctx.beginPath(); ctx.arc(s * 0.5, s * 0.94, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#888';
+    ctx.beginPath();
+    ctx.moveTo(s * 0.22, s * 0.7);
+    ctx.quadraticCurveTo(s * 0.5, s * 0.64, s * 0.78, s * 0.7);
+    ctx.quadraticCurveTo(s * 0.5, s * 0.74, s * 0.22, s * 0.7);
+    ctx.fill();
+    ctx.fillStyle = gemColor;
+    ctx.beginPath(); ctx.arc(s * 0.5, s * 0.7, 2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = darkColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.4, s * 0.68); ctx.lineTo(s * 0.6, s * 0.68);
+    ctx.lineTo(s * 0.56, s * 0.16); ctx.lineTo(s * 0.5, s * 0.02);
+    ctx.lineTo(s * 0.44, s * 0.16); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = bladeColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.42, s * 0.66); ctx.lineTo(s * 0.58, s * 0.66);
+    ctx.lineTo(s * 0.54, s * 0.18); ctx.lineTo(s * 0.5, s * 0.04);
+    ctx.lineTo(s * 0.46, s * 0.18); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = darkColor;
+    ctx.fillRect(s * 0.48, s * 0.2, s * 0.04, s * 0.38);
+    ctx.fillStyle = bladeColor;
+    ctx.fillRect(s * 0.485, s * 0.22, s * 0.03, s * 0.34);
+    ctx.fillStyle = lightColor;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.44, s * 0.58); ctx.lineTo(s * 0.46, s * 0.2);
+    ctx.lineTo(s * 0.47, s * 0.2); ctx.lineTo(s * 0.45, s * 0.58);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.beginPath(); ctx.arc(s * 0.5, s * 0.06, 1.5, 0, Math.PI * 2); ctx.fill();
   }
 
   makeItemTexture(itemType, drawFn) {
