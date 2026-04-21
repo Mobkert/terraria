@@ -1,5 +1,7 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
 import { ItemTypes } from '../data/items.js';
+import { DefaultCustomization } from '../data/customization.js';
+import { generatePlayerCanvases } from '../utils/playerRenderer.js';
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
@@ -282,90 +284,14 @@ export default class BootScene extends Phaser.Scene {
     ctx.fillRect(0, 0, 1, s);
   }
 
-  generatePlayerTexture() {
-    const w = TILE_SIZE;
-    const h = TILE_SIZE * 2;
+  generatePlayerTexture(customization) {
+    const config = customization || DefaultCustomization;
+    const { front, side } = generatePlayerCanvases(config);
 
-    // --- Front view (idle) ---
-    const front = document.createElement('canvas');
-    front.width = w;
-    front.height = h;
-    const fc = front.getContext('2d');
-
-    fc.fillStyle = '#2255aa';
-    fc.beginPath();
-    fc.ellipse(w / 2, h / 2, w / 2 - 1, h / 2 - 1, 0, 0, Math.PI * 2);
-    fc.fill();
-    fc.fillStyle = '#4488ff';
-    fc.beginPath();
-    fc.ellipse(w / 2, h / 2, w / 2 - 3, h / 2 - 3, 0, 0, Math.PI * 2);
-    fc.fill();
-    fc.fillStyle = '#66aaff';
-    fc.beginPath();
-    fc.ellipse(w / 2, h * 0.58, w * 0.3, h * 0.22, 0, 0, Math.PI * 2);
-    fc.fill();
-    fc.fillStyle = 'rgba(255,255,255,0.35)';
-    fc.beginPath();
-    fc.ellipse(w * 0.35, h * 0.22, 5, 7, -0.4, 0, Math.PI * 2);
-    fc.fill();
-    fc.fillStyle = 'rgba(255,255,255,0.18)';
-    fc.beginPath();
-    fc.ellipse(w * 0.55, h * 0.18, 2, 3, 0, 0, Math.PI * 2);
-    fc.fill();
-    fc.fillStyle = '#ffffff';
-    fc.beginPath(); fc.ellipse(w * 0.36, h * 0.36, 5, 5.5, 0, 0, Math.PI * 2); fc.fill();
-    fc.beginPath(); fc.ellipse(w * 0.64, h * 0.36, 5, 5.5, 0, 0, Math.PI * 2); fc.fill();
-    fc.fillStyle = '#1122aa';
-    fc.beginPath(); fc.ellipse(w * 0.38, h * 0.37, 2.5, 3, 0, 0, Math.PI * 2); fc.fill();
-    fc.beginPath(); fc.ellipse(w * 0.66, h * 0.37, 2.5, 3, 0, 0, Math.PI * 2); fc.fill();
-    fc.fillStyle = '#fff';
-    fc.beginPath(); fc.arc(w * 0.36, h * 0.35, 1, 0, Math.PI * 2); fc.fill();
-    fc.beginPath(); fc.arc(w * 0.64, h * 0.35, 1, 0, Math.PI * 2); fc.fill();
-    fc.strokeStyle = '#1155aa';
-    fc.lineWidth = 1.5;
-    fc.beginPath();
-    fc.arc(w * 0.5, h * 0.42, 5, 0.3, Math.PI - 0.3);
-    fc.stroke();
+    if (this.textures.exists('player')) this.textures.remove('player');
+    if (this.textures.exists('player_side')) this.textures.remove('player_side');
 
     this.textures.addCanvas('player', front);
-
-    // --- Side view (walking) ---
-    const side = document.createElement('canvas');
-    side.width = w;
-    side.height = h;
-    const sc = side.getContext('2d');
-
-    sc.fillStyle = '#2255aa';
-    sc.beginPath();
-    sc.ellipse(w / 2 + 1, h / 2, w / 2 - 1, h / 2 - 1, 0.08, 0, Math.PI * 2);
-    sc.fill();
-    sc.fillStyle = '#4488ff';
-    sc.beginPath();
-    sc.ellipse(w / 2 + 1, h / 2, w / 2 - 3, h / 2 - 3, 0.08, 0, Math.PI * 2);
-    sc.fill();
-    sc.fillStyle = '#66aaff';
-    sc.beginPath();
-    sc.ellipse(w * 0.52, h * 0.58, w * 0.28, h * 0.22, 0, 0, Math.PI * 2);
-    sc.fill();
-    sc.fillStyle = 'rgba(255,255,255,0.35)';
-    sc.beginPath();
-    sc.ellipse(w * 0.37, h * 0.22, 5, 7, -0.4, 0, Math.PI * 2);
-    sc.fill();
-    sc.fillStyle = '#ffffff';
-    sc.beginPath(); sc.ellipse(w * 0.5, h * 0.36, 5, 5.5, 0, 0, Math.PI * 2); sc.fill();
-    sc.beginPath(); sc.ellipse(w * 0.76, h * 0.36, 4, 5, 0, 0, Math.PI * 2); sc.fill();
-    sc.fillStyle = '#1122aa';
-    sc.beginPath(); sc.ellipse(w * 0.53, h * 0.37, 2.5, 3, 0, 0, Math.PI * 2); sc.fill();
-    sc.beginPath(); sc.ellipse(w * 0.79, h * 0.37, 2, 2.5, 0, 0, Math.PI * 2); sc.fill();
-    sc.fillStyle = '#fff';
-    sc.beginPath(); sc.arc(w * 0.51, h * 0.35, 1, 0, Math.PI * 2); sc.fill();
-    sc.beginPath(); sc.arc(w * 0.77, h * 0.35, 1, 0, Math.PI * 2); sc.fill();
-    sc.strokeStyle = '#1155aa';
-    sc.lineWidth = 1.5;
-    sc.beginPath();
-    sc.arc(w * 0.58, h * 0.42, 4, 0.3, Math.PI - 0.3);
-    sc.stroke();
-
     this.textures.addCanvas('player_side', side);
   }
 

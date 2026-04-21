@@ -1,8 +1,15 @@
 import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
+import { DefaultCustomization } from '../data/customization.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super('MenuScene');
+  }
+
+  init(data) {
+    this.customization = (data && data.customization)
+      ? { ...data.customization }
+      : { ...DefaultCustomization };
   }
 
   create() {
@@ -26,9 +33,13 @@ export default class MenuScene extends Phaser.Scene {
       color: '#aabbcc',
     }).setOrigin(0.5);
 
-    this.createButton(width / 2, height * 0.52, 'Create World', () => {
+    this.createButton(width / 2, height * 0.48, 'Create World', () => {
       const seed = Math.floor(Math.random() * 2147483647);
       this.showLoadingWorld(seed);
+    });
+
+    this.createButton(width / 2, height * 0.60, 'Customize', () => {
+      this.scene.start('CustomizeScene', { customization: this.customization });
     });
   }
 

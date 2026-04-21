@@ -189,7 +189,9 @@ export default class Player {
     this.swingTimer = 0;
 
     const pointer = this.scene.input.activePointer;
-    this.swingDirection = pointer.worldX >= this.x ? 1 : -1;
+    const cam = this.scene.cameras.main;
+    const swingWorld = cam.getWorldPoint(pointer.x, pointer.y);
+    this.swingDirection = swingWorld.x >= this.x ? 1 : -1;
 
     if (this.swingDirection > 0) {
       this.swingStartAngle = -Math.PI * 0.78;
@@ -239,8 +241,10 @@ export default class Player {
       this.drawSwingTrail(handY, eased);
     } else {
       const pointer = this.scene.input.activePointer;
-      const worldX = pointer.worldX;
-      const worldY = pointer.worldY;
+      const cam = this.scene.cameras.main;
+      const wp = cam.getWorldPoint(pointer.x, pointer.y);
+      const worldX = wp.x;
+      const worldY = wp.y;
 
       const angle = Math.atan2(worldY - handY, worldX - this.x);
 

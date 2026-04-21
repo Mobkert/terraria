@@ -195,6 +195,19 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/systems/AdvancementTracker.js`, `src/ui/AdvancementUI.js`, `src/scenes/UIScene.js`, `src/scenes/GameScene.js`
 
+## Phase 16: Player Customization (COMPLETED)
+
+- Added "Customize" button to the main menu, opening a dedicated customization screen
+- **Colors**: 8 blob colors (Blue, Green, Red, Purple, Orange, Pink, Yellow, Cyan) with matching eye/outline tints
+- **Accessories**: 5 options — None, Cowboy Hat, Bandana, Banana Peel Hat, Iron Ore Hat
+- **Patterns**: 5 body patterns — None, Viney, Heart, Banana, Lightning
+- Live preview of the blob at 4x scale while customizing
+- Extracted player rendering into reusable `playerRenderer.js` utility; BootScene uses it for default textures
+- "Save & Back" applies customization globally by regenerating `player` and `player_side` textures
+- Customization state persists between menu and customize screens
+
+**Key files:** `src/data/customization.js`, `src/utils/playerRenderer.js`, `src/scenes/CustomizeScene.js`, `src/scenes/MenuScene.js`, `src/scenes/BootScene.js`, `src/main.js`
+
 ## Controls Summary
 
 | Key | Action |

@@ -49,8 +49,10 @@ export default class BlockBreakPlace {
     }
 
     const pointer = this.scene.input.activePointer;
-    const worldX = pointer.worldX;
-    const worldY = pointer.worldY;
+    const cam = this.scene.cameras.main;
+    const worldPoint = cam.getWorldPoint(pointer.x, pointer.y);
+    const worldX = worldPoint.x;
+    const worldY = worldPoint.y;
     const tileX = Math.floor(worldX / TILE_SIZE);
     const tileY = Math.floor(worldY / TILE_SIZE);
 
@@ -387,7 +389,9 @@ export default class BlockBreakPlace {
     this.player.startSwing();
 
     const pointer = this.scene.input.activePointer;
-    const aimX = pointer.worldX;
+    const cam = this.scene.cameras.main;
+    const aimWorld = cam.getWorldPoint(pointer.x, pointer.y);
+    const aimX = aimWorld.x;
     const px = this.player.x;
     const py = this.player.y - this.player.height / 2;
     const dir = aimX >= px ? 1 : -1;
