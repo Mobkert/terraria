@@ -16,6 +16,13 @@ import FurnaceManager from '../systems/FurnaceManager.js';
 import EnemySpawner from '../systems/EnemySpawner.js';
 import Arrow from '../entities/Arrow.js';
 
+const BIOME_NAMES = {
+  forest: 'Forest',
+  desert: 'Desert',
+  jungle: 'Jungle',
+  birch: 'Birch Forest',
+};
+
 const BIOME_TINTS = {
   forest: { color: 0x000000, alpha: 0 },
   desert: { color: 0xcc8833, alpha: 0.08 },
@@ -157,10 +164,11 @@ export default class GameScene extends Phaser.Scene {
     const tx = this.player.getTileX();
     const ty = this.player.getTileY();
     const biome = this.worldData.biomes[tx] || '?';
+    const biomeName = BIOME_NAMES[biome] || biome;
     const selected = this.inventory.getSelectedItem();
     const itemName = selected ? getItemName(selected.type) : 'Empty';
     this.infoText.setText(
-      `Pos: ${tx},${ty} | Biome: ${biome} | Hand: ${itemName}`,
+      `Pos: ${tx},${ty} | Biome: ${biomeName} | Hand: ${itemName}`,
     );
   }
 
