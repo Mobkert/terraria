@@ -141,6 +141,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    if (delta > 50) delta = 50;
     this.player.update(delta);
     this.blockSystem.update(delta);
     this.furnaceManager.update(delta);
