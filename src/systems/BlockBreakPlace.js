@@ -113,6 +113,10 @@ export default class BlockBreakPlace {
     return Math.sqrt(dx * dx + dy * dy) <= this.REACH * TILE_SIZE;
   }
 
+  canInteractBg(tileX, tileY) {
+    return this.tileManager.getBlock(tileX, tileY) === BlockTypes.AIR;
+  }
+
   drawCursorHighlight(tileX, tileY, inRange) {
     const g = this.cursorHighlight;
     g.clear();
@@ -121,9 +125,15 @@ export default class BlockBreakPlace {
     const x = tileX * TILE_SIZE;
     const y = tileY * TILE_SIZE;
     const highlightColor = this.inventory.bgMode ? 0x6688ff : 0xffffff;
-    const blockType = this.inventory.bgMode
-      ? this.tileManager.getBgBlock(tileX, tileY)
-      : this.tileManager.getBlock(tileX, tileY);
+
+    let blockType;
+    if (this.inventory.bgMode) {
+      blockType = this.canInteractBg(tileX, tileY)
+        ? this.tileManager.getBgBlock(tileX, tileY)
+        : BlockTypes.AIR;
+    } else {
+      blockType = this.tileManager.getBlock(tileX, tileY);
+    }
 
     if (blockType !== BlockTypes.AIR) {
       g.lineStyle(2, highlightColor, 0.6);
@@ -134,6 +144,11 @@ export default class BlockBreakPlace {
   }
 
   handleBreaking(tileX, tileY, delta) {
+    if (this.inventory.bgMode && !this.canInteractBg(tileX, tileY)) {
+      this.resetBreaking();
+      return;
+    }
+
     const blockType = this.inventory.bgMode
       ? this.tileManager.getBgBlock(tileX, tileY)
       : this.tileManager.getBlock(tileX, tileY);
@@ -242,7 +257,7 @@ export default class BlockBreakPlace {
     const dropX = tileX * TILE_SIZE + TILE_SIZE / 2;
     const dropY = tileY * TILE_SIZE + TILE_SIZE / 2;
 
-    if (blockType === BlockTypes.CHEST && this.chestManager) {
+    if (!this.inventory.bgMode && blockType === BlockTypes.CHEST && this.chestManager) {
       const chestSlots = this.chestManager.getChest(tileX, tileY);
       for (const slot of chestSlots) {
         if (slot) {
@@ -261,7 +276,7 @@ export default class BlockBreakPlace {
       this.chestManager.removeChest(tileX, tileY);
     }
 
-    if (blockType === BlockTypes.FURNACE && this.furnaceManager) {
+    if (!this.inventory.bgMode && blockType === BlockTypes.FURNACE && this.furnaceManager) {
       const f = this.furnaceManager.getFurnace(tileX, tileY);
       for (const slotName of ['inputSlot', 'fuelSlot', 'outputSlot']) {
         const slot = f[slotName];
