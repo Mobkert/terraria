@@ -34,6 +34,8 @@ export default class BlockBreakPlace {
     this.ATTACK_DELAY = 400;
     this.ATTACK_RANGE = 60;
 
+    this.lastSwingThreshold = 0;
+
     scene.input.mouse.disableContextMenu();
   }
 
@@ -141,6 +143,8 @@ export default class BlockBreakPlace {
       this.resetBreaking();
       this.breakTarget = { x: tileX, y: tileY };
       this.breakProgress = 0;
+      this.lastSwingThreshold = 0;
+      this.player.startSwing();
     }
 
     const blockData = BlockData[blockType];
@@ -165,6 +169,12 @@ export default class BlockBreakPlace {
     const breakTime = baseTime / speedMult;
     const dt = delta / 1000;
     this.breakProgress += dt / breakTime;
+
+    const currentThreshold = Math.floor(this.breakProgress * 4);
+    if (currentThreshold > this.lastSwingThreshold) {
+      this.lastSwingThreshold = currentThreshold;
+      this.player.startSwing();
+    }
 
     this.drawBreakOverlay(tileX, tileY);
 
@@ -208,6 +218,7 @@ export default class BlockBreakPlace {
   resetBreaking() {
     this.breakTarget = null;
     this.breakProgress = 0;
+    this.lastSwingThreshold = 0;
     if (this.breakOverlay) {
       this.breakOverlay.clear();
     }
@@ -372,6 +383,8 @@ export default class BlockBreakPlace {
     const held = this.inventory.getSelectedItem();
     const tool = held ? getToolData(held.type) : null;
     if (!tool || tool.toolType !== 'sword') return;
+
+    this.player.startSwing();
 
     const pointer = this.scene.input.activePointer;
     const aimX = pointer.worldX;

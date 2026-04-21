@@ -51,6 +51,17 @@ export default class Player {
     this.heldItem.setVisible(false);
     this.heldItemType = null;
     this.HELD_OFFSET = 20;
+
+    this.swinging = false;
+    this.swingTimer = 0;
+    this.swingDuration = 300;
+    this.swingDirection = 1;
+    this.swingStartAngle = 0;
+    this.swingEndAngle = 0;
+    this.swingTrailAlpha = 0;
+
+    this.swingTrail = scene.add.graphics();
+    this.swingTrail.setDepth(9);
   }
 
   update(delta) {
@@ -117,6 +128,22 @@ export default class Player {
       }
     }
 
+    if (this.swinging) {
+      this.swingTimer += delta;
+      if (this.swingTimer >= this.swingDuration) {
+        this.swinging = false;
+        this.swingTimer = 0;
+      }
+    }
+
+    if (this.swingTrailAlpha > 0 && !this.swinging) {
+      this.swingTrailAlpha -= delta / 150;
+      if (this.swingTrailAlpha <= 0) {
+        this.swingTrailAlpha = 0;
+        this.swingTrail.clear();
+      }
+    }
+
     this.updateHeldItem();
   }
 
@@ -156,12 +183,32 @@ export default class Player {
     this.inventory.dirty = true;
   }
 
+  startSwing() {
+    if (this.swinging) return;
+    this.swinging = true;
+    this.swingTimer = 0;
+
+    const pointer = this.scene.input.activePointer;
+    this.swingDirection = pointer.worldX >= this.x ? 1 : -1;
+
+    if (this.swingDirection > 0) {
+      this.swingStartAngle = -Math.PI * 0.78;
+      this.swingEndAngle = Math.PI * 0.22;
+    } else {
+      this.swingStartAngle = Math.PI + Math.PI * 0.78;
+      this.swingEndAngle = Math.PI - Math.PI * 0.22;
+    }
+
+    this.swingTrailAlpha = 0.45;
+  }
+
   updateHeldItem() {
     const selected = this.inventory.getSelectedItem();
 
     if (!selected || this.inventory.isOpen) {
       this.heldItem.setVisible(false);
       this.heldItemType = null;
+      this.swingTrail.clear();
       return;
     }
 
@@ -173,21 +220,76 @@ export default class Player {
       this.heldItem.setDisplaySize(size, size);
     }
 
-    const pointer = this.scene.input.activePointer;
-    const worldX = pointer.worldX;
-    const worldY = pointer.worldY;
-
     const handY = this.y - this.height * 0.45;
-    const angle = Math.atan2(worldY - handY, worldX - this.x);
 
-    const hx = this.x + Math.cos(angle) * this.HELD_OFFSET;
-    const hy = handY + Math.sin(angle) * this.HELD_OFFSET;
+    if (this.swinging) {
+      const t = Math.min(this.swingTimer / this.swingDuration, 1);
+      const eased = 1 - (1 - t) * (1 - t);
+      const angle = this.swingStartAngle + (this.swingEndAngle - this.swingStartAngle) * eased;
+      const swingOffset = this.HELD_OFFSET + 6;
 
-    this.heldItem.setPosition(Math.round(hx), Math.round(hy));
-    this.heldItem.setRotation(angle);
-    const facingLeft = worldX < this.x;
-    this.heldItem.setFlipY(facingLeft);
-    this.heldItem.setVisible(true);
+      const hx = this.x + Math.cos(angle) * swingOffset;
+      const hy = handY + Math.sin(angle) * swingOffset;
+
+      this.heldItem.setPosition(Math.round(hx), Math.round(hy));
+      this.heldItem.setRotation(angle);
+      this.heldItem.setFlipY(this.swingDirection < 0);
+      this.heldItem.setVisible(true);
+
+      this.drawSwingTrail(handY, eased);
+    } else {
+      const pointer = this.scene.input.activePointer;
+      const worldX = pointer.worldX;
+      const worldY = pointer.worldY;
+
+      const angle = Math.atan2(worldY - handY, worldX - this.x);
+
+      const hx = this.x + Math.cos(angle) * this.HELD_OFFSET;
+      const hy = handY + Math.sin(angle) * this.HELD_OFFSET;
+
+      this.heldItem.setPosition(Math.round(hx), Math.round(hy));
+      this.heldItem.setRotation(angle);
+      this.heldItem.setFlipY(worldX < this.x);
+      this.heldItem.setVisible(true);
+
+      if (this.swingTrailAlpha > 0) {
+        this.drawSwingTrail(handY, 1);
+      }
+    }
+  }
+
+  drawSwingTrail(handY, progress) {
+    this.swingTrail.clear();
+    if (this.swingTrailAlpha <= 0) return;
+
+    const trailRadius = this.HELD_OFFSET + 10;
+    const cx = this.x;
+    const cy = handY;
+
+    const currentAngle = this.swingStartAngle + (this.swingEndAngle - this.swingStartAngle) * progress;
+    const arcSpan = (this.swingEndAngle - this.swingStartAngle);
+    const trailStart = currentAngle - arcSpan * Math.min(progress, 0.6);
+
+    const steps = 8;
+    for (let i = 0; i < steps; i++) {
+      const t0 = i / steps;
+      const t1 = (i + 1) / steps;
+      const a0 = trailStart + (currentAngle - trailStart) * t0;
+      const a1 = trailStart + (currentAngle - trailStart) * t1;
+      const alpha = this.swingTrailAlpha * (t1 * 0.8);
+
+      const innerR = trailRadius - 4;
+      const outerR = trailRadius + 4;
+
+      this.swingTrail.fillStyle(0xffffff, alpha);
+      this.swingTrail.beginPath();
+      this.swingTrail.moveTo(cx + Math.cos(a0) * innerR, cy + Math.sin(a0) * innerR);
+      this.swingTrail.lineTo(cx + Math.cos(a0) * outerR, cy + Math.sin(a0) * outerR);
+      this.swingTrail.lineTo(cx + Math.cos(a1) * outerR, cy + Math.sin(a1) * outerR);
+      this.swingTrail.lineTo(cx + Math.cos(a1) * innerR, cy + Math.sin(a1) * innerR);
+      this.swingTrail.closePath();
+      this.swingTrail.fillPath();
+    }
   }
 
   moveAxis(dt) {
