@@ -14,6 +14,7 @@ import BlockBreakPlace from '../systems/BlockBreakPlace.js';
 import ChestManager from '../systems/ChestManager.js';
 import FurnaceManager from '../systems/FurnaceManager.js';
 import EnemySpawner from '../systems/EnemySpawner.js';
+import AdvancementTracker from '../systems/AdvancementTracker.js';
 import Arrow from '../entities/Arrow.js';
 
 const BIOME_NAMES = {
@@ -74,6 +75,8 @@ export default class GameScene extends Phaser.Scene {
     );
     this.blockSystem.enemies = this.enemies;
 
+    this.advancementTracker = new AdvancementTracker(this.inventory);
+
     this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0.1);
 
     this.tileManager.update();
@@ -83,6 +86,7 @@ export default class GameScene extends Phaser.Scene {
       chestManager: this.chestManager,
       furnaceManager: this.furnaceManager,
       player: this.player,
+      advancementTracker: this.advancementTracker,
     });
 
     this.biomeTint = this.add.rectangle(
@@ -165,6 +169,7 @@ export default class GameScene extends Phaser.Scene {
     const ty = this.player.getTileY();
     const biome = this.worldData.biomes[tx] || '?';
     const biomeName = BIOME_NAMES[biome] || biome;
+    this.advancementTracker.update(biome);
     const selected = this.inventory.getSelectedItem();
     const itemName = selected ? getItemName(selected.type) : 'Empty';
     this.infoText.setText(

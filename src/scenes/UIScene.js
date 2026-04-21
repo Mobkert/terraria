@@ -3,6 +3,7 @@ import InventoryUI from '../ui/InventoryUI.js';
 import CraftingUI from '../ui/CraftingUI.js';
 import ChestUI from '../ui/ChestUI.js';
 import FurnaceUI from '../ui/FurnaceUI.js';
+import AdvancementUI from '../ui/AdvancementUI.js';
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -14,6 +15,7 @@ export default class UIScene extends Phaser.Scene {
     this.chestManager = data.chestManager;
     this.furnaceManager = data.furnaceManager;
     this.player = data.player;
+    this.advancementTracker = data.advancementTracker;
   }
 
   create() {
@@ -22,8 +24,18 @@ export default class UIScene extends Phaser.Scene {
     this.craftingUI = new CraftingUI(this, this.inventory);
     this.chestUI = new ChestUI(this, this.inventory, this.inventoryUI);
     this.furnaceUI = new FurnaceUI(this, this.inventory, this.inventoryUI);
+    this.advancementUI = new AdvancementUI(this, this.advancementTracker);
+
+    this.input.keyboard.on('keydown-P', () => {
+      if (this.inventoryUI.isOpen) return;
+      this.advancementUI.toggle();
+    });
 
     this.input.keyboard.on('keydown-E', () => {
+      if (this.advancementUI.isOpen) {
+        this.advancementUI.toggle();
+        return;
+      }
       if (this.inventoryUI.isOpen) {
         this.closeInventory();
       } else {
@@ -51,6 +63,74 @@ export default class UIScene extends Phaser.Scene {
       }
       this.inventory.dirty = true;
     });
+
+    this.toastQueue = [];
+    this.activeToast = null;
+  }
+
+  showAdvancementToast(adv) {
+    const sw = this.cameras.main.width;
+    const toastW = 260;
+    const toastH = 52;
+    const startX = sw + toastW;
+    const endX = sw - toastW - 12;
+    const toastY = 12;
+
+    const container = this.add.container(startX, toastY);
+    container.setDepth(500);
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x1a1a2e, 0.95);
+    bg.fillRoundedRect(0, 0, toastW, toastH, 8);
+    bg.lineStyle(2, 0x44aa44, 1);
+    bg.strokeRoundedRect(0, 0, toastW, toastH, 8);
+    container.add(bg);
+
+    if (this.textures.exists(adv.icon)) {
+      const icon = this.add.image(14, toastH / 2, adv.icon);
+      icon.setDisplaySize(28, 28);
+      container.add(icon);
+    }
+
+    const header = this.add.text(34, 6, 'Advancement Complete!', {
+      fontSize: '11px', color: '#ffdd44', fontStyle: 'bold',
+    });
+    container.add(header);
+
+    const name = this.add.text(34, 24, adv.name, {
+      fontSize: '14px', color: '#88ff88', fontStyle: 'bold',
+    });
+    container.add(name);
+
+    this.tweens.add({
+      targets: container,
+      x: endX,
+      duration: 400,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        this.time.delayedCall(3000, () => {
+          this.tweens.add({
+            targets: container,
+            x: startX,
+            duration: 300,
+            ease: 'Cubic.easeIn',
+            onComplete: () => {
+              container.destroy();
+              this.activeToast = null;
+              this.processToastQueue();
+            },
+          });
+        });
+      },
+    });
+
+    this.activeToast = container;
+  }
+
+  processToastQueue() {
+    if (this.activeToast || this.toastQueue.length === 0) return;
+    const adv = this.toastQueue.shift();
+    this.showAdvancementToast(adv);
   }
 
   openInventory(hasWorkbench) {
@@ -114,11 +194,18 @@ export default class UIScene extends Phaser.Scene {
       }
     }
 
+    while (this.advancementTracker.pendingToasts.length > 0) {
+      const adv = this.advancementTracker.pendingToasts.shift();
+      this.toastQueue.push(adv);
+    }
+    this.processToastQueue();
+
     this.hotbarUI.update();
     this.inventoryUI.update();
     this.craftingUI.update();
     this.chestUI.update();
     this.furnaceUI.update();
+    this.advancementUI.update();
     this.inventory.dirty = false;
   }
 }

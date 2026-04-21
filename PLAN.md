@@ -180,6 +180,21 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/data/blocks.js`, `src/scenes/BootScene.js`, `src/world/WorldGenerator.js`, `src/data/recipes.js`, `src/systems/Crafting.js`, `src/scenes/GameScene.js`
 
+## Phase 15: Advancement System (COMPLETED)
+
+- Added advancement tracker and UI, toggled with **P** key
+- 6 advancements tracked in real-time:
+  - **Explorer**: Visit every biome (Forest, Desert, Jungle, Birch Forest)
+  - **Lumberjack**: Acquire any logs (wood or birch wood)
+  - **Getting Stoned**: Acquire stone
+  - **Fuel Up**: Acquire coal
+  - **Iron Age**: Acquire iron (raw iron or iron ingot)
+  - **Leaf Collector**: Get a full stack (99) of any leaves
+- Panel shows completion count, icons, descriptions, and green "DONE" status
+- Automatically closes when opening inventory, P closes the panel
+
+**Key files:** `src/systems/AdvancementTracker.js`, `src/ui/AdvancementUI.js`, `src/scenes/UIScene.js`, `src/scenes/GameScene.js`
+
 ## Controls Summary
 
 | Key | Action |
@@ -191,6 +206,7 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 | RMB | Place block / interact / use consumable (hold 2s) |
 | E | Open inventory / crafting |
 | 1-9 | Select hotbar slot |
+| P | Open advancements |
 | Scroll | Cycle hotbar |
 
 ## Tech Stack
