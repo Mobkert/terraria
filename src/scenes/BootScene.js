@@ -26,17 +26,29 @@ export default class BootScene extends Phaser.Scene {
       canvas.height = s;
       const ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = colorToCSS(data.color);
-      ctx.fillRect(0, 0, s, s);
+      if (data.halfHeight) {
+        ctx.fillStyle = colorToCSS(data.color);
+        ctx.fillRect(0, s / 2, s, s / 2);
+        this.addSlabDetail(ctx, data, s);
+        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+        ctx.fillRect(0, s - 1, s, 1);
+        ctx.fillRect(s - 1, s / 2, 1, s / 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(0, s / 2, s, 1);
+        ctx.fillRect(0, s / 2, 1, s / 2);
+      } else {
+        ctx.fillStyle = colorToCSS(data.color);
+        ctx.fillRect(0, 0, s, s);
 
-      if (data.topColor) {
-        ctx.fillStyle = colorToCSS(data.topColor);
-        ctx.fillRect(0, 0, s, Math.floor(s / 4));
+        if (data.topColor) {
+          ctx.fillStyle = colorToCSS(data.topColor);
+          ctx.fillRect(0, 0, s, Math.floor(s / 4));
+        }
+
+        this.addBlockDetail(ctx, parseInt(id), data, s);
+
+        if (data.solid !== false && parseInt(id) !== BlockTypes.BIRCH_WOOD) this.addBorderShading(ctx, s);
       }
-
-      this.addBlockDetail(ctx, parseInt(id), data, s);
-
-      if (data.solid !== false && parseInt(id) !== BlockTypes.BIRCH_WOOD) this.addBorderShading(ctx, s);
 
       this.textures.addCanvas(`block_${id}`, canvas);
     }
@@ -282,6 +294,21 @@ export default class BootScene extends Phaser.Scene {
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
     ctx.fillRect(0, 0, s, 1);
     ctx.fillRect(0, 0, 1, s);
+  }
+
+  addSlabDetail(ctx, data, s) {
+    const h = s / 2;
+    const y0 = s / 2;
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.fillRect(0, y0 + h * 0.4, s, 1);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(0, y0 + h * 0.2, s, 1);
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    for (let i = 0; i < 4; i++) {
+      const px = Math.floor(s * (0.15 + i * 0.22));
+      const py = y0 + Math.floor(h * (0.2 + (i % 2) * 0.35));
+      ctx.fillRect(px, py, 2, 2);
+    }
   }
 
   generatePlayerTexture(customization) {

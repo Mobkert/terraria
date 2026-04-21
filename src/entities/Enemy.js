@@ -249,7 +249,27 @@ export default class Enemy {
         this.y = newY;
       } else {
         if (dy > 0) {
-          this.y = Math.floor(newY / TILE_SIZE) * TILE_SIZE;
+          const bottom = newY - 0.01;
+          const tBottomY = Math.floor(bottom / TILE_SIZE);
+          const pLeft = Math.floor((this.x - this.width / 2) / TILE_SIZE);
+          const pRight = Math.floor((this.x + this.width / 2 - 0.01) / TILE_SIZE);
+          let onlySlabs = true;
+          let hasAnySlab = false;
+          for (let tx = pLeft; tx <= pRight; tx++) {
+            const block = this.tileManager.getBlock(tx, tBottomY);
+            if (block !== BlockTypes.AIR) {
+              const data = BlockData[block];
+              if (data && data.solid !== false) {
+                if (data.halfHeight) hasAnySlab = true;
+                else onlySlabs = false;
+              }
+            }
+          }
+          if (onlySlabs && hasAnySlab) {
+            this.y = tBottomY * TILE_SIZE + TILE_SIZE / 2;
+          } else {
+            this.y = Math.floor(newY / TILE_SIZE) * TILE_SIZE;
+          }
         } else {
           const headY = newY - this.height;
           this.y = (Math.floor(headY / TILE_SIZE) + 1) * TILE_SIZE + this.height + 0.01;
@@ -272,7 +292,17 @@ export default class Enemy {
 
     for (let tx = tLeft; tx <= tRight; tx++) {
       for (let ty = tTop; ty <= tBottom; ty++) {
-        if (isSolid(this.tileManager.getBlock(tx, ty))) return true;
+        const block = this.tileManager.getBlock(tx, ty);
+        if (block !== BlockTypes.AIR) {
+          const data = BlockData[block];
+          if (!data || data.solid !== false) {
+            if (data && data.halfHeight) {
+              const slabTop = ty * TILE_SIZE + TILE_SIZE / 2;
+              if (bottom < slabTop) continue;
+            }
+            return true;
+          }
+        }
       }
     }
     return false;

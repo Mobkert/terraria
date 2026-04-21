@@ -24,6 +24,11 @@ export const BlockTypes = {
   BIRCH_LEAVES: 34,
   BIRCH_PLANKS: 35,
   BIRCH_GRASS: 36,
+  STONE_SLAB: 37,
+  DEEPSLATE_SLAB: 38,
+  OAK_SLAB: 39,
+  BIRCH_SLAB: 40,
+  SANDSTONE_SLAB: 41,
 };
 
 export const BlockData = {
@@ -181,5 +186,40 @@ export const BlockData = {
     drops: BlockTypes.DIRT,
     extraDropChance: 0.1,
     extraDrop: 20,
+  },
+  [BlockTypes.STONE_SLAB]: {
+    name: 'Stone Slab',
+    color: 0x808080,
+    hardness: 2,
+    tool: 'pickaxe',
+    halfHeight: true,
+  },
+  [BlockTypes.DEEPSLATE_SLAB]: {
+    name: 'Deepslate Slab',
+    color: 0x4a4a4a,
+    hardness: 3,
+    tool: 'pickaxe',
+    halfHeight: true,
+  },
+  [BlockTypes.OAK_SLAB]: {
+    name: 'Oak Slab',
+    color: 0xa0724a,
+    hardness: 1.5,
+    tool: 'axe',
+    halfHeight: true,
+  },
+  [BlockTypes.BIRCH_SLAB]: {
+    name: 'Birch Slab',
+    color: 0xd4c4a0,
+    hardness: 1.5,
+    tool: 'axe',
+    halfHeight: true,
+  },
+  [BlockTypes.SANDSTONE_SLAB]: {
+    name: 'Sandstone Slab',
+    color: 0xc4a35a,
+    hardness: 1.5,
+    tool: 'pickaxe',
+    halfHeight: true,
   },
 };

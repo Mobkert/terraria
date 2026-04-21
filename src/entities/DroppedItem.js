@@ -52,11 +52,16 @@ export default class DroppedItem {
     const newY = this.y + this.vy * dt;
     const txMid = Math.floor(this.x / TILE_SIZE);
     const tyNew = Math.floor(newY / TILE_SIZE);
-    if (!isSolid(this.tileManager.getBlock(txMid, tyNew))) {
+    const landBlock = this.tileManager.getBlock(txMid, tyNew);
+    const landData = BlockData[landBlock];
+    const landSolid = isSolid(landBlock);
+    const isHalf = landSolid && landData && landData.halfHeight;
+    const slabTop = tyNew * TILE_SIZE + TILE_SIZE / 2;
+    if (!landSolid || (isHalf && newY < slabTop)) {
       this.y = newY;
     } else {
       if (this.vy > 0) {
-        this.y = tyNew * TILE_SIZE - 1;
+        this.y = isHalf ? slabTop - 1 : tyNew * TILE_SIZE - 1;
       }
       this.vy = 0;
       this.vx *= 0.85;

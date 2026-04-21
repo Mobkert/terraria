@@ -41,8 +41,15 @@ export default class Arrow {
     if (block !== BlockTypes.AIR) {
       const data = BlockData[block];
       if (!data || data.solid !== false) {
-        this.die();
-        return;
+        if (data && data.halfHeight) {
+          if (this.y >= ty * TILE_SIZE + TILE_SIZE / 2) {
+            this.die();
+            return;
+          }
+        } else {
+          this.die();
+          return;
+        }
       }
     }
 

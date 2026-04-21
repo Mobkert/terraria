@@ -342,7 +342,7 @@ export default class BlockBreakPlace {
 
     const placingData = BlockData[selected.type];
     const isSolid = !placingData || placingData.solid !== false;
-    if (isSolid && this.overlapsPlayer(tileX, tileY)) return;
+    if (isSolid && this.overlapsPlayer(tileX, tileY, placingData)) return;
 
     this.tileManager.setBlock(tileX, tileY, selected.type);
     this.inventory.consumeSelected(1);
@@ -371,11 +371,15 @@ export default class BlockBreakPlace {
     );
   }
 
-  overlapsPlayer(tileX, tileY) {
+  overlapsPlayer(tileX, tileY, blockData) {
     const tl = tileX * TILE_SIZE;
     const tr = tl + TILE_SIZE;
-    const tt = tileY * TILE_SIZE;
+    let tt = tileY * TILE_SIZE;
     const tb = tt + TILE_SIZE;
+
+    if (blockData && blockData.halfHeight) {
+      tt += TILE_SIZE / 2;
+    }
 
     const pl = this.player.x - this.player.width / 2;
     const pr = this.player.x + this.player.width / 2;

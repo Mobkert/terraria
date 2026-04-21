@@ -221,6 +221,19 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/world/TileManager.js`, `src/systems/BlockBreakPlace.js`, `src/ui/HotbarUI.js`, `src/scenes/UIScene.js`, `src/systems/Inventory.js`, `src/world/WorldGenerator.js`
 
+## Phase 18: Slabs (COMPLETED)
+
+- Added 5 slab types: Stone Slab, Deepslate Slab, Oak Slab, Birch Slab, Sandstone Slab
+- Slabs are half-height blocks that occupy only the bottom half of a tile
+- Crafted at a workbench: 3 base blocks → 6 slabs
+- `halfHeight: true` property on BlockData drives both rendering and collision
+- Slab textures render only the bottom half of the tile (top half transparent)
+- Player, enemies, dropped items, and arrows all respect half-height collision
+- Players and enemies land on the slab surface (tile midpoint) instead of tile top
+- Placement overlap check accounts for the slab's reduced collision area
+
+**Key files:** `src/data/blocks.js`, `src/data/recipes.js`, `src/scenes/BootScene.js`, `src/entities/Player.js`, `src/entities/Enemy.js`, `src/entities/DroppedItem.js`, `src/entities/Arrow.js`, `src/systems/BlockBreakPlace.js`
+
 ## Controls Summary
 
 | Key | Action |

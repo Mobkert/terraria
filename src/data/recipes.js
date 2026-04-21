@@ -120,4 +120,29 @@ export const Recipes = [
     ],
     workbench: true,
   },
+  {
+    result: { type: BlockTypes.STONE_SLAB, count: 6 },
+    ingredients: [{ type: BlockTypes.STONE, count: 3 }],
+    workbench: true,
+  },
+  {
+    result: { type: BlockTypes.DEEPSLATE_SLAB, count: 6 },
+    ingredients: [{ type: BlockTypes.DEEPSLATE, count: 3 }],
+    workbench: true,
+  },
+  {
+    result: { type: BlockTypes.OAK_SLAB, count: 6 },
+    ingredients: [{ type: BlockTypes.PLANKS, count: 3 }],
+    workbench: true,
+  },
+  {
+    result: { type: BlockTypes.BIRCH_SLAB, count: 6 },
+    ingredients: [{ type: BlockTypes.BIRCH_PLANKS, count: 3 }],
+    workbench: true,
+  },
+  {
+    result: { type: BlockTypes.SANDSTONE_SLAB, count: 6 },
+    ingredients: [{ type: BlockTypes.SANDSTONE, count: 3 }],
+    workbench: true,
+  },
 ];
