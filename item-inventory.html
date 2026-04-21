@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Encyclopedia - All Items &amp; Blocks</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 24px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2.4em;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #ff6b6b, #ffa36b, #ffd93d, #6bffa3, #6bc5ff, #b56bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { text-align: center; color: #888; margin-bottom: 32px; font-size: 1.1em; }
+  .stat-bar { display: flex; justify-content: center; gap: 32px; margin-bottom: 36px; flex-wrap: wrap; }
+  .stat-box { background: #16213e; border: 1px solid #333; border-radius: 10px; padding: 14px 28px; text-align: center; }
+  .stat-box .num { font-size: 2em; font-weight: bold; color: #ffd93d; }
+  .stat-box .label { font-size: 0.85em; color: #aaa; margin-top: 4px; }
+  .section { margin-bottom: 40px; }
+  .section-title { font-size: 1.5em; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #333; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .card {
+    background: #16213e; border: 1px solid #2a2a4a; border-radius: 8px;
+    padding: 14px; display: flex; gap: 14px; align-items: center;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .card:hover { border-color: #555; transform: translateY(-2px); }
+  .card canvas { border-radius: 4px; border: 2px solid rgba(255,255,255,0.08); image-rendering: pixelated; flex-shrink: 0; }
+  .card .info { flex: 1; min-width: 0; }
+  .card .name { font-weight: 600; font-size: 1.05em; color: #fff; }
+  .card .details { font-size: 0.82em; color: #999; margin-top: 4px; line-height: 1.6; }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 0.75em; font-weight: 600; margin-right: 4px; }
+  .tag-pickaxe { background: #3a3a5a; color: #aac; }
+  .tag-axe { background: #4a3a2a; color: #dba; }
+  .tag-shovel { background: #3a4a2a; color: #bda; }
+  .tag-none { background: #2a2a3a; color: #999; }
+  .tag-sword { background: #5a2a2a; color: #faa; }
+  .tag-workbench { background: #5a4a1a; color: #fda; }
+  .tag-hand { background: #2a4a3a; color: #adb; }
+  .tag-slab { background: #4a4a2a; color: #dda; }
+  .tag-throwable { background: #6a2a1a; color: #fca; }
+  .tag-consumable { background: #1a5a2a; color: #afa; }
+  .tag-light { background: #5a5a1a; color: #ffa; }
+  .tag-interactable { background: #1a3a5a; color: #adf; }
+  .tag-furnace { background: #5a2a1a; color: #fca; }
+  .recipe { background: #111; border-radius: 5px; padding: 4px 8px; font-size: 0.8em; color: #ccc; display: inline-block; margin-top: 4px; }
+  .recipe .arrow { color: #ffd93d; margin: 0 4px; }
+  .drop-info { color: #8bc; font-size: 0.8em; }
+</style>
+</head>
+<body>
+
+<h1>Game Encyclopedia</h1>
+<p class="subtitle">Complete reference of every block, item, tool, and weapon</p>
+
+<div class="stat-bar">
+  <div class="stat-box"><div class="num">24</div><div class="label">Blocks</div></div>
+  <div class="stat-box"><div class="num">14</div><div class="label">Items</div></div>
+  <div class="stat-box"><div class="num">38</div><div class="label">Total</div></div>
+  <div class="stat-box"><div class="num">21</div><div class="label">Recipes</div></div>
+</div>
+
+<div id="content"></div>
+
+<script>
+const S = 32;
+const DISPLAY = 48;
+
+function colorToCSS(hex) {
+  const r = (hex >> 16) & 0xff;
+  const g = (hex >> 8) & 0xff;
+  const b = hex & 0xff;
+  return `rgb(${r},${g},${b})`;
+}
+
+function makeCanvas(w, h) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  return c;
+}
+
+function addBorderShading(ctx, s) {
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.fillRect(0, s - 1, s, 1);
+  ctx.fillRect(s - 1, 0, 1, s);
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillRect(0, 0, s, 1);
+  ctx.fillRect(0, 0, 1, s);
+}
+
+function addSlabDetail(ctx, s) {
+  const h = s / 2, y0 = s / 2;
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.fillRect(0, y0 + h * 0.4, s, 1);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fillRect(0, y0 + h * 0.2, s, 1);
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  for (let i = 0; i < 4; i++) {
+    const px = Math.floor(s * (0.15 + i * 0.22));
+    const py = y0 + Math.floor(h * (0.2 + (i % 2) * 0.35));
+    ctx.fillRect(px, py, 2, 2);
+  }
+}
+
+// Block textures
+const BlockTypes = { AIR:0,GRASS:1,DIRT:2,STONE:3,DEEPSLATE:4,SAND:5,SANDSTONE:6,WOOD:7,LEAVES:8,JUNGLE_GRASS:9,PLANKS:10,WORKBENCH:11,CHEST:12,CACTUS:16,VINE:17,TORCH:21,COAL_ORE:23,IRON_ORE:24,FURNACE:25,BIRCH_WOOD:33,BIRCH_LEAVES:34,BIRCH_PLANKS:35,BIRCH_GRASS:36,STONE_SLAB:37,DEEPSLATE_SLAB:38,OAK_SLAB:39,BIRCH_SLAB:40,SANDSTONE_SLAB:41 };
+const ItemTypes = { STICK:13,WOODEN_PICKAXE:14,WOODEN_AXE:15,STONE_PICKAXE:18,STONE_AXE:19,GRASS_ESSENCE:20,COAL:22,RAW_IRON:26,IRON_INGOT:27,IRON_PICKAXE:28,IRON_AXE:29,WOODEN_SWORD:30,STONE_SWORD:31,IRON_SWORD:32,GUNPOWDER:42,BOMB:43 };
+
+const BlockData = {
+  1:{name:'Grass',color:0x4a8c2a,topColor:0x5cb338,hardness:1,tool:'shovel'},
+  2:{name:'Dirt',color:0x8b6914,hardness:1,tool:'shovel'},
+  3:{name:'Stone',color:0x808080,hardness:3,tool:'pickaxe'},
+  4:{name:'Deepslate',color:0x4a4a4a,hardness:5,tool:'pickaxe'},
+  5:{name:'Sand',color:0xdbc67b,hardness:1,tool:'shovel'},
+  6:{name:'Sandstone',color:0xc4a35a,hardness:2,tool:'pickaxe'},
+  7:{name:'Wood',color:0x6b4226,hardness:2,tool:'axe'},
+  8:{name:'Leaves',color:0x2d7a2d,hardness:0.5,tool:'none'},
+  9:{name:'Jungle Grass',color:0x2d6b2d,topColor:0x3a8a3a,hardness:1,tool:'shovel'},
+  10:{name:'Wood Planks',color:0xa0724a,hardness:2,tool:'axe'},
+  11:{name:'Workbench',color:0x8b5e3c,hardness:2,tool:'axe',interactable:true},
+  12:{name:'Chest',color:0x9c7a3c,hardness:2,tool:'axe',interactable:true},
+  16:{name:'Cactus',color:0x2d8a3e,hardness:1,tool:'axe'},
+  17:{name:'Vine',color:0x1a6b2a,hardness:0.2,tool:'none',solid:false},
+  21:{name:'Torch',color:0xffaa22,hardness:0.1,tool:'none',solid:false,lightLevel:12},
+  23:{name:'Coal Ore',color:0x808080,hardness:4,tool:'pickaxe',minTier:2},
+  24:{name:'Iron Ore',color:0x808080,hardness:5,tool:'pickaxe',minTier:2},
+  25:{name:'Furnace',color:0x6a6a6a,hardness:4,tool:'pickaxe',interactable:true},
+  33:{name:'Birch Wood',color:0xe8dcc8,hardness:2,tool:'axe'},
+  34:{name:'Birch Leaves',color:0xcc7733,hardness:0.5,tool:'none'},
+  35:{name:'Birch Planks',color:0xd4c4a0,hardness:2,tool:'axe'},
+  36:{name:'Birch Grass',color:0x4a8c2a,topColor:0x88a040,hardness:1,tool:'shovel'},
+  37:{name:'Stone Slab',color:0x808080,hardness:2,tool:'pickaxe',halfHeight:true},
+  38:{name:'Deepslate Slab',color:0x4a4a4a,hardness:3,tool:'pickaxe',halfHeight:true},
+  39:{name:'Oak Slab',color:0xa0724a,hardness:1.5,tool:'axe',halfHeight:true},
+  40:{name:'Birch Slab',color:0xd4c4a0,hardness:1.5,tool:'axe',halfHeight:true},
+  41:{name:'Sandstone Slab',color:0xc4a35a,hardness:1.5,tool:'pickaxe',halfHeight:true},
+};
+
+function drawBlockDetail(ctx, id, data, s) {
+  switch (id) {
+    case 3: {
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      for (const [x,y] of [[4,6],[12,3],[22,10],[8,20],[26,24],[16,18],[6,28],[20,5]]) ctx.fillRect(x,y,3,2);
+      break;
+    }
+    case 4: {
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      for (let i=0;i<5;i++) ctx.fillRect(0,3+i*6,s,1);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      for (let i=0;i<3;i++) ctx.fillRect(0,6+i*9,s,1);
+      break;
+    }
+    case 6: {
+      ctx.fillStyle = 'rgba(139,107,53,0.3)';
+      for (let i=0;i<4;i++) ctx.fillRect(0,5+i*7,s,1);
+      break;
+    }
+    case 5: {
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      for (const [x,y] of [[3,5],[10,2],[20,8],[5,18],[25,22],[14,26],[28,12],[7,12]]) ctx.fillRect(x,y,1,1);
+      break;
+    }
+    case 7: {
+      ctx.fillStyle = 'rgba(80,30,10,0.4)';
+      for (let i=0;i<4;i++) ctx.fillRect(6+i*7,0,1,s);
+      ctx.fillStyle = 'rgba(120,70,40,0.2)';
+      ctx.fillRect(14,0,4,s);
+      break;
+    }
+    case 8: {
+      ctx.fillStyle = 'rgba(20,100,20,0.4)';
+      for (const [x,y] of [[4,4],[14,6],[24,4],[8,16],[18,14],[28,18],[6,26],[20,24]]) { ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill(); }
+      break;
+    }
+    case 2: {
+      ctx.fillStyle = 'rgba(100,60,10,0.2)';
+      for (const [x,y] of [[5,8],[18,4],[10,22],[26,16],[14,12],[3,26],[22,28],[28,6]]) ctx.fillRect(x,y,2,2);
+      break;
+    }
+    case 10: {
+      ctx.fillStyle = 'rgba(80,50,20,0.3)';
+      ctx.fillRect(0,7,s,1); ctx.fillRect(0,15,s,1); ctx.fillRect(0,23,s,1);
+      ctx.fillStyle = 'rgba(180,130,80,0.15)';
+      ctx.fillRect(0,8,s,1); ctx.fillRect(0,16,s,1); ctx.fillRect(0,24,s,1);
+      break;
+    }
+    case 11: {
+      ctx.fillStyle = 'rgba(60,30,10,0.4)';
+      ctx.fillRect(0,0,s,3); ctx.fillRect(2,3,3,s-3); ctx.fillRect(s-5,3,3,s-3);
+      ctx.fillStyle = 'rgba(160,110,60,0.3)';
+      ctx.fillRect(0,0,s,2);
+      break;
+    }
+    case 12: {
+      ctx.fillStyle = 'rgba(120,80,20,0.3)';
+      ctx.strokeStyle = 'rgba(80,50,10,0.5)'; ctx.lineWidth = 2;
+      ctx.strokeRect(2,4,s-4,s-8);
+      ctx.fillStyle = 'rgba(255,200,50,0.6)';
+      ctx.fillRect(13,12,6,6);
+      break;
+    }
+    case 16: {
+      ctx.fillStyle = 'rgba(20,60,20,0.3)';
+      ctx.fillRect(4,0,2,s); ctx.fillRect(s-6,0,2,s);
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      for (const [sx,sy] of [[6,4],[20,8],[8,16],[22,22],[10,28],[24,14]]) ctx.fillRect(sx,sy,2,2);
+      break;
+    }
+    case 17: {
+      ctx.fillStyle = 'rgba(10,80,20,0.5)';
+      ctx.fillRect(6,0,3,s); ctx.fillRect(16,2,2,s-2); ctx.fillRect(24,1,3,s-1);
+      ctx.fillStyle = 'rgba(30,120,40,0.3)';
+      ctx.fillRect(10,4,2,8); ctx.fillRect(20,12,2,10);
+      break;
+    }
+    case 23: {
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      for (const [x,y] of [[4,6],[12,3],[22,10],[8,20],[26,24],[16,18]]) ctx.fillRect(x,y,3,2);
+      ctx.fillStyle = '#222222';
+      for (const [x,y] of [[8,8],[18,14],[10,20],[22,6],[14,24],[24,18]]) { ctx.fillRect(x,y,4,3); ctx.fillRect(x+1,y-1,2,1); }
+      break;
+    }
+    case 24: {
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      for (const [x,y] of [[4,6],[12,3],[22,10],[8,20],[26,24],[16,18]]) ctx.fillRect(x,y,3,2);
+      ctx.fillStyle = '#cc9966';
+      for (const [x,y] of [[7,10],[20,6],[12,20],[24,16],[16,8],[8,26]]) { ctx.fillRect(x,y,4,3); ctx.fillRect(x+1,y-1,2,1); }
+      break;
+    }
+    case 25: {
+      ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0,0,s,s);
+      ctx.fillStyle = '#555555'; ctx.fillRect(2,2,s-4,s-4);
+      ctx.fillStyle = '#6a6a6a'; ctx.fillRect(3,3,s-6,s-6);
+      ctx.fillStyle = '#1a1a1a'; ctx.fillRect(s*0.25,s*0.4,s*0.5,s*0.45);
+      ctx.fillStyle = '#cc4400'; ctx.fillRect(s*0.3,s*0.65,s*0.15,s*0.12); ctx.fillRect(s*0.55,s*0.6,s*0.1,s*0.15);
+      break;
+    }
+    case 21: {
+      ctx.clearRect(0,0,s,s);
+      ctx.fillStyle = '#8B6914'; ctx.fillRect(s*0.44,s*0.35,s*0.12,s*0.55);
+      ctx.fillStyle = '#FFAA22'; ctx.beginPath(); ctx.ellipse(s*0.5,s*0.3,s*0.14,s*0.18,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#FFDD44'; ctx.beginPath(); ctx.ellipse(s*0.5,s*0.28,s*0.08,s*0.1,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#FFFFAA'; ctx.beginPath(); ctx.ellipse(s*0.5,s*0.26,s*0.03,s*0.05,0,0,Math.PI*2); ctx.fill();
+      break;
+    }
+    case 33: {
+      ctx.clearRect(0,0,s,s);
+      ctx.fillStyle = '#e8dcc8'; ctx.fillRect(s*0.25,0,s*0.5,s);
+      ctx.fillStyle = '#d0c4b0'; ctx.fillRect(s*0.25,0,1,s); ctx.fillRect(s*0.75-1,0,1,s);
+      ctx.fillStyle = '#555555';
+      ctx.fillRect(s*0.28,s*0.1,s*0.2,2); ctx.fillRect(s*0.5,s*0.25,s*0.18,2);
+      ctx.fillRect(s*0.3,s*0.45,s*0.15,2); ctx.fillRect(s*0.48,s*0.6,s*0.2,2);
+      ctx.fillRect(s*0.28,s*0.78,s*0.22,2);
+      ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(s*0.4,0,s*0.08,s);
+      break;
+    }
+    case 34: {
+      ctx.fillStyle = 'rgba(160,80,20,0.4)';
+      for (const [x,y] of [[4,4],[14,6],[24,4],[8,16],[18,14],[28,18],[6,26],[20,24]]) { ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill(); }
+      ctx.fillStyle = 'rgba(255,200,100,0.2)';
+      for (const [x,y] of [[10,10],[22,8],[16,22],[8,20]]) ctx.fillRect(x,y,2,2);
+      break;
+    }
+    case 35: {
+      ctx.fillStyle = 'rgba(160,140,100,0.3)';
+      ctx.fillRect(0,7,s,1); ctx.fillRect(0,15,s,1); ctx.fillRect(0,23,s,1);
+      ctx.fillStyle = 'rgba(240,230,200,0.15)';
+      ctx.fillRect(0,8,s,1); ctx.fillRect(0,16,s,1); ctx.fillRect(0,24,s,1);
+      break;
+    }
+    case 36: {
+      ctx.fillStyle = 'rgba(100,60,10,0.2)';
+      for (const [x,y] of [[5,8],[18,4],[10,22],[26,16],[14,12],[3,26],[22,28],[28,6]]) ctx.fillRect(x,y,2,2);
+      ctx.fillStyle = 'rgba(220,140,40,0.5)';
+      for (const [x,y] of [[8,2],[20,1],[4,5],[16,4],[28,3],[12,6],[24,5]]) ctx.fillRect(x,y,3,2);
+      break;
+    }
+  }
+}
+
+function generateBlockTexture(id) {
+  const data = BlockData[id];
+  if (!data) return null;
+  const s = S;
+  const c = makeCanvas(s, s);
+  const ctx = c.getContext('2d');
+
+  if (data.halfHeight) {
+    ctx.fillStyle = colorToCSS(data.color);
+    ctx.fillRect(0, s/2, s, s/2);
+    addSlabDetail(ctx, s);
+    ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.fillRect(0,s-1,s,1); ctx.fillRect(s-1,s/2,1,s/2);
+    ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(0,s/2,s,1); ctx.fillRect(0,s/2,1,s/2);
+  } else {
+    ctx.fillStyle = colorToCSS(data.color);
+    ctx.fillRect(0, 0, s, s);
+    if (data.topColor) {
+      ctx.fillStyle = colorToCSS(data.topColor);
+      ctx.fillRect(0, 0, s, Math.floor(s/4));
+    }
+    drawBlockDetail(ctx, id, data, s);
+    if (data.solid !== false && id !== 33) addBorderShading(ctx, s);
+  }
+  return c;
+}
+
+// Item texture helpers
+function drawPickC(ctx,s,hc,dc,lc,ac) {
+  ctx.fillStyle='#5a3a1a'; ctx.fillRect(s*0.48,s*0.3,s*0.04,s*0.62);
+  ctx.fillStyle='#8B5E3C'; ctx.fillRect(s*0.485,s*0.32,s*0.03,s*0.58);
+  ctx.fillStyle='#aa8844'; for(let i=0;i<4;i++) ctx.fillRect(s*0.46,s*0.7+i*5,s*0.08,2);
+  ctx.fillStyle=dc; ctx.beginPath(); ctx.moveTo(s*0.06,s*0.14); ctx.quadraticCurveTo(s*0.06,s*0.04,s*0.2,s*0.06); ctx.lineTo(s*0.48,s*0.16); ctx.lineTo(s*0.52,s*0.16); ctx.lineTo(s*0.8,s*0.06); ctx.quadraticCurveTo(s*0.94,s*0.04,s*0.94,s*0.14); ctx.lineTo(s*0.86,s*0.22); ctx.lineTo(s*0.14,s*0.22); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=hc; ctx.beginPath(); ctx.moveTo(s*0.1,s*0.14); ctx.quadraticCurveTo(s*0.1,s*0.07,s*0.22,s*0.08); ctx.lineTo(s*0.48,s*0.17); ctx.lineTo(s*0.52,s*0.17); ctx.lineTo(s*0.78,s*0.08); ctx.quadraticCurveTo(s*0.9,s*0.07,s*0.9,s*0.14); ctx.lineTo(s*0.84,s*0.2); ctx.lineTo(s*0.16,s*0.2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=lc; ctx.beginPath(); ctx.moveTo(s*0.16,s*0.12); ctx.quadraticCurveTo(s*0.5,s*0.08,s*0.84,s*0.12); ctx.lineTo(s*0.84,s*0.14); ctx.quadraticCurveTo(s*0.5,s*0.1,s*0.16,s*0.14); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=ac; ctx.fillRect(s*0.06,s*0.12,s*0.06,s*0.06); ctx.fillRect(s*0.88,s*0.12,s*0.06,s*0.06);
+}
+function drawAxeC(ctx,s,hc,dc,lc) {
+  ctx.fillStyle='#5a3a1a'; ctx.fillRect(s*0.38,s*0.3,s*0.04,s*0.62);
+  ctx.fillStyle='#8B5E3C'; ctx.fillRect(s*0.385,s*0.32,s*0.03,s*0.58);
+  ctx.fillStyle='#aa8844'; for(let i=0;i<4;i++) ctx.fillRect(s*0.36,s*0.7+i*5,s*0.08,2);
+  ctx.fillStyle=dc; ctx.beginPath(); ctx.moveTo(s*0.38,s*0.06); ctx.lineTo(s*0.38,s*0.38); ctx.quadraticCurveTo(s*0.7,s*0.42,s*0.92,s*0.28); ctx.quadraticCurveTo(s*0.94,s*0.2,s*0.92,s*0.12); ctx.quadraticCurveTo(s*0.7,s*0.02,s*0.38,s*0.06); ctx.fill();
+  ctx.fillStyle=hc; ctx.beginPath(); ctx.moveTo(s*0.4,s*0.08); ctx.lineTo(s*0.4,s*0.36); ctx.quadraticCurveTo(s*0.68,s*0.4,s*0.88,s*0.28); ctx.quadraticCurveTo(s*0.9,s*0.2,s*0.88,s*0.14); ctx.quadraticCurveTo(s*0.68,s*0.04,s*0.4,s*0.08); ctx.fill();
+  ctx.strokeStyle=lc; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(s*0.88,s*0.14); ctx.quadraticCurveTo(s*0.92,s*0.22,s*0.88,s*0.3); ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.lineWidth=0.8; ctx.beginPath(); ctx.moveTo(s*0.44,s*0.12); ctx.quadraticCurveTo(s*0.6,s*0.08,s*0.78,s*0.18); ctx.stroke();
+}
+function drawSwordC(ctx,s,bc,dc,lc,gc) {
+  ctx.fillStyle='#5a3a1a'; ctx.fillRect(s*0.46,s*0.72,s*0.08,s*0.2);
+  ctx.fillStyle='#7a5230'; ctx.fillRect(s*0.47,s*0.74,s*0.06,s*0.16);
+  ctx.fillStyle='#aa8844'; ctx.fillRect(s*0.44,s*0.76,s*0.12,s*0.02); ctx.fillRect(s*0.44,s*0.82,s*0.12,s*0.02); ctx.fillRect(s*0.44,s*0.88,s*0.12,s*0.02);
+  ctx.fillStyle='#777'; ctx.beginPath(); ctx.arc(s*0.5,s*0.94,2.5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#888'; ctx.beginPath(); ctx.moveTo(s*0.22,s*0.7); ctx.quadraticCurveTo(s*0.5,s*0.64,s*0.78,s*0.7); ctx.quadraticCurveTo(s*0.5,s*0.74,s*0.22,s*0.7); ctx.fill();
+  ctx.fillStyle=gc; ctx.beginPath(); ctx.arc(s*0.5,s*0.7,2,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=dc; ctx.beginPath(); ctx.moveTo(s*0.4,s*0.68); ctx.lineTo(s*0.6,s*0.68); ctx.lineTo(s*0.56,s*0.16); ctx.lineTo(s*0.5,s*0.02); ctx.lineTo(s*0.44,s*0.16); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=bc; ctx.beginPath(); ctx.moveTo(s*0.42,s*0.66); ctx.lineTo(s*0.58,s*0.66); ctx.lineTo(s*0.54,s*0.18); ctx.lineTo(s*0.5,s*0.04); ctx.lineTo(s*0.46,s*0.18); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=dc; ctx.fillRect(s*0.48,s*0.2,s*0.04,s*0.38);
+  ctx.fillStyle=bc; ctx.fillRect(s*0.485,s*0.22,s*0.03,s*0.34);
+  ctx.fillStyle=lc; ctx.beginPath(); ctx.moveTo(s*0.44,s*0.58); ctx.lineTo(s*0.46,s*0.2); ctx.lineTo(s*0.47,s*0.2); ctx.lineTo(s*0.45,s*0.58); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(s*0.5,s*0.06,1.5,0,Math.PI*2); ctx.fill();
+}
+
+function generateItemTexture(id) {
+  const s = S;
+  const c = makeCanvas(s, s);
+  const ctx = c.getContext('2d');
+  switch(id) {
+    case 13: // STICK
+      ctx.strokeStyle='#8B5E3C'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(s*0.35,s*0.15); ctx.lineTo(s*0.65,s*0.85); ctx.stroke();
+      ctx.strokeStyle='#6B4226'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(s*0.37,s*0.15); ctx.lineTo(s*0.67,s*0.85); ctx.stroke();
+      break;
+    case 14: drawPickC(ctx,s,'#B08860','#7a5535','#d4b488','#9a7040'); break;
+    case 15: drawAxeC(ctx,s,'#B08860','#7a5535','#d4b488'); break;
+    case 18: drawPickC(ctx,s,'#8a8a8a','#5a5a5a','#b0b0b0','#707070'); break;
+    case 19: drawAxeC(ctx,s,'#8a8a8a','#5a5a5a','#b8b8b8'); break;
+    case 28: drawPickC(ctx,s,'#cccccc','#909090','#eaeaea','#aaaaaa'); break;
+    case 29: drawAxeC(ctx,s,'#cccccc','#909090','#eeeeee'); break;
+    case 30: drawSwordC(ctx,s,'#c4a060','#9a7a40','#ddcc88','#88aa44'); break;
+    case 31: drawSwordC(ctx,s,'#999999','#707070','#cccccc','#6688aa'); break;
+    case 32: drawSwordC(ctx,s,'#dddddd','#a8a8a8','#f8f8f8','#4488dd'); break;
+    case 20: // GRASS_ESSENCE
+      ctx.fillStyle='rgba(50,200,50,0.15)'; ctx.beginPath(); ctx.ellipse(s*0.5,s*0.52,s*0.4,s*0.44,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#1a6a1a'; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.18); ctx.quadraticCurveTo(s*0.82,s*0.38,s*0.78,s*0.62); ctx.quadraticCurveTo(s*0.72,s*0.88,s*0.5,s*0.9); ctx.quadraticCurveTo(s*0.28,s*0.88,s*0.22,s*0.62); ctx.quadraticCurveTo(s*0.18,s*0.38,s*0.5,s*0.18); ctx.fill();
+      ctx.fillStyle='#33aa33'; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.22); ctx.quadraticCurveTo(s*0.76,s*0.4,s*0.72,s*0.6); ctx.quadraticCurveTo(s*0.68,s*0.84,s*0.5,s*0.86); ctx.quadraticCurveTo(s*0.32,s*0.84,s*0.28,s*0.6); ctx.quadraticCurveTo(s*0.24,s*0.4,s*0.5,s*0.22); ctx.fill();
+      ctx.fillStyle='#88ff88'; ctx.beginPath(); ctx.arc(s*0.42,s*0.5,2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(s*0.58,s*0.62,1.5,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(s*0.5,s*0.72,1,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(s*0.38,s*0.66,1.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.ellipse(s*0.4,s*0.4,3,7,-0.3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#886633'; ctx.fillRect(s*0.44,s*0.1,s*0.12,s*0.1);
+      ctx.fillStyle='#aa8844'; ctx.fillRect(s*0.45,s*0.11,s*0.1,s*0.08);
+      ctx.fillStyle='#44aa44'; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.08); ctx.quadraticCurveTo(s*0.62,s*0.02,s*0.66,s*0.06); ctx.quadraticCurveTo(s*0.6,s*0.12,s*0.5,s*0.12); ctx.closePath(); ctx.fill();
+      break;
+    case 22: // COAL
+      ctx.fillStyle='#222222'; ctx.beginPath(); ctx.ellipse(s*0.5,s*0.52,s*0.32,s*0.3,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#3a3a3a'; ctx.fillRect(s*0.3,s*0.35,s*0.15,s*0.12); ctx.fillRect(s*0.55,s*0.5,s*0.1,s*0.1);
+      break;
+    case 26: // RAW_IRON
+      ctx.fillStyle='#cc9966'; ctx.beginPath(); ctx.moveTo(s*0.3,s*0.7); ctx.lineTo(s*0.2,s*0.4); ctx.lineTo(s*0.45,s*0.25); ctx.lineTo(s*0.75,s*0.35); ctx.lineTo(s*0.8,s*0.6); ctx.lineTo(s*0.55,s*0.75); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#b8844a'; ctx.fillRect(s*0.35,s*0.4,s*0.15,s*0.12); ctx.fillRect(s*0.55,s*0.5,s*0.1,s*0.08);
+      break;
+    case 27: // IRON_INGOT
+      ctx.fillStyle='#d4d4d4'; ctx.beginPath(); ctx.moveTo(s*0.15,s*0.6); ctx.lineTo(s*0.3,s*0.35); ctx.lineTo(s*0.7,s*0.35); ctx.lineTo(s*0.85,s*0.6); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#aaaaaa'; ctx.beginPath(); ctx.moveTo(s*0.15,s*0.6); ctx.lineTo(s*0.85,s*0.6); ctx.lineTo(s*0.75,s*0.72); ctx.lineTo(s*0.25,s*0.72); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#eeeeee'; ctx.fillRect(s*0.4,s*0.4,s*0.12,s*0.06);
+      break;
+    case 42: // GUNPOWDER
+      ctx.fillStyle='#333333'; ctx.beginPath(); ctx.moveTo(s*0.3,s*0.75); ctx.lineTo(s*0.22,s*0.5); ctx.lineTo(s*0.38,s*0.35); ctx.lineTo(s*0.62,s*0.35); ctx.lineTo(s*0.78,s*0.5); ctx.lineTo(s*0.7,s*0.75); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#555555'; ctx.fillRect(s*0.35,s*0.42,s*0.12,s*0.08); ctx.fillRect(s*0.52,s*0.55,s*0.1,s*0.06);
+      ctx.fillStyle='#1a1a1a';
+      const gSpots=[[0.38,0.45],[0.55,0.48],[0.42,0.6],[0.62,0.58],[0.48,0.52],[0.35,0.65]];
+      for(const [px,py] of gSpots) { ctx.beginPath(); ctx.arc(s*px,s*py,1,0,Math.PI*2); ctx.fill(); }
+      break;
+    case 43: // BOMB
+      ctx.fillStyle='#2a2a2a'; ctx.beginPath(); ctx.arc(s*0.5,s*0.58,s*0.3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#3d3d3d'; ctx.beginPath(); ctx.arc(s*0.5,s*0.58,s*0.24,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#555555'; ctx.beginPath(); ctx.arc(s*0.42,s*0.5,s*0.06,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#8B5E3C'; ctx.fillRect(s*0.46,s*0.22,s*0.08,s*0.12);
+      ctx.fillStyle='#aa7744'; ctx.fillRect(s*0.47,s*0.23,s*0.06,s*0.1);
+      ctx.strokeStyle='#cc8833'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.22); ctx.quadraticCurveTo(s*0.62,s*0.12,s*0.65,s*0.08); ctx.stroke();
+      ctx.fillStyle='#ff6622'; ctx.beginPath(); ctx.arc(s*0.65,s*0.08,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffaa22'; ctx.beginPath(); ctx.arc(s*0.65,s*0.08,1.5,0,Math.PI*2); ctx.fill();
+      break;
+  }
+  return c;
+}
+
+function generateEnemyTexture(type) {
+  const w = S, h = S * 2;
+  const c = makeCanvas(w, h);
+  const ctx = c.getContext('2d');
+  if (type === 'zombie') {
+    ctx.fillStyle='#3a7a3a'; ctx.beginPath(); ctx.moveTo(w*0.5,h*0.06); ctx.lineTo(w*0.72,h*0.12); ctx.lineTo(w*0.82,h*0.3); ctx.lineTo(w*0.85,h*0.5); ctx.lineTo(w*0.78,h*0.72); ctx.lineTo(w*0.72,h*0.92); ctx.lineTo(w*0.6,h*0.96); ctx.lineTo(w*0.4,h*0.96); ctx.lineTo(w*0.28,h*0.92); ctx.lineTo(w*0.18,h*0.7); ctx.lineTo(w*0.15,h*0.48); ctx.lineTo(w*0.2,h*0.28); ctx.lineTo(w*0.32,h*0.1); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#2a5a2a'; ctx.beginPath(); ctx.arc(w*0.6,h*0.5,5,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(w*0.35,h*0.65,4,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(w*0.55,h*0.75,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#cc2222'; ctx.beginPath(); ctx.ellipse(w*0.38,h*0.2,3,4,-0.2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(w*0.6,h*0.18,4,3,0.15,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(w*0.38,h*0.2,1.5,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(w*0.61,h*0.18,1.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#1a3a1a'; ctx.fillRect(w*0.35,h*0.28,w*0.25,3);
+    ctx.fillStyle='#55bb55'; ctx.fillRect(w*0.42,h*0.31,2,5); ctx.fillRect(w*0.5,h*0.31,2,7);
+  } else if (type === 'skeleton') {
+    ctx.fillStyle='#e8e0cc'; ctx.beginPath(); ctx.ellipse(w*0.5,h*0.13,9,10,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#d4cdb8'; ctx.fillRect(w*0.32,h*0.2,w*0.36,4);
+    ctx.fillStyle='#0a0a0a'; ctx.beginPath(); ctx.ellipse(w*0.38,h*0.11,3,4,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(w*0.62,h*0.11,3,4,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#cc3333'; ctx.beginPath(); ctx.arc(w*0.38,h*0.11,1.5,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(w*0.62,h*0.11,1.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#2a2a1a'; ctx.beginPath(); ctx.arc(w*0.5,h*0.16,1.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ccccbb'; for(let i=0;i<5;i++) ctx.fillRect(w*0.34+i*3,h*0.2,2,3);
+    ctx.fillStyle='#ccc8b0'; for(let i=0;i<6;i++) ctx.fillRect(w*0.44,h*0.26+i*6,w*0.12,4);
+    ctx.strokeStyle='#d4cdb8'; ctx.lineWidth=1.5; for(let i=0;i<3;i++){const ry=h*0.32+i*10; ctx.beginPath(); ctx.arc(w*0.5,ry,8,Math.PI*0.15,Math.PI*0.85); ctx.stroke();}
+    ctx.fillStyle='#6b4226'; ctx.fillRect(w*0.75,h*0.28,3,18);
+    ctx.strokeStyle='#888'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(w*0.76,h*0.27); ctx.lineTo(w*0.9,h*0.32); ctx.moveTo(w*0.76,h*0.43); ctx.lineTo(w*0.9,h*0.38); ctx.stroke();
+    ctx.fillStyle='#d4cdb8'; ctx.fillRect(w*0.34,h*0.62,3,h*0.28); ctx.fillRect(w*0.62,h*0.62,3,h*0.28); ctx.fillRect(w*0.44,h*0.6,w*0.12,3);
+  } else if (type === 'bomb_zombie') {
+    ctx.fillStyle='#bb3318'; ctx.beginPath(); ctx.ellipse(w*0.5,h*0.45,w*0.42,h*0.3,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#dd6622'; ctx.beginPath(); ctx.ellipse(w*0.5,h*0.5,w*0.25,h*0.18,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ff9944'; ctx.beginPath(); ctx.ellipse(w*0.5,h*0.48,w*0.12,h*0.08,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ffee00'; ctx.beginPath(); ctx.ellipse(w*0.36,h*0.34,4,5,-0.2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(w*0.64,h*0.34,4,5,0.2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(w*0.36,h*0.34,2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(w*0.64,h*0.34,2,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#1a0a0a'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(w*0.5,h*0.46,4,0.2,Math.PI-0.2); ctx.stroke();
+    ctx.strokeStyle='#444'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(w*0.5,h*0.15); ctx.quadraticCurveTo(w*0.65,h*0.08,w*0.6,h*0.02); ctx.stroke();
+    ctx.fillStyle='#ffff44'; ctx.beginPath(); ctx.arc(w*0.6,h*0.02,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#ffaa00'; ctx.beginPath(); ctx.arc(w*0.6,h*0.02,1.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#993018'; ctx.fillRect(w*0.3,h*0.74,w*0.14,h*0.2); ctx.fillRect(w*0.56,h*0.74,w*0.14,h*0.2);
+    ctx.fillStyle='#771a0a'; ctx.fillRect(w*0.26,h*0.9,w*0.2,h*0.06); ctx.fillRect(w*0.54,h*0.9,w*0.2,h*0.06);
+  }
+  return c;
+}
+
+function styled(canvas, displayW, displayH) {
+  canvas.style.width = displayW + 'px';
+  canvas.style.height = displayH + 'px';
+  canvas.style.imageRendering = 'pixelated';
+  return canvas;
+}
+
+function card(canvas, name, detailsHTML) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.appendChild(canvas);
+  const info = document.createElement('div');
+  info.className = 'info';
+  info.innerHTML = `<div class="name">${name}</div><div class="details">${detailsHTML}</div>`;
+  div.appendChild(info);
+  return div;
+}
+
+function toolTag(t) {
+  if (t === 'pickaxe') return '<span class="tag tag-pickaxe">Pickaxe</span>';
+  if (t === 'axe') return '<span class="tag tag-axe">Axe</span>';
+  if (t === 'shovel') return '<span class="tag tag-shovel">Shovel</span>';
+  return '<span class="tag tag-none">Any</span>';
+}
+
+function section(title, id) {
+  const s = document.createElement('div');
+  s.className = 'section';
+  s.innerHTML = `<div class="section-title">${title}</div>`;
+  const g = document.createElement('div');
+  g.className = 'grid';
+  s.appendChild(g);
+  return { section: s, grid: g };
+}
+
+function addBlockCard(grid, id, extra) {
+  const data = BlockData[id];
+  if (!data) return;
+  const c = generateBlockTexture(id);
+  styled(c, DISPLAY, DISPLAY);
+  let det = toolTag(data.tool);
+  if (data.interactable) det += '<span class="tag tag-interactable">Interactable</span>';
+  if (data.halfHeight) det += '<span class="tag tag-slab">Slab</span>';
+  if (data.lightLevel) det += `<span class="tag tag-light">Light: ${data.lightLevel}</span>`;
+  if (data.solid === false) det += ' Non-solid';
+  det += ` <span>Hardness: ${data.hardness}</span>`;
+  if (data.minTier) det += ` <span>Min Tier: ${data.minTier === 2 ? 'Stone' : data.minTier}</span>`;
+  if (extra) det += '<br>' + extra;
+  grid.appendChild(card(c, data.name, det));
+}
+
+function addItemCard(grid, id, extra) {
+  const c = generateItemTexture(id);
+  styled(c, DISPLAY, DISPLAY);
+  grid.appendChild(card(c, extra.name, extra.details));
+}
+
+const content = document.getElementById('content');
+
+// Natural Blocks
+const nat = section('Natural Blocks');
+content.appendChild(nat.section);
+addBlockCard(nat.grid, 1, '<span class="drop-info">Drops: Dirt (+10% Grass Essence)</span>');
+addBlockCard(nat.grid, 2);
+addBlockCard(nat.grid, 3);
+addBlockCard(nat.grid, 4);
+addBlockCard(nat.grid, 5);
+addBlockCard(nat.grid, 6);
+addBlockCard(nat.grid, 7);
+addBlockCard(nat.grid, 8);
+addBlockCard(nat.grid, 33);
+addBlockCard(nat.grid, 34);
+addBlockCard(nat.grid, 9, '<span class="drop-info">Drops: Dirt (+10% Grass Essence)</span>');
+addBlockCard(nat.grid, 36, '<span class="drop-info">Drops: Dirt (+10% Grass Essence)</span>');
+addBlockCard(nat.grid, 16);
+addBlockCard(nat.grid, 17, '<span class="drop-info">Drops: Nothing</span>');
+
+// Ore Blocks
+const ore = section('Ore Blocks');
+content.appendChild(ore.section);
+addBlockCard(ore.grid, 23, '<span class="drop-info">Drops: Coal</span>');
+addBlockCard(ore.grid, 24, '<span class="drop-info">Drops: Raw Iron</span>');
+
+// Crafted & Functional
+const craft = section('Crafted &amp; Functional Blocks');
+content.appendChild(craft.section);
+addBlockCard(craft.grid, 10, '<div class="recipe">1 Wood <span class="arrow">\u2192</span> 4 Planks <span class="tag tag-hand">Hand</span></div>');
+addBlockCard(craft.grid, 35, '<div class="recipe">1 Birch Wood <span class="arrow">\u2192</span> 4 Birch Planks <span class="tag tag-hand">Hand</span></div>');
+addBlockCard(craft.grid, 11, '<div class="recipe">4 Planks <span class="arrow">\u2192</span> 1 Workbench <span class="tag tag-hand">Hand</span></div>');
+addBlockCard(craft.grid, 12, '<div class="recipe">8 Planks <span class="arrow">\u2192</span> 1 Chest <span class="tag tag-workbench">Workbench</span></div>');
+addBlockCard(craft.grid, 25, '<div class="recipe">8 Stone <span class="arrow">\u2192</span> 1 Furnace <span class="tag tag-workbench">Workbench</span></div>');
+addBlockCard(craft.grid, 21, '<div class="recipe">1 Coal + 1 Stick <span class="arrow">\u2192</span> 4 Torches <span class="tag tag-hand">Hand</span></div>');
+
+// Slabs
+const slabs = section('Slabs (Half-Height Blocks)');
+content.appendChild(slabs.section);
+addBlockCard(slabs.grid, 37, '<div class="recipe">3 Stone <span class="arrow">\u2192</span> 6 Slabs <span class="tag tag-workbench">Workbench</span></div>');
+addBlockCard(slabs.grid, 38, '<div class="recipe">3 Deepslate <span class="arrow">\u2192</span> 6 Slabs <span class="tag tag-workbench">Workbench</span></div>');
+addBlockCard(slabs.grid, 39, '<div class="recipe">3 Planks <span class="arrow">\u2192</span> 6 Slabs <span class="tag tag-workbench">Workbench</span></div>');
+addBlockCard(slabs.grid, 40, '<div class="recipe">3 Birch Planks <span class="arrow">\u2192</span> 6 Slabs <span class="tag tag-workbench">Workbench</span></div>');
+addBlockCard(slabs.grid, 41, '<div class="recipe">3 Sandstone <span class="arrow">\u2192</span> 6 Slabs <span class="tag tag-workbench">Workbench</span></div>');
+
+// Tools
+const tools = section('Tools');
+content.appendChild(tools.section);
+const toolItems = [
+  {id:14,name:'Wooden Pickaxe',details:'<span class="tag tag-pickaxe">Pickaxe</span> Speed: 3 | Tier: 1<div class="recipe">3 Planks + 2 Sticks <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:18,name:'Stone Pickaxe',details:'<span class="tag tag-pickaxe">Pickaxe</span> Speed: 5 | Tier: 2<div class="recipe">3 Stone + 2 Sticks <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:28,name:'Iron Pickaxe',details:'<span class="tag tag-pickaxe">Pickaxe</span> Speed: 8 | Tier: 3<div class="recipe">3 Iron Ingots + 2 Sticks <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:15,name:'Wooden Axe',details:'<span class="tag tag-axe">Axe</span> Speed: 3<div class="recipe">3 Planks + 2 Sticks <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:19,name:'Stone Axe',details:'<span class="tag tag-axe">Axe</span> Speed: 5<div class="recipe">3 Stone + 2 Sticks <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:29,name:'Iron Axe',details:'<span class="tag tag-axe">Axe</span> Speed: 8<div class="recipe">3 Iron Ingots + 2 Sticks <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+];
+for (const t of toolItems) addItemCard(tools.grid, t.id, t);
+
+// Weapons
+const weap = section('Weapons');
+content.appendChild(weap.section);
+const weapItems = [
+  {id:30,name:'Wooden Sword',details:'<span class="tag tag-sword">Sword</span> Damage: 10<div class="recipe">2 Planks + 1 Stick <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:31,name:'Stone Sword',details:'<span class="tag tag-sword">Sword</span> Damage: 15<div class="recipe">2 Stone + 1 Stick <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:32,name:'Iron Sword',details:'<span class="tag tag-sword">Sword</span> Damage: 20<div class="recipe">2 Iron Ingots + 1 Stick <span class="arrow">\u2192</span> 1 <span class="tag tag-workbench">Workbench</span></div>'},
+  {id:43,name:'Bomb',details:'<span class="tag tag-throwable">Throwable</span> Damage: 40 | Radius: 3 | Stack: 99<div class="recipe">1 Gunpowder + 1 Coal <span class="arrow">\u2192</span> 1 Bomb <span class="tag tag-hand">Hand</span></div>'},
+];
+for (const t of weapItems) addItemCard(weap.grid, t.id, t);
+
+// Materials
+const mats = section('Materials &amp; Resources');
+content.appendChild(mats.section);
+const matItems = [
+  {id:13,name:'Stick',details:'Stack: 99<div class="recipe">1 Planks <span class="arrow">\u2192</span> 4 Sticks <span class="tag tag-hand">Hand</span></div>'},
+  {id:22,name:'Coal',details:'Stack: 99<br><span class="drop-info">Source: Coal Ore (Stone Pickaxe+)</span>'},
+  {id:26,name:'Raw Iron',details:'Stack: 99<br><span class="drop-info">Source: Iron Ore (Stone Pickaxe+)</span>'},
+  {id:27,name:'Iron Ingot',details:'Stack: 99<div class="recipe">1 Raw Iron + 1 Coal <span class="arrow">\u2192</span> 1 Ingot <span class="tag tag-furnace">Furnace</span></div>'},
+  {id:42,name:'Gunpowder',details:'Stack: 99<br><span class="drop-info">Source: Bomb Zombie (65% on explode, 80% on kill)</span>'},
+];
+for (const t of matItems) addItemCard(mats.grid, t.id, t);
+
+// Consumables
+const cons = section('Consumables');
+content.appendChild(cons.section);
+addItemCard(cons.grid, 20, {name:'Grass Essence', details:'<span class="tag tag-consumable">Consumable</span> Heals: 15 HP | Stack: 99<br><span class="drop-info">Source: 10% from Grass blocks, Loot Chests</span><br><span class="drop-info">Usage: Hold RMB for 2 seconds</span>'});
+
+// Enemies
+const enem = section('Enemies');
+content.appendChild(enem.section);
+const enemies = [
+  {type:'zombie',name:'Zombie',details:'HP: 40 | Damage: 15 | Speed: 60<br><span class="drop-info">Melee attacker, chases player</span>'},
+  {type:'skeleton',name:'Skeleton',details:'HP: 30 | Damage: 8 | Speed: 45<br><span class="drop-info">Ranged attacker, shoots arrows</span>'},
+  {type:'bomb_zombie',name:'Bomb Zombie',details:'HP: 25 | Damage: 40 | Speed: 85<br><span class="drop-info">Charges and explodes (radius 3). Drops Gunpowder.</span>'},
+];
+for (const e of enemies) {
+  const c = generateEnemyTexture(e.type);
+  styled(c, DISPLAY, DISPLAY * 2);
+  enem.grid.appendChild(card(c, e.name, e.details));
+}
+</script>
+
+</body>
+</html>
