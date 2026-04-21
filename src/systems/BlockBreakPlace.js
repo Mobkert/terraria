@@ -1,5 +1,5 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
-import { getToolData, getConsumableData } from '../data/items.js';
+import { getToolData, getConsumableData, ItemData } from '../data/items.js';
 import DroppedItem from '../entities/DroppedItem.js';
 
 export default class BlockBreakPlace {
@@ -36,6 +36,10 @@ export default class BlockBreakPlace {
 
     this.lastSwingThreshold = 0;
 
+    this.throwCooldown = 0;
+    this.THROW_DELAY = 300;
+    this.spawnBombFn = null;
+
     scene.input.mouse.disableContextMenu();
   }
 
@@ -61,13 +65,18 @@ export default class BlockBreakPlace {
     this.drawCursorHighlight(tileX, tileY, inRange);
 
     if (this.attackCooldown > 0) this.attackCooldown -= delta;
+    if (this.throwCooldown > 0) this.throwCooldown -= delta;
 
     if (pointer.leftButtonDown()) {
       const held = this.inventory.getSelectedItem();
       const tool = held ? getToolData(held.type) : null;
+      const itemInfo = held ? ItemData[held.type] : null;
       if (tool && tool.toolType === 'sword') {
         this.resetBreaking();
         this.handleSwordAttack();
+      } else if (itemInfo && itemInfo.throwable) {
+        this.resetBreaking();
+        this.handleThrow(worldX, worldY, itemInfo);
       } else if (inRange) {
         this.handleBreaking(tileX, tileY, delta);
       } else {
@@ -463,6 +472,24 @@ export default class BlockBreakPlace {
     }
 
     this.attackCooldown = this.ATTACK_DELAY;
+  }
+
+  handleThrow(worldX, worldY, itemInfo) {
+    if (this.throwCooldown > 0) return;
+    if (!this.spawnBombFn) return;
+
+    const px = this.player.x;
+    const py = this.player.y - this.player.height * 0.6;
+    const dx = worldX - px;
+    const dy = worldY - py;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const speed = 400;
+    const vx = (dx / dist) * speed;
+    const vy = (dy / dist) * speed;
+
+    this.spawnBombFn(px, py, vx, vy, itemInfo.damage, itemInfo.explodeRadius);
+    this.inventory.consumeSelected(1);
+    this.throwCooldown = this.THROW_DELAY;
   }
 
   handleInteract(blockType, tileX, tileY) {

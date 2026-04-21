@@ -461,6 +461,57 @@ export default class BootScene extends Phaser.Scene {
     this.makeItemTexture(ItemTypes.IRON_SWORD, (ctx) => {
       this.drawSwordC(ctx, s, '#dddddd', '#a8a8a8', '#f8f8f8', '#4488dd');
     });
+
+    this.makeItemTexture(ItemTypes.GUNPOWDER, (ctx) => {
+      ctx.fillStyle = '#333333';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.3, s * 0.75);
+      ctx.lineTo(s * 0.22, s * 0.5);
+      ctx.lineTo(s * 0.38, s * 0.35);
+      ctx.lineTo(s * 0.62, s * 0.35);
+      ctx.lineTo(s * 0.78, s * 0.5);
+      ctx.lineTo(s * 0.7, s * 0.75);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#555555';
+      ctx.fillRect(s * 0.35, s * 0.42, s * 0.12, s * 0.08);
+      ctx.fillRect(s * 0.52, s * 0.55, s * 0.1, s * 0.06);
+      ctx.fillStyle = '#1a1a1a';
+      for (let i = 0; i < 6; i++) {
+        const px = s * (0.32 + Math.random() * 0.36);
+        const py = s * (0.4 + Math.random() * 0.3);
+        ctx.beginPath(); ctx.arc(px, py, 1, 0, Math.PI * 2); ctx.fill();
+      }
+    });
+
+    this.makeItemTexture(ItemTypes.BOMB, (ctx) => {
+      ctx.fillStyle = '#2a2a2a';
+      ctx.beginPath();
+      ctx.arc(s * 0.5, s * 0.58, s * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#3d3d3d';
+      ctx.beginPath();
+      ctx.arc(s * 0.5, s * 0.58, s * 0.24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#555555';
+      ctx.beginPath();
+      ctx.arc(s * 0.42, s * 0.5, s * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#8B5E3C';
+      ctx.fillRect(s * 0.46, s * 0.22, s * 0.08, s * 0.12);
+      ctx.fillStyle = '#aa7744';
+      ctx.fillRect(s * 0.47, s * 0.23, s * 0.06, s * 0.1);
+      ctx.strokeStyle = '#cc8833';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.22);
+      ctx.quadraticCurveTo(s * 0.62, s * 0.12, s * 0.65, s * 0.08);
+      ctx.stroke();
+      ctx.fillStyle = '#ff6622';
+      ctx.beginPath(); ctx.arc(s * 0.65, s * 0.08, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffaa22';
+      ctx.beginPath(); ctx.arc(s * 0.65, s * 0.08, 1.5, 0, Math.PI * 2); ctx.fill();
+    });
   }
 
   drawPickC(ctx, s, headColor, darkColor, lightColor, accentColor) {

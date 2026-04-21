@@ -145,4 +145,12 @@ export const Recipes = [
     ingredients: [{ type: BlockTypes.SANDSTONE, count: 3 }],
     workbench: true,
   },
+  {
+    result: { type: ItemTypes.BOMB, count: 1 },
+    ingredients: [
+      { type: ItemTypes.GUNPOWDER, count: 1 },
+      { type: ItemTypes.COAL, count: 1 },
+    ],
+    workbench: false,
+  },
 ];

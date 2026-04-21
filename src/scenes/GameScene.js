@@ -16,6 +16,9 @@ import FurnaceManager from '../systems/FurnaceManager.js';
 import EnemySpawner from '../systems/EnemySpawner.js';
 import AdvancementTracker from '../systems/AdvancementTracker.js';
 import Arrow from '../entities/Arrow.js';
+import DroppedItem from '../entities/DroppedItem.js';
+import ThrownBomb from '../entities/ThrownBomb.js';
+import { ItemTypes } from '../data/items.js';
 
 const BIOME_NAMES = {
   forest: 'Forest',
@@ -63,6 +66,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.enemies = [];
     this.arrows = [];
+    this.thrownBombs = [];
     this.enemySpawner = new EnemySpawner(this, this.tileManager, this.worldData);
 
     this.blockSystem = new BlockBreakPlace(
@@ -74,6 +78,11 @@ export default class GameScene extends Phaser.Scene {
       this.furnaceManager,
     );
     this.blockSystem.enemies = this.enemies;
+    this.blockSystem.spawnBombFn = (x, y, vx, vy, dmg, radius) => {
+      this.spawnBomb(x, y, vx, vy, dmg, radius);
+    };
+
+    this.inventory.addItem(ItemTypes.BOMB, 20);
 
     this.advancementTracker = new AdvancementTracker(this.inventory);
 
@@ -160,6 +169,7 @@ export default class GameScene extends Phaser.Scene {
     this.enemySpawner.update(delta, this.player, this.enemies);
     this.updateEnemies(delta);
     this.updateArrows(delta);
+    this.updateBombs(delta);
     this.tileManager.update();
 
     this.updateSkyPosition();
@@ -190,6 +200,10 @@ export default class GameScene extends Phaser.Scene {
       enemy.update(delta, this.player, this.enemies, spawnArrowFn);
 
       if (enemy.dead) {
+        for (const drop of enemy.pendingDrops) {
+          const item = new DroppedItem(this, drop.x, drop.y, drop.type, this.tileManager);
+          this.blockSystem.droppedItems.push(item);
+        }
         this.enemies.splice(i, 1);
         continue;
       }
@@ -209,6 +223,19 @@ export default class GameScene extends Phaser.Scene {
       const arrow = this.arrows[i];
       arrow.update(delta, this.player);
       if (arrow.dead) this.arrows.splice(i, 1);
+    }
+  }
+
+  spawnBomb(x, y, vx, vy, damage, radius) {
+    const bomb = new ThrownBomb(this, x, y, vx, vy, damage, radius, this.tileManager, this.enemies);
+    this.thrownBombs.push(bomb);
+  }
+
+  updateBombs(delta) {
+    for (let i = this.thrownBombs.length - 1; i >= 0; i--) {
+      const bomb = this.thrownBombs[i];
+      bomb.update(delta, this.player);
+      if (bomb.dead) this.thrownBombs.splice(i, 1);
     }
   }
 

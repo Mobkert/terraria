@@ -1,4 +1,5 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
+import { ItemTypes } from '../data/items.js';
 
 export const EnemyTypes = {
   ZOMBIE: {
@@ -78,6 +79,7 @@ export default class Enemy {
 
     this.fusing = false;
     this.fuseTimer = 0;
+    this.pendingDrops = [];
 
     this.GRAVITY = 720;
     this.MAX_FALL = 640;
@@ -214,6 +216,9 @@ export default class Enemy {
       player.vy -= 250;
     }
 
+    if (Math.random() < 0.65) {
+      this.pendingDrops.push({ type: ItemTypes.GUNPOWDER, x: this.x, y: this.y });
+    }
     this.die();
   }
 
@@ -223,7 +228,12 @@ export default class Enemy {
     this.hurtFlash = 0.2;
     this.vx += knockDir * 250;
     this.vy -= 150;
-    if (this.health <= 0) this.die();
+    if (this.health <= 0) {
+      if (this.type === 'BOMB_ZOMBIE' && !this.fusing && Math.random() < 0.80) {
+        this.pendingDrops.push({ type: ItemTypes.GUNPOWDER, x: this.x, y: this.y });
+      }
+      this.die();
+    }
   }
 
   die() {

@@ -234,6 +234,20 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/data/blocks.js`, `src/data/recipes.js`, `src/scenes/BootScene.js`, `src/entities/Player.js`, `src/entities/Enemy.js`, `src/entities/DroppedItem.js`, `src/entities/Arrow.js`, `src/systems/BlockBreakPlace.js`
 
+## Phase 19: Throwable Bombs (COMPLETED)
+
+- Added **Gunpowder** item dropped by Bomb Zombies (65% on explode, 80% on kill without exploding)
+- Added **Bomb** item craftable from 1 gunpowder + 1 coal (hand-craftable)
+- Bombs are throwable projectiles: select in hotbar and LMB to throw towards the cursor
+- Thrown bombs have gravity and spin mid-air
+- Explodes on contact with a solid block or enemy
+- Explosion deals 40 damage and destroys blocks in a radius of 3 (same as Bomb Zombie explosion)
+- Explosion also damages the player if in range (with knockback)
+- Visual explosion effect (expanding fireballs) on detonation
+- Bomb Zombie `pendingDrops` system allows enemies to drop items on death
+
+**Key files:** `src/data/items.js`, `src/data/recipes.js`, `src/entities/ThrownBomb.js`, `src/entities/Enemy.js`, `src/scenes/GameScene.js`, `src/systems/BlockBreakPlace.js`, `src/scenes/BootScene.js`
+
 ## Controls Summary
 
 | Key | Action |
@@ -241,7 +255,7 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 | A | Move left |
 | D | Move right |
 | SPACE | Jump |
-| LMB | Break block / sword attack |
+| LMB | Break block / sword attack / throw bomb |
 | RMB | Place block / interact / use consumable (hold 2s) |
 | E | Open inventory / crafting |
 | 1-9 | Select hotbar slot |

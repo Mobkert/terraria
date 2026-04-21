@@ -16,6 +16,8 @@ export const ItemTypes = {
   WOODEN_SWORD: 30,
   STONE_SWORD: 31,
   IRON_SWORD: 32,
+  GUNPOWDER: 42,
+  BOMB: 43,
 };
 
 export const ItemData = {
@@ -97,6 +99,17 @@ export const ItemData = {
     stackSize: 1,
     toolType: 'sword',
     damage: 20,
+  },
+  [ItemTypes.GUNPOWDER]: {
+    name: 'Gunpowder',
+    stackSize: 99,
+  },
+  [ItemTypes.BOMB]: {
+    name: 'Bomb',
+    stackSize: 99,
+    throwable: true,
+    damage: 40,
+    explodeRadius: 3,
   },
 };
 
