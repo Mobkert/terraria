@@ -275,8 +275,11 @@ function placeChests(tiles, w, h, surfaceHeights, rng) {
 }
 
 export function findSpawnPoint(worldData) {
-  const { width, height, surfaceHeights } = worldData;
+  const { tiles, width, height, surfaceHeights } = worldData;
   const startX = Math.floor(width / 2);
+  const treeBlocks = new Set([
+    BlockTypes.WOOD, BlockTypes.LEAVES, BlockTypes.CACTUS, BlockTypes.VINE,
+  ]);
 
   for (let offset = 0; offset < width / 2; offset++) {
     for (const dir of [1, -1]) {
@@ -284,9 +287,14 @@ export function findSpawnPoint(worldData) {
       if (x < 0 || x >= width) continue;
 
       const sy = surfaceHeights[x];
-      if (sy > 5 && sy < height - 10) {
-        return { x, y: sy - 1 };
+      if (sy <= 5 || sy >= height - 10) continue;
+
+      let blocked = false;
+      for (let cy = sy - 1; cy >= sy - 4 && cy >= 0; cy--) {
+        const block = tiles[cy * width + x];
+        if (treeBlocks.has(block)) { blocked = true; break; }
       }
+      if (!blocked) return { x, y: sy - 1 };
     }
   }
 

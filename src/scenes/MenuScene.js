@@ -28,7 +28,7 @@ export default class MenuScene extends Phaser.Scene {
 
     this.createButton(width / 2, height * 0.52, 'Create World', () => {
       const seed = Math.floor(Math.random() * 2147483647);
-      this.scene.start('GameScene', { seed });
+      this.showLoadingWorld(seed);
     });
   }
 
@@ -89,6 +89,33 @@ export default class MenuScene extends Phaser.Scene {
         }
       }
     }
+  }
+
+  showLoadingWorld(seed) {
+    this.children.removeAll(true);
+
+    const { width, height } = this.cameras.main;
+    this.cameras.main.setBackgroundColor('#000000');
+
+    const loadText = this.add.text(width / 2, height / 2, 'Loading World.', {
+      fontSize: '42px',
+      fontFamily: 'Arial',
+      color: '#ffffff',
+    }).setOrigin(0.5);
+
+    let dotCount = 1;
+    this.time.addEvent({
+      delay: 400,
+      loop: true,
+      callback: () => {
+        dotCount = (dotCount % 3) + 1;
+        loadText.setText('Loading World' + '.'.repeat(dotCount));
+      },
+    });
+
+    this.time.delayedCall(1750, () => {
+      this.scene.start('GameScene', { seed });
+    });
   }
 
   createButton(x, y, label, callback) {
