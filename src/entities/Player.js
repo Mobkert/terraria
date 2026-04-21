@@ -101,8 +101,8 @@ export default class Player {
 
     if (this.onGround && !wasOnGround && this.fallStartY !== null) {
       const fallDist = (this.y - this.fallStartY) / TILE_SIZE;
-      if (fallDist > 3) {
-        const damage = Math.floor((fallDist - 3) * 10);
+      if (fallDist > 6) {
+        const damage = Math.floor((fallDist - 6) * 7);
         this.takeDamage(damage);
       }
       this.fallStartY = null;
