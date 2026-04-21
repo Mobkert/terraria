@@ -20,6 +20,10 @@ export const BlockTypes = {
   COAL_ORE: 23,
   IRON_ORE: 24,
   FURNACE: 25,
+  BIRCH_WOOD: 33,
+  BIRCH_LEAVES: 34,
+  BIRCH_PLANKS: 35,
+  BIRCH_GRASS: 36,
 };
 
 export const BlockData = {
@@ -149,5 +153,33 @@ export const BlockData = {
     hardness: 4,
     tool: 'pickaxe',
     interactable: true,
+  },
+  [BlockTypes.BIRCH_WOOD]: {
+    name: 'Birch Wood',
+    color: 0xe8dcc8,
+    hardness: 2,
+    tool: 'axe',
+  },
+  [BlockTypes.BIRCH_LEAVES]: {
+    name: 'Birch Leaves',
+    color: 0xcc7733,
+    hardness: 0.5,
+    tool: 'none',
+  },
+  [BlockTypes.BIRCH_PLANKS]: {
+    name: 'Birch Planks',
+    color: 0xd4c4a0,
+    hardness: 2,
+    tool: 'axe',
+  },
+  [BlockTypes.BIRCH_GRASS]: {
+    name: 'Birch Grass',
+    color: 0x4a8c2a,
+    topColor: 0x88a040,
+    hardness: 1,
+    tool: 'shovel',
+    drops: BlockTypes.DIRT,
+    extraDropChance: 0.1,
+    extraDrop: 20,
   },
 };

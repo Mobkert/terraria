@@ -1,10 +1,24 @@
 import { BlockTypes } from './blocks.js';
 import { ItemTypes } from './items.js';
 
+export const INTERCHANGEABLE = {
+  [BlockTypes.BIRCH_PLANKS]: BlockTypes.PLANKS,
+  [BlockTypes.BIRCH_WOOD]: BlockTypes.WOOD,
+};
+
+export function getBaseType(type) {
+  return INTERCHANGEABLE[type] || type;
+}
+
 export const Recipes = [
   {
     result: { type: BlockTypes.PLANKS, count: 4 },
     ingredients: [{ type: BlockTypes.WOOD, count: 1 }],
+    workbench: false,
+  },
+  {
+    result: { type: BlockTypes.BIRCH_PLANKS, count: 4 },
+    ingredients: [{ type: BlockTypes.BIRCH_WOOD, count: 1 }],
     workbench: false,
   },
   {

@@ -164,6 +164,22 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/entities/Enemy.js`, `src/entities/Arrow.js`, `src/systems/EnemySpawner.js`, `src/systems/BlockBreakPlace.js` (combat), `src/scenes/GameScene.js`
 
+## Phase 14: Birch Forest Biome (COMPLETED)
+
+- Added 4 new block types: `BIRCH_WOOD` (33), `BIRCH_LEAVES` (34), `BIRCH_PLANKS` (35), `BIRCH_GRASS` (36)
+- **Birch Wood**: white/cream bark with dark horizontal streaks, rendered as half-width trunk for a skinny appearance
+- **Birch Leaves**: orange-colored with darker cluster details
+- **Birch Planks**: light tan with subtle grain lines, interchangeable with regular planks in all crafting recipes
+- **Birch Grass**: green base with orange speckled top, mixed 50/50 with regular grass in birch biomes
+- New `BIRCH` biome added to WorldGenerator (noise range -0.3 to 0.0), with transition blending to adjacent biomes
+- Birch trees are taller (5-8 blocks) with higher spawn density (spacing 4-5, 30% chance)
+- Birch wood → birch planks recipe (1 wood → 4 planks, hand-craftable)
+- Crafting interchangeability system: `INTERCHANGEABLE` map in recipes.js with `getBaseType()` helper; `Crafting.js` updated to count and consume equivalent item types
+- Birch biome tint: subtle warm orange overlay (0xcc8844, alpha 0.04)
+- Spawn point logic updated to avoid spawning inside birch trees
+
+**Key files:** `src/data/blocks.js`, `src/scenes/BootScene.js`, `src/world/WorldGenerator.js`, `src/data/recipes.js`, `src/systems/Crafting.js`, `src/scenes/GameScene.js`
+
 ## Controls Summary
 
 | Key | Action |

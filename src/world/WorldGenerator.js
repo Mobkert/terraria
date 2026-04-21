@@ -20,10 +20,12 @@ const Biomes = {
   FOREST: 'forest',
   DESERT: 'desert',
   JUNGLE: 'jungle',
+  BIRCH: 'birch',
 };
 
 function selectBiome(noiseValue) {
   if (noiseValue < -0.3) return Biomes.DESERT;
+  if (noiseValue < 0.0) return Biomes.BIRCH;
   if (noiseValue > 0.3) return Biomes.JUNGLE;
   return Biomes.FOREST;
 }
@@ -32,7 +34,11 @@ function getTransitionBlend(noiseValue, rng) {
   const BLEND_WIDTH = 0.12;
   if (Math.abs(noiseValue - (-0.3)) < BLEND_WIDTH) {
     const t = (noiseValue - (-0.3) + BLEND_WIDTH) / (BLEND_WIDTH * 2);
-    return rng() < t ? Biomes.FOREST : Biomes.DESERT;
+    return rng() < t ? Biomes.BIRCH : Biomes.DESERT;
+  }
+  if (Math.abs(noiseValue - 0.0) < BLEND_WIDTH) {
+    const t = (noiseValue - 0.0 + BLEND_WIDTH) / (BLEND_WIDTH * 2);
+    return rng() < t ? Biomes.FOREST : Biomes.BIRCH;
   }
   if (Math.abs(noiseValue - 0.3) < BLEND_WIDTH) {
     const t = (noiseValue - 0.3 + BLEND_WIDTH) / (BLEND_WIDTH * 2);
@@ -41,12 +47,14 @@ function getTransitionBlend(noiseValue, rng) {
   return null;
 }
 
-function getSurfaceBlock(biome) {
+function getSurfaceBlock(biome, rng) {
   switch (biome) {
     case Biomes.DESERT:
       return BlockTypes.SAND;
     case Biomes.JUNGLE:
       return BlockTypes.JUNGLE_GRASS;
+    case Biomes.BIRCH:
+      return (rng && rng() < 0.5) ? BlockTypes.BIRCH_GRASS : BlockTypes.GRASS;
     default:
       return BlockTypes.GRASS;
   }
@@ -91,7 +99,7 @@ export function generateWorld(seed = Date.now()) {
       if (depth < 0) {
         tiles[y * WORLD_WIDTH + x] = BlockTypes.AIR;
       } else if (depth === 0) {
-        tiles[y * WORLD_WIDTH + x] = getSurfaceBlock(surfaceBiome);
+        tiles[y * WORLD_WIDTH + x] = getSurfaceBlock(surfaceBiome, rng);
       } else if (depth <= 15) {
         tiles[y * WORLD_WIDTH + x] = getSubSurfaceBlock(surfaceBiome);
       } else if (depth <= 75) {
@@ -160,10 +168,11 @@ function placeTrees(tiles, w, h, surfaceHeights, biomes, rng) {
     const biome = biomes[x];
     if (biome === Biomes.DESERT) continue;
 
-    const minSpacing = biome === Biomes.JUNGLE ? 4 : 6;
+    const isBirch = biome === Biomes.BIRCH;
+    const minSpacing = biome === Biomes.JUNGLE ? 4 : isBirch ? 4 : 6;
     if (x - lastTreeX < minSpacing) continue;
 
-    const treeChance = biome === Biomes.JUNGLE ? 0.35 : 0.2;
+    const treeChance = biome === Biomes.JUNGLE ? 0.35 : isBirch ? 0.3 : 0.2;
     if (rng() > treeChance) continue;
 
     const sy = surfaceHeights[x];
@@ -173,17 +182,20 @@ function placeTrees(tiles, w, h, surfaceHeights, biomes, rng) {
     const rightH = surfaceHeights[Math.min(w - 1, x + 1)];
     if (Math.abs(leftH - sy) > 1 || Math.abs(rightH - sy) > 1) continue;
 
-    const trunkHeight = 4 + Math.floor(rng() * 3);
+    const trunkHeight = isBirch ? (5 + Math.floor(rng() * 4)) : (4 + Math.floor(rng() * 3));
+    const woodType = isBirch ? BlockTypes.BIRCH_WOOD : BlockTypes.WOOD;
+    const leafType = isBirch ? BlockTypes.BIRCH_LEAVES : BlockTypes.LEAVES;
 
     for (let ty = sy - trunkHeight; ty < sy; ty++) {
       if (ty >= 0 && ty < h) {
-        tiles[ty * w + x] = BlockTypes.WOOD;
+        tiles[ty * w + x] = woodType;
       }
     }
 
     const canopyRadius = biome === Biomes.JUNGLE ? 3 : 2;
     const canopyTopY = sy - trunkHeight - canopyRadius;
     const canopyBotY = sy - trunkHeight + 1;
+    const maxDist = isBirch ? canopyRadius : canopyRadius + 1;
 
     for (let ly = canopyTopY; ly <= canopyBotY; ly++) {
       for (let lx = x - canopyRadius; lx <= x + canopyRadius; lx++) {
@@ -191,13 +203,13 @@ function placeTrees(tiles, w, h, surfaceHeights, biomes, rng) {
 
         const dx = Math.abs(lx - x);
         const dy = Math.abs(ly - (canopyTopY + canopyRadius));
-        if (dx + dy > canopyRadius + 1) continue;
+        if (dx + dy > maxDist) continue;
 
         if (lx === x && ly >= sy - trunkHeight) continue;
 
         const idx = ly * w + lx;
         if (tiles[idx] === BlockTypes.AIR) {
-          tiles[idx] = BlockTypes.LEAVES;
+          tiles[idx] = leafType;
         }
       }
     }
@@ -279,6 +291,7 @@ export function findSpawnPoint(worldData) {
   const startX = Math.floor(width / 2);
   const treeBlocks = new Set([
     BlockTypes.WOOD, BlockTypes.LEAVES, BlockTypes.CACTUS, BlockTypes.VINE,
+    BlockTypes.BIRCH_WOOD, BlockTypes.BIRCH_LEAVES,
   ]);
 
   for (let offset = 0; offset < width / 2; offset++) {

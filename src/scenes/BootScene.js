@@ -34,7 +34,7 @@ export default class BootScene extends Phaser.Scene {
 
       this.addBlockDetail(ctx, parseInt(id), data, s);
 
-      if (data.solid !== false) this.addBorderShading(ctx, s);
+      if (data.solid !== false && parseInt(id) !== BlockTypes.BIRCH_WOOD) this.addBorderShading(ctx, s);
 
       this.textures.addCanvas(`block_${id}`, canvas);
     }
@@ -211,6 +211,62 @@ export default class BootScene extends Phaser.Scene {
         ctx.beginPath();
         ctx.ellipse(s * 0.5, s * 0.26, s * 0.03, s * 0.05, 0, 0, Math.PI * 2);
         ctx.fill();
+        break;
+      }
+      case BlockTypes.BIRCH_WOOD: {
+        ctx.clearRect(0, 0, s, s);
+        ctx.fillStyle = '#e8dcc8';
+        ctx.fillRect(s * 0.25, 0, s * 0.5, s);
+        ctx.fillStyle = '#d0c4b0';
+        ctx.fillRect(s * 0.25, 0, 1, s);
+        ctx.fillRect(s * 0.75 - 1, 0, 1, s);
+        ctx.fillStyle = '#555555';
+        ctx.fillRect(s * 0.28, s * 0.1, s * 0.2, 2);
+        ctx.fillRect(s * 0.5, s * 0.25, s * 0.18, 2);
+        ctx.fillRect(s * 0.3, s * 0.45, s * 0.15, 2);
+        ctx.fillRect(s * 0.48, s * 0.6, s * 0.2, 2);
+        ctx.fillRect(s * 0.28, s * 0.78, s * 0.22, 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.fillRect(s * 0.4, 0, s * 0.08, s);
+        break;
+      }
+      case BlockTypes.BIRCH_LEAVES: {
+        ctx.fillStyle = 'rgba(160,80,20,0.4)';
+        const clusters = [[4,4],[14,6],[24,4],[8,16],[18,14],[28,18],[6,26],[20,24]];
+        for (const [x, y] of clusters) {
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = 'rgba(255,200,100,0.2)';
+        const highlights = [[10,10],[22,8],[16,22],[8,20]];
+        for (const [x, y] of highlights) {
+          ctx.fillRect(x, y, 2, 2);
+        }
+        break;
+      }
+      case BlockTypes.BIRCH_PLANKS: {
+        ctx.fillStyle = 'rgba(160,140,100,0.3)';
+        ctx.fillRect(0, 7, s, 1);
+        ctx.fillRect(0, 15, s, 1);
+        ctx.fillRect(0, 23, s, 1);
+        ctx.fillStyle = 'rgba(240,230,200,0.15)';
+        ctx.fillRect(0, 8, s, 1);
+        ctx.fillRect(0, 16, s, 1);
+        ctx.fillRect(0, 24, s, 1);
+        break;
+      }
+      case BlockTypes.BIRCH_GRASS: {
+        ctx.fillStyle = 'rgba(100,60,10,0.2)';
+        const specks = [[5,8],[18,4],[10,22],[26,16],[14,12],[3,26],[22,28],[28,6]];
+        for (const [x, y] of specks) {
+          ctx.fillRect(x, y, 2, 2);
+        }
+        ctx.fillStyle = 'rgba(220,140,40,0.5)';
+        const orangeSpots = [[8,2],[20,1],[4,5],[16,4],[28,3],[12,6],[24,5]];
+        for (const [x, y] of orangeSpots) {
+          ctx.fillRect(x, y, 3, 2);
+        }
         break;
       }
     }

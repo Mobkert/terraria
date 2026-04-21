@@ -20,6 +20,7 @@ const BIOME_TINTS = {
   forest: { color: 0x000000, alpha: 0 },
   desert: { color: 0xcc8833, alpha: 0.08 },
   jungle: { color: 0x225533, alpha: 0.1 },
+  birch: { color: 0xcc8844, alpha: 0.04 },
 };
 
 export default class GameScene extends Phaser.Scene {
