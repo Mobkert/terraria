@@ -12,7 +12,7 @@ export default class BootScene extends Phaser.Scene {
     this.generateItemTextures();
     this.generateEnemyTextures();
     this.generateSkyGradient();
-    this.scene.start('GameScene');
+    this.scene.start('LoadingScene');
   }
 
   generateBlockTextures() {

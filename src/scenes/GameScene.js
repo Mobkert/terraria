@@ -1,6 +1,5 @@
 import { TILE_SIZE } from '../data/blocks.js';
 import { getItemName } from '../data/items.js';
-import Enemy from '../entities/Enemy.js';
 import {
   generateWorld,
   findSpawnPoint,
@@ -28,8 +27,12 @@ export default class GameScene extends Phaser.Scene {
     super('GameScene');
   }
 
+  init(data) {
+    this.seed = (data && data.seed) || 42;
+  }
+
   create() {
-    this.worldData = generateWorld(42);
+    this.worldData = generateWorld(this.seed);
     this.tileManager = new TileManager(this, this.worldData);
 
     const worldPxW = WORLD_WIDTH * TILE_SIZE;
@@ -46,7 +49,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.inventory = new Inventory();
     this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory);
-    this.chestManager = new ChestManager(this.worldData, mulberry32(42 + 999));
+    this.chestManager = new ChestManager(this.worldData, mulberry32(this.seed + 999));
     this.furnaceManager = new FurnaceManager();
 
     this.enemies = [];
@@ -62,10 +65,6 @@ export default class GameScene extends Phaser.Scene {
       this.furnaceManager,
     );
     this.blockSystem.enemies = this.enemies;
-
-    const bombX = spawnX + 100;
-    const bombY = spawnY;
-    this.enemies.push(new Enemy(this, bombX, bombY, 'BOMB_ZOMBIE', this.tileManager));
 
     this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0.1);
 
