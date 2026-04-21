@@ -193,6 +193,7 @@ export default class ChestUI {
       const item = this.chestSlots[s.idx];
       if (item) {
         s.icon.setTexture(getItemTexture(item.type));
+        s.icon.setDisplaySize(ICON, ICON);
         s.icon.setVisible(true);
         s.count.setText(item.count > 1 ? String(item.count) : '');
       } else {

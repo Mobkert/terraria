@@ -226,6 +226,7 @@ export default class FurnaceUI {
       const item = this.getSlot(name);
       if (item) {
         obj.icon.setTexture(getItemTexture(item.type));
+        obj.icon.setDisplaySize(ICON, ICON);
         obj.icon.setVisible(true);
         obj.count.setText(item.count > 1 ? String(item.count) : '');
       } else {

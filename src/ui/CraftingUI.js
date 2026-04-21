@@ -108,6 +108,7 @@ export default class CraftingUI {
         row.recipe = recipe;
 
         row.icon.setTexture(getItemTexture(recipe.result.type));
+        row.icon.setDisplaySize(ICON_SIZE, ICON_SIZE);
         row.icon.setVisible(true);
 
         const name = getItemName(recipe.result.type);

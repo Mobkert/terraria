@@ -259,6 +259,7 @@ export default class InventoryUI {
 
     if (this.cursorItem) {
       this.cursorIcon.setTexture(getItemTexture(this.cursorItem.type));
+      this.cursorIcon.setDisplaySize(ICON, ICON);
       this.cursorIcon.setPosition(pointer.x + 12, pointer.y + 12);
       this.cursorIcon.setVisible(true);
       this.cursorCount.setPosition(pointer.x + 26, pointer.y + 26);
@@ -282,6 +283,7 @@ export default class InventoryUI {
 
       if (item) {
         s.icon.setTexture(getItemTexture(item.type));
+        s.icon.setDisplaySize(ICON, ICON);
         s.icon.setVisible(true);
         s.count.setText(item.count > 1 ? String(item.count) : '');
       } else {

@@ -81,6 +81,7 @@ export default class HotbarUI {
       const item = this.inventory.hotbar[i];
       if (item) {
         this.icons[i].setTexture(getItemTexture(item.type));
+        this.icons[i].setDisplaySize(ICON_SIZE, ICON_SIZE);
         this.icons[i].setVisible(true);
         this.counts[i].setText(item.count > 1 ? String(item.count) : '');
       } else {
