@@ -4,11 +4,14 @@ export default class TileManager {
   constructor(scene, worldData) {
     this.scene = scene;
     this.tiles = worldData.tiles;
+    this.bgTiles = worldData.bgTiles;
     this.w = worldData.width;
     this.h = worldData.height;
     this.surfaceHeights = worldData.surfaceHeights;
     this.sprites = new Map();
+    this.bgSprites = new Map();
     this.pool = [];
+    this.bgPool = [];
     this.lastBounds = null;
     this.BUFFER = 3;
 
@@ -29,6 +32,11 @@ export default class TileManager {
     return this.tiles[y * this.w + x];
   }
 
+  getBgBlock(x, y) {
+    if (x < 0 || x >= this.w || y < 0 || y >= this.h) return BlockTypes.AIR;
+    return this.bgTiles[y * this.w + x];
+  }
+
   getLight(x, y) {
     if (x < 0 || x >= this.w || y < 0 || y >= this.h) return 15;
     return this.lightMap[y * this.w + x];
@@ -40,6 +48,12 @@ export default class TileManager {
     this.refreshTile(x, y);
     this.updateLightArea(x, y, 16);
     this.lastDarkBounds = null;
+  }
+
+  setBgBlock(x, y, type) {
+    if (x < 0 || x >= this.w || y < 0 || y >= this.h) return;
+    this.bgTiles[y * this.w + x] = type;
+    this.refreshBgTile(x, y);
   }
 
   isSolid(x, y) {
@@ -246,8 +260,47 @@ export default class TileManager {
     }
   }
 
+  refreshBgTile(x, y) {
+    const k = this.tileKey(x, y);
+    const existing = this.bgSprites.get(k);
+    if (existing) {
+      existing.setVisible(false);
+      existing.setActive(false);
+      this.bgPool.push(existing);
+      this.bgSprites.delete(k);
+    }
+
+    const blockType = this.getBgBlock(x, y);
+    if (blockType !== BlockTypes.AIR) {
+      this.placeBgSprite(x, y, blockType, k);
+    }
+  }
+
   placeSprite(x, y, blockType, k) {
     let sprite = this.pool.pop();
+    if (sprite) {
+      sprite.setTexture(`block_${blockType}`);
+      sprite.setPosition(
+        x * TILE_SIZE + TILE_SIZE / 2,
+        y * TILE_SIZE + TILE_SIZE / 2,
+      );
+      sprite.setVisible(true);
+      sprite.setActive(true);
+      sprite.setAlpha(1);
+      sprite.setTint(0xffffff);
+      sprite.setDepth(0);
+    } else {
+      sprite = this.scene.add.image(
+        x * TILE_SIZE + TILE_SIZE / 2,
+        y * TILE_SIZE + TILE_SIZE / 2,
+        `block_${blockType}`,
+      );
+    }
+    this.sprites.set(k, sprite);
+  }
+
+  placeBgSprite(x, y, blockType, k) {
+    let sprite = this.bgPool.pop();
     if (sprite) {
       sprite.setTexture(`block_${blockType}`);
       sprite.setPosition(
@@ -263,7 +316,10 @@ export default class TileManager {
         `block_${blockType}`,
       );
     }
-    this.sprites.set(k, sprite);
+    sprite.setAlpha(1);
+    sprite.setTint(0x888888);
+    sprite.setDepth(-1);
+    this.bgSprites.set(k, sprite);
   }
 
   getVisibleBounds() {
@@ -294,6 +350,17 @@ export default class TileManager {
       bounds.bottom !== lb.bottom;
 
     if (boundsChanged) {
+      for (const [k, sprite] of this.bgSprites) {
+        const y = k % this.h;
+        const x = (k - y) / this.h;
+        if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) {
+          sprite.setVisible(false);
+          sprite.setActive(false);
+          this.bgPool.push(sprite);
+          this.bgSprites.delete(k);
+        }
+      }
+
       for (const [k, sprite] of this.sprites) {
         const y = k % this.h;
         const x = (k - y) / this.h;
@@ -313,11 +380,19 @@ export default class TileManager {
       for (let x = bounds.left; x <= bounds.right; x++) {
         for (let y = bounds.top; y <= bounds.bottom; y++) {
           const k = this.tileKey(x, y);
-          if (this.sprites.has(k)) continue;
 
-          const blockType = this.getBlock(x, y);
-          if (blockType !== BlockTypes.AIR) {
-            this.placeSprite(x, y, blockType, k);
+          if (!this.bgSprites.has(k)) {
+            const bgType = this.getBgBlock(x, y);
+            if (bgType !== BlockTypes.AIR) {
+              this.placeBgSprite(x, y, bgType, k);
+            }
+          }
+
+          if (!this.sprites.has(k)) {
+            const blockType = this.getBlock(x, y);
+            if (blockType !== BlockTypes.AIR) {
+              this.placeSprite(x, y, blockType, k);
+            }
           }
         }
       }

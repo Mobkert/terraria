@@ -117,7 +117,9 @@ export function generateWorld(seed = Date.now()) {
   placeVines(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
   placeChests(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
 
-  return { tiles, width: WORLD_WIDTH, height: WORLD_HEIGHT, surfaceHeights, biomes };
+  const bgTiles = new Uint8Array(WORLD_WIDTH * WORLD_HEIGHT);
+
+  return { tiles, bgTiles, width: WORLD_WIDTH, height: WORLD_HEIGHT, surfaceHeights, biomes };
 }
 
 function placeOres(tiles, w, h, surfaceHeights, rng) {

@@ -120,18 +120,23 @@ export default class BlockBreakPlace {
 
     const x = tileX * TILE_SIZE;
     const y = tileY * TILE_SIZE;
-    const blockType = this.tileManager.getBlock(tileX, tileY);
+    const highlightColor = this.inventory.bgMode ? 0x6688ff : 0xffffff;
+    const blockType = this.inventory.bgMode
+      ? this.tileManager.getBgBlock(tileX, tileY)
+      : this.tileManager.getBlock(tileX, tileY);
 
     if (blockType !== BlockTypes.AIR) {
-      g.lineStyle(2, 0xffffff, 0.6);
+      g.lineStyle(2, highlightColor, 0.6);
     } else {
-      g.lineStyle(1, 0xffffff, 0.25);
+      g.lineStyle(1, highlightColor, 0.25);
     }
     g.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
   }
 
   handleBreaking(tileX, tileY, delta) {
-    const blockType = this.tileManager.getBlock(tileX, tileY);
+    const blockType = this.inventory.bgMode
+      ? this.tileManager.getBgBlock(tileX, tileY)
+      : this.tileManager.getBlock(tileX, tileY);
     if (blockType === BlockTypes.AIR) {
       this.resetBreaking();
       return;
@@ -227,7 +232,11 @@ export default class BlockBreakPlace {
   }
 
   breakBlock(tileX, tileY, blockType) {
-    this.tileManager.setBlock(tileX, tileY, BlockTypes.AIR);
+    if (this.inventory.bgMode) {
+      this.tileManager.setBgBlock(tileX, tileY, BlockTypes.AIR);
+    } else {
+      this.tileManager.setBlock(tileX, tileY, BlockTypes.AIR);
+    }
     this.resetBreaking();
 
     const dropX = tileX * TILE_SIZE + TILE_SIZE / 2;
@@ -302,6 +311,16 @@ export default class BlockBreakPlace {
     const selected = this.inventory.getSelectedItem();
     if (!selected || !this.inventory.isBlock(selected.type)) return;
 
+    if (this.inventory.bgMode) {
+      if (this.tileManager.getBgBlock(tileX, tileY) !== BlockTypes.AIR) return;
+      if (!this.hasAdjacentBlock(tileX, tileY) && !this.hasAdjacentBgBlock(tileX, tileY)) return;
+
+      this.tileManager.setBgBlock(tileX, tileY, selected.type);
+      this.inventory.consumeSelected(1);
+      this.placeCooldown = this.PLACE_DELAY;
+      return;
+    }
+
     if (this.tileManager.getBlock(tileX, tileY) !== BlockTypes.AIR) return;
 
     if (!this.hasAdjacentBlock(tileX, tileY)) return;
@@ -317,6 +336,19 @@ export default class BlockBreakPlace {
 
   hasAdjacentBlock(x, y) {
     return (
+      this.tileManager.getBlock(x - 1, y) !== BlockTypes.AIR ||
+      this.tileManager.getBlock(x + 1, y) !== BlockTypes.AIR ||
+      this.tileManager.getBlock(x, y - 1) !== BlockTypes.AIR ||
+      this.tileManager.getBlock(x, y + 1) !== BlockTypes.AIR
+    );
+  }
+
+  hasAdjacentBgBlock(x, y) {
+    return (
+      this.tileManager.getBgBlock(x - 1, y) !== BlockTypes.AIR ||
+      this.tileManager.getBgBlock(x + 1, y) !== BlockTypes.AIR ||
+      this.tileManager.getBgBlock(x, y - 1) !== BlockTypes.AIR ||
+      this.tileManager.getBgBlock(x, y + 1) !== BlockTypes.AIR ||
       this.tileManager.getBlock(x - 1, y) !== BlockTypes.AIR ||
       this.tileManager.getBlock(x + 1, y) !== BlockTypes.AIR ||
       this.tileManager.getBlock(x, y - 1) !== BlockTypes.AIR ||

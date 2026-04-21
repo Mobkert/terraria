@@ -3,7 +3,6 @@ import { ItemTypes } from './items.js';
 
 export const INTERCHANGEABLE = {
   [BlockTypes.BIRCH_PLANKS]: BlockTypes.PLANKS,
-  [BlockTypes.BIRCH_WOOD]: BlockTypes.WOOD,
 };
 
 export function getBaseType(type) {

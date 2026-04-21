@@ -208,6 +208,19 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/data/customization.js`, `src/utils/playerRenderer.js`, `src/scenes/CustomizeScene.js`, `src/scenes/MenuScene.js`, `src/scenes/BootScene.js`, `src/main.js`
 
+## Phase 17: Background Block Layer (COMPLETED)
+
+- Press **B** to toggle between "Frontground" and "Background" placement modes
+- Mode indicator displayed next to the hotbar on the right
+- Background blocks render behind foreground blocks at reduced opacity (45% alpha, depth -1)
+- Player and entities do not collide with background blocks
+- Background blocks can be placed adjacent to other background or foreground blocks
+- Breaking in background mode only affects background blocks
+- Cursor highlight turns blue when in background mode
+- Separate `bgTiles` array in world data and `bgSprites` pool in TileManager
+
+**Key files:** `src/world/TileManager.js`, `src/systems/BlockBreakPlace.js`, `src/ui/HotbarUI.js`, `src/scenes/UIScene.js`, `src/systems/Inventory.js`, `src/world/WorldGenerator.js`
+
 ## Controls Summary
 
 | Key | Action |
@@ -220,6 +233,7 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 | E | Open inventory / crafting |
 | 1-9 | Select hotbar slot |
 | P | Open advancements |
+| B | Toggle background/frontground mode |
 | Scroll | Cycle hotbar |
 
 ## Tech Stack

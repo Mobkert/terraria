@@ -55,6 +55,21 @@ export default class HotbarUI {
 
     this.lastHealth = -1;
     this.lastDirty = true;
+
+    this.modeText = scene.add.text(
+      this.startX + (9 * SLOT_SIZE + 8 * GAP) + 12,
+      this.y + SLOT_SIZE / 2,
+      '',
+      {
+        fontSize: '13px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+        stroke: '#000000',
+        strokeThickness: 2,
+      },
+    );
+    this.modeText.setOrigin(0, 0.5);
+    this.modeText.setDepth(201);
   }
 
   update() {
@@ -94,6 +109,14 @@ export default class HotbarUI {
       this.drawHealthBar();
       this.lastHealth = this.player.health;
     }
+
+    if (this.inventory.bgMode) {
+      this.modeText.setText('Mode: Background');
+      this.modeText.setColor('#88aaff');
+    } else {
+      this.modeText.setText('Mode: Frontground');
+      this.modeText.setColor('#ffffff');
+    }
   }
 
   drawHealthBar() {
@@ -125,6 +148,7 @@ export default class HotbarUI {
     this.gfx.setVisible(v);
     this.healthGfx.setVisible(v);
     this.healthText.setVisible(v);
+    this.modeText.setVisible(v);
     for (const icon of this.icons) icon.setVisible(v && false);
     for (const count of this.counts) count.setVisible(v);
     if (v) this.inventory.dirty = true;

@@ -8,6 +8,7 @@ export default class Inventory {
     this.MAX_STACK = 99;
     this.dirty = true;
     this.isOpen = false;
+    this.bgMode = false;
     this.craftingRequest = null;
     this.chestRequest = null;
     this.furnaceRequest = null;

@@ -43,6 +43,12 @@ export default class UIScene extends Phaser.Scene {
       }
     });
 
+    this.input.keyboard.on('keydown-B', () => {
+      if (this.inventoryUI.isOpen || this.advancementUI.isOpen) return;
+      this.inventory.bgMode = !this.inventory.bgMode;
+      this.inventory.dirty = true;
+    });
+
     const keyNames = [
       'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE',
       'SIX', 'SEVEN', 'EIGHT', 'NINE',
