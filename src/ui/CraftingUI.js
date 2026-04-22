@@ -17,7 +17,20 @@ export default class CraftingUI {
 
     this.recipeRows = [];
     this.scrollOffset = 0;
+    this.totalRecipes = 0;
     this.build();
+
+    this.scrollHandler = (pointer, gameObjects, dx, dy) => {
+      if (!this.container.visible) return;
+      const px = pointer.x;
+      const py = pointer.y;
+      if (px >= this.panelX && px <= this.panelX + this.panelW &&
+          py >= this.panelY && py <= this.panelY + this.panelH) {
+        if (dy > 0) this.scroll(1);
+        else if (dy < 0) this.scroll(-1);
+      }
+    };
+    this.scene.input.on('wheel', this.scrollHandler);
   }
 
   build() {
@@ -25,7 +38,7 @@ export default class CraftingUI {
     const sh = this.scene.cameras.main.height;
 
     this.panelW = 210;
-    this.panelH = 30 + MAX_VISIBLE * ROW_H + 16;
+    this.panelH = 30 + MAX_VISIBLE * ROW_H + 30;
     this.panelX = sw / 2 + 246;
     this.panelY = (sh - this.panelH) / 2;
 
@@ -52,6 +65,30 @@ export default class CraftingUI {
       const row = this.createRow(y);
       this.recipeRows.push(row);
     }
+
+    const arrowY = this.listY + MAX_VISIBLE * ROW_H + 6;
+    const centerX = this.panelX + this.panelW / 2;
+
+    this.upBtn = this.scene.add.text(centerX - 30, arrowY, '\u25B2', {
+      fontSize: '14px', color: '#666688',
+    }).setOrigin(0.5, 0).setInteractive({ useHandCursor: true });
+    this.upBtn.on('pointerdown', () => this.scroll(-1));
+    this.upBtn.on('pointerover', () => this.upBtn.setColor('#aaaacc'));
+    this.upBtn.on('pointerout', () => this.upBtn.setColor('#666688'));
+    this.container.add(this.upBtn);
+
+    this.scrollInfo = this.scene.add.text(centerX, arrowY, '', {
+      fontSize: '10px', color: '#666688',
+    }).setOrigin(0.5, 0);
+    this.container.add(this.scrollInfo);
+
+    this.downBtn = this.scene.add.text(centerX + 30, arrowY, '\u25BC', {
+      fontSize: '14px', color: '#666688',
+    }).setOrigin(0.5, 0).setInteractive({ useHandCursor: true });
+    this.downBtn.on('pointerdown', () => this.scroll(1));
+    this.downBtn.on('pointerover', () => this.downBtn.setColor('#aaaacc'));
+    this.downBtn.on('pointerout', () => this.downBtn.setColor('#666688'));
+    this.container.add(this.downBtn);
   }
 
   createRow(y) {
@@ -85,6 +122,12 @@ export default class CraftingUI {
     return { bg, icon, label, cost, recipe: null };
   }
 
+  scroll(dir) {
+    const maxOffset = Math.max(0, this.totalRecipes - MAX_VISIBLE);
+    this.scrollOffset = Math.max(0, Math.min(maxOffset, this.scrollOffset + dir));
+    this.refresh();
+  }
+
   show(hasWorkbench) {
     this.hasWorkbench = hasWorkbench;
     this.scrollOffset = 0;
@@ -98,6 +141,7 @@ export default class CraftingUI {
 
   refresh() {
     const available = Crafting.getAvailable(this.inventory, this.hasWorkbench);
+    this.totalRecipes = available.length;
 
     for (let i = 0; i < MAX_VISIBLE; i++) {
       const row = this.recipeRows[i];
@@ -135,6 +179,16 @@ export default class CraftingUI {
         row.cost.setText('');
         row.bg.setVisible(false);
       }
+    }
+
+    const showScroll = this.totalRecipes > MAX_VISIBLE;
+    this.upBtn.setVisible(showScroll);
+    this.downBtn.setVisible(showScroll);
+    this.scrollInfo.setVisible(showScroll);
+    if (showScroll) {
+      const page = this.scrollOffset + 1;
+      const maxPage = this.totalRecipes - MAX_VISIBLE + 1;
+      this.scrollInfo.setText(`${page}/${maxPage}`);
     }
   }
 
