@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Player Design Mockups</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
+  h1 { text-align: center; color: #ccaa77; }
+  h2 { color: #88bb88; border-bottom: 1px solid #444; padding-bottom: 8px; margin-top: 50px; }
+  .desc { color: #999; font-size: 13px; margin-bottom: 10px; max-width: 800px; }
+  .row { display: flex; gap: 60px; justify-content: center; align-items: flex-end; margin: 20px 0 40px; }
+  .card { text-align: center; }
+  .card canvas { border: 2px solid #444; background: #2a2a3e; image-rendering: pixelated; }
+  .card p { margin: 8px 0 0; font-size: 14px; color: #aaa; }
+  .current { border-color: #666 !important; }
+  .label { font-size: 11px; color: #777; margin-top: 2px; }
+</style>
+</head>
+<body>
+<h1>Player Avatar Mockups</h1>
+
+<h2>Current Design</h2>
+<p class="desc">The existing plain blue blob for reference.</p>
+<div class="row" id="current"></div>
+
+<h2>Option A: Slime Hero</h2>
+<p class="desc">A glossy, slime-like blob with a shiny highlight, a friendly face with a smile, and a subtle darker outline for definition.</p>
+<div class="row" id="optionA"></div>
+
+<h2>Option B: Adventurer Blob</h2>
+<p class="desc">The classic blob shape enhanced with a small adventurer's headband, expressive eyebrows, determined eyes, and a slight gradient for depth.</p>
+<div class="row" id="optionB"></div>
+
+<h2>Option C: Armored Jelly</h2>
+<p class="desc">A blob with a tougher feel -- subtle belly shading, a small chest plate marking, bold eyes with highlights, and a darker border to pop against any background.</p>
+<div class="row" id="optionC"></div>
+
+<script>
+const S = 32;
+const W = S;
+const H = S * 2;
+const SCALE = 5;
+
+function makeCard(parent, label, drawFn) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  canvas.style.width = (W * SCALE) + 'px';
+  canvas.style.height = (H * SCALE) + 'px';
+  const ctx = canvas.getContext('2d');
+  drawFn(ctx, W, H);
+  div.appendChild(canvas);
+  const p = document.createElement('p');
+  p.textContent = label;
+  div.appendChild(p);
+  parent.appendChild(div);
+}
+
+// ============== CURRENT DESIGN ==============
+makeCard(document.getElementById('current'), 'Current Player', (ctx, w, h) => {
+  ctx.fillStyle = '#4488ff';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h/2, w/2-2, h/2-2, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.ellipse(w/2-5, h/2-10, 4, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w/2+5, h/2-10, 4, 5, 0, 0, Math.PI*2); ctx.fill();
+
+  ctx.fillStyle = '#000000';
+  ctx.beginPath(); ctx.ellipse(w/2-4, h/2-10, 2, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w/2+6, h/2-10, 2, 3, 0, 0, Math.PI*2); ctx.fill();
+});
+
+// ============== OPTION A: Slime Hero ==============
+makeCard(document.getElementById('optionA'), 'Front View', (ctx, w, h) => {
+  // Dark outline
+  ctx.fillStyle = '#2255aa';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h/2, w/2-1, h/2-1, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Main body
+  ctx.fillStyle = '#4488ff';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h/2, w/2-3, h/2-3, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Lighter belly
+  ctx.fillStyle = '#66aaff';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h*0.58, w*0.3, h*0.22, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Glossy highlight top-left
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(w*0.35, h*0.22, 5, 7, -0.4, 0, Math.PI*2);
+  ctx.fill();
+  // Small secondary highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(w*0.55, h*0.18, 2, 3, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Eyes - white, large, friendly
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.ellipse(w*0.36, h*0.36, 5, 5.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.64, h*0.36, 5, 5.5, 0, 0, Math.PI*2); ctx.fill();
+  // Pupils
+  ctx.fillStyle = '#1122aa';
+  ctx.beginPath(); ctx.ellipse(w*0.38, h*0.37, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.66, h*0.37, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  // Pupil shine
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(w*0.36, h*0.35, 1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.64, h*0.35, 1, 0, Math.PI*2); ctx.fill();
+  // Happy smile
+  ctx.strokeStyle = '#1155aa';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(w*0.5, h*0.42, 5, 0.3, Math.PI-0.3);
+  ctx.stroke();
+});
+
+makeCard(document.getElementById('optionA'), 'Side View (moving)', (ctx, w, h) => {
+  ctx.fillStyle = '#2255aa';
+  ctx.beginPath();
+  ctx.ellipse(w/2+1, h/2, w/2-1, h/2-1, 0.08, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#4488ff';
+  ctx.beginPath();
+  ctx.ellipse(w/2+1, h/2, w/2-3, h/2-3, 0.08, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#66aaff';
+  ctx.beginPath();
+  ctx.ellipse(w*0.52, h*0.58, w*0.28, h*0.22, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(w*0.37, h*0.22, 5, 7, -0.4, 0, Math.PI*2);
+  ctx.fill();
+  // Eyes looking right
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.ellipse(w*0.5, h*0.36, 5, 5.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.76, h*0.36, 4, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#1122aa';
+  ctx.beginPath(); ctx.ellipse(w*0.53, h*0.37, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.79, h*0.37, 2, 2.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(w*0.51, h*0.35, 1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.77, h*0.35, 1, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#1155aa';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(w*0.58, h*0.42, 4, 0.3, Math.PI-0.3);
+  ctx.stroke();
+});
+
+// ============== OPTION B: Adventurer Blob ==============
+makeCard(document.getElementById('optionB'), 'Front View', (ctx, w, h) => {
+  // Body outline
+  ctx.fillStyle = '#2a5599';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h/2, w/2-1, h/2-1, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Main body
+  ctx.fillStyle = '#3377dd';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h/2, w/2-3, h/2-3, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Bottom darker gradient
+  ctx.fillStyle = '#2a66bb';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h*0.65, w*0.38, h*0.25, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Top lighter area
+  ctx.fillStyle = '#5599ee';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h*0.3, w*0.35, h*0.15, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Headband
+  ctx.fillStyle = '#cc3333';
+  ctx.fillRect(w*0.12, h*0.24, w*0.76, 3);
+  // Headband knot on side
+  ctx.fillStyle = '#cc3333';
+  ctx.fillRect(w*0.82, h*0.22, 3, 3);
+  ctx.fillRect(w*0.85, h*0.24, 2, 5);
+  ctx.fillRect(w*0.83, h*0.28, 2, 4);
+  // Eyebrows - determined
+  ctx.fillStyle = '#1a3366';
+  ctx.fillRect(w*0.24, h*0.3, 7, 2);
+  ctx.fillRect(w*0.56, h*0.3, 7, 2);
+  // Eyes - white with colored iris
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.ellipse(w*0.36, h*0.37, 4.5, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.64, h*0.37, 4.5, 5, 0, 0, Math.PI*2); ctx.fill();
+  // Iris
+  ctx.fillStyle = '#2255bb';
+  ctx.beginPath(); ctx.ellipse(w*0.37, h*0.38, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.65, h*0.38, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  // Pupil
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(w*0.37, h*0.38, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.65, h*0.38, 1.2, 0, Math.PI*2); ctx.fill();
+  // Shine
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(w*0.35, h*0.36, 1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.63, h*0.36, 1, 0, Math.PI*2); ctx.fill();
+  // Confident smirk
+  ctx.strokeStyle = '#1a3366';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(w*0.52, h*0.46, 4, 0.2, Math.PI*0.7);
+  ctx.stroke();
+});
+
+makeCard(document.getElementById('optionB'), 'Side View (moving)', (ctx, w, h) => {
+  ctx.fillStyle = '#2a5599';
+  ctx.beginPath();
+  ctx.ellipse(w/2+1, h/2, w/2-1, h/2-1, 0.08, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#3377dd';
+  ctx.beginPath();
+  ctx.ellipse(w/2+1, h/2, w/2-3, h/2-3, 0.08, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#2a66bb';
+  ctx.beginPath();
+  ctx.ellipse(w*0.52, h*0.65, w*0.36, h*0.25, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#5599ee';
+  ctx.beginPath();
+  ctx.ellipse(w*0.48, h*0.3, w*0.32, h*0.14, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Headband
+  ctx.fillStyle = '#cc3333';
+  ctx.fillRect(w*0.14, h*0.24, w*0.74, 3);
+  ctx.fillStyle = '#cc3333';
+  ctx.fillRect(w*0.84, h*0.22, 3, 3);
+  ctx.fillRect(w*0.87, h*0.24, 2, 5);
+  // One eyebrow visible
+  ctx.fillStyle = '#1a3366';
+  ctx.fillRect(w*0.45, h*0.3, 7, 2);
+  ctx.fillRect(w*0.68, h*0.3, 5, 2);
+  // Eyes
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.ellipse(w*0.52, h*0.37, 4.5, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.76, h*0.37, 3.5, 4.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#2255bb';
+  ctx.beginPath(); ctx.ellipse(w*0.54, h*0.38, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.78, h*0.38, 2, 2.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(w*0.54, h*0.38, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.78, h*0.38, 1, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(w*0.52, h*0.36, 1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.76, h*0.36, 0.8, 0, Math.PI*2); ctx.fill();
+  // Smirk
+  ctx.strokeStyle = '#1a3366';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(w*0.62, h*0.46, 3.5, 0.2, Math.PI*0.6);
+  ctx.stroke();
+});
+
+// ============== OPTION C: Armored Jelly ==============
+makeCard(document.getElementById('optionC'), 'Front View', (ctx, w, h) => {
+  // Strong dark border
+  ctx.fillStyle = '#1a3366';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h/2, w/2-1, h/2-1, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Main body - slightly purple tint
+  ctx.fillStyle = '#4477dd';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h/2, w/2-3, h/2-3, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Upper lighter zone
+  ctx.fillStyle = '#5588ee';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h*0.35, w*0.32, h*0.18, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Belly plate / chest marking
+  ctx.fillStyle = '#3366bb';
+  ctx.beginPath();
+  ctx.ellipse(w/2, h*0.55, w*0.22, h*0.18, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#2255aa';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.ellipse(w/2, h*0.55, w*0.22, h*0.18, 0, 0, Math.PI*2);
+  ctx.stroke();
+  // Inner plate detail line
+  ctx.strokeStyle = '#2a55aa';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(w*0.38, h*0.5);
+  ctx.lineTo(w*0.62, h*0.5);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(w*0.4, h*0.56);
+  ctx.lineTo(w*0.6, h*0.56);
+  ctx.stroke();
+  // Glossy highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.beginPath();
+  ctx.ellipse(w*0.38, h*0.2, 4, 6, -0.3, 0, Math.PI*2);
+  ctx.fill();
+  // Bold eyes with thick outline
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.ellipse(w*0.36, h*0.35, 5.5, 6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.64, h*0.35, 5.5, 6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.ellipse(w*0.36, h*0.35, 4, 4.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.64, h*0.35, 4, 4.5, 0, 0, Math.PI*2); ctx.fill();
+  // Iris - electric blue
+  ctx.fillStyle = '#2266ff';
+  ctx.beginPath(); ctx.ellipse(w*0.37, h*0.36, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.65, h*0.36, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  // Pupils
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(w*0.37, h*0.36, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.65, h*0.36, 1.2, 0, Math.PI*2); ctx.fill();
+  // Eye shine
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(w*0.34, h*0.34, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.62, h*0.34, 1.2, 0, Math.PI*2); ctx.fill();
+  // Neutral mouth
+  ctx.strokeStyle = '#1a3366';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(w*0.4, h*0.44);
+  ctx.lineTo(w*0.6, h*0.44);
+  ctx.stroke();
+});
+
+makeCard(document.getElementById('optionC'), 'Side View (moving)', (ctx, w, h) => {
+  ctx.fillStyle = '#1a3366';
+  ctx.beginPath();
+  ctx.ellipse(w/2+1, h/2, w/2-1, h/2-1, 0.06, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#4477dd';
+  ctx.beginPath();
+  ctx.ellipse(w/2+1, h/2, w/2-3, h/2-3, 0.06, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#5588ee';
+  ctx.beginPath();
+  ctx.ellipse(w*0.5, h*0.35, w*0.3, h*0.17, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Belly plate
+  ctx.fillStyle = '#3366bb';
+  ctx.beginPath();
+  ctx.ellipse(w*0.52, h*0.55, w*0.2, h*0.17, 0.06, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#2255aa';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.ellipse(w*0.52, h*0.55, w*0.2, h*0.17, 0.06, 0, Math.PI*2);
+  ctx.stroke();
+  // Highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.beginPath();
+  ctx.ellipse(w*0.38, h*0.2, 4, 6, -0.3, 0, Math.PI*2);
+  ctx.fill();
+  // Eyes
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.ellipse(w*0.52, h*0.35, 5.5, 6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.76, h*0.35, 4.5, 5.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.ellipse(w*0.52, h*0.35, 4, 4.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.76, h*0.35, 3.5, 4, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#2266ff';
+  ctx.beginPath(); ctx.ellipse(w*0.54, h*0.36, 2.5, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w*0.78, h*0.36, 2, 2.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(w*0.54, h*0.36, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.78, h*0.36, 1, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(w*0.52, h*0.34, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.76, h*0.34, 0.8, 0, Math.PI*2); ctx.fill();
+  // Mouth
+  ctx.strokeStyle = '#1a3366';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(w*0.5, h*0.44);
+  ctx.lineTo(w*0.66, h*0.44);
+  ctx.stroke();
+});
+
+</script>
+</body>
+</html>

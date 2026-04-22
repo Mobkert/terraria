@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Item Design Mockups</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
+  h1 { text-align: center; color: #ccaa77; }
+  h2 { color: #88bb88; border-bottom: 1px solid #444; padding-bottom: 8px; margin-top: 50px; }
+  h3 { color: #aaaacc; margin-top: 30px; }
+  .desc { color: #999; font-size: 13px; margin-bottom: 10px; max-width: 900px; }
+  .row { display: flex; gap: 30px; justify-content: center; align-items: flex-end; margin: 15px 0 30px; flex-wrap: wrap; }
+  .card { text-align: center; }
+  .card canvas { border: 2px solid #444; background: #2a2a3e; image-rendering: pixelated; }
+  .card p { margin: 6px 0 0; font-size: 12px; color: #aaa; }
+  .section-label { font-size: 11px; color: #666; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<h1>Item Design Mockups</h1>
+<p class="desc" style="text-align:center;margin:0 auto 20px;">Each option shows all pickaxes (wood, stone, iron), axes, swords, and the grass essence side by side.</p>
+
+<h2>Current Designs (for reference)</h2>
+<div class="row" id="current"></div>
+
+<h2>Option A: Clean Pixel-Art</h2>
+<p class="desc">Crisp shapes with clear outlines, beveled edges, and distinct material shading. Tools have wider, more defined heads. Swords have proper guards and tapered blades.</p>
+<div class="row" id="optionA"></div>
+
+<h2>Option B: Chunky & Bold</h2>
+<p class="desc">Thick, chunky tools with heavy outlines and exaggerated proportions. Bold colors with strong contrast. Big meaty axe heads, wide pickaxe prongs, and broad sword blades.</p>
+<div class="row" id="optionB"></div>
+
+<h2>Option C: Sleek & Detailed</h2>
+<p class="desc">Refined, slender tools with gradient shading, shine highlights, and fine details. Elegant sword designs with fuller grooves. Essence has a magical glow effect.</p>
+<div class="row" id="optionC"></div>
+
+<script>
+const S = 32;
+const SCALE = 5;
+
+function makeCard(parent, label, drawFn) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  const canvas = document.createElement('canvas');
+  canvas.width = S;
+  canvas.height = S;
+  canvas.style.width = (S * SCALE) + 'px';
+  canvas.style.height = (S * SCALE) + 'px';
+  const ctx = canvas.getContext('2d');
+  drawFn(ctx, S);
+  div.appendChild(canvas);
+  const p = document.createElement('p');
+  p.textContent = label;
+  div.appendChild(p);
+  parent.appendChild(div);
+}
+
+// ===================== CURRENT =====================
+makeCard(document.getElementById('current'), 'Wood Pick', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(s*0.5,s*0.9); ctx.lineTo(s*0.5,s*0.35); ctx.stroke();
+  ctx.fillStyle = '#A0724A'; ctx.fillRect(s*0.2,s*0.1,s*0.6,s*0.18);
+  ctx.fillStyle = '#8B5E3C'; ctx.fillRect(s*0.18,s*0.08,s*0.08,s*0.24); ctx.fillRect(s*0.74,s*0.08,s*0.08,s*0.24);
+});
+makeCard(document.getElementById('current'), 'Stone Pick', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(s*0.5,s*0.9); ctx.lineTo(s*0.5,s*0.35); ctx.stroke();
+  ctx.fillStyle = '#808080'; ctx.fillRect(s*0.2,s*0.1,s*0.6,s*0.18);
+  ctx.fillStyle = '#666666'; ctx.fillRect(s*0.18,s*0.08,s*0.08,s*0.24); ctx.fillRect(s*0.74,s*0.08,s*0.08,s*0.24);
+});
+makeCard(document.getElementById('current'), 'Iron Pick', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(s*0.5,s*0.9); ctx.lineTo(s*0.5,s*0.35); ctx.stroke();
+  ctx.fillStyle = '#d4d4d4'; ctx.fillRect(s*0.2,s*0.1,s*0.6,s*0.18);
+  ctx.fillStyle = '#aaaaaa'; ctx.fillRect(s*0.18,s*0.08,s*0.08,s*0.24); ctx.fillRect(s*0.74,s*0.08,s*0.08,s*0.24);
+});
+makeCard(document.getElementById('current'), 'Wood Axe', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(s*0.45,s*0.9); ctx.lineTo(s*0.45,s*0.3); ctx.stroke();
+  ctx.fillStyle = '#A0724A'; ctx.beginPath(); ctx.moveTo(s*0.45,s*0.1); ctx.lineTo(s*0.82,s*0.22); ctx.lineTo(s*0.82,s*0.42); ctx.lineTo(s*0.45,s*0.38); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#8B5E3C'; ctx.fillRect(s*0.42,s*0.08,s*0.06,s*0.34);
+});
+makeCard(document.getElementById('current'), 'Stone Axe', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(s*0.45,s*0.9); ctx.lineTo(s*0.45,s*0.3); ctx.stroke();
+  ctx.fillStyle = '#808080'; ctx.beginPath(); ctx.moveTo(s*0.45,s*0.1); ctx.lineTo(s*0.82,s*0.22); ctx.lineTo(s*0.82,s*0.42); ctx.lineTo(s*0.45,s*0.38); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#666666'; ctx.fillRect(s*0.42,s*0.08,s*0.06,s*0.34);
+});
+makeCard(document.getElementById('current'), 'Iron Axe', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(s*0.45,s*0.9); ctx.lineTo(s*0.45,s*0.3); ctx.stroke();
+  ctx.fillStyle = '#d4d4d4'; ctx.beginPath(); ctx.moveTo(s*0.45,s*0.1); ctx.lineTo(s*0.82,s*0.22); ctx.lineTo(s*0.82,s*0.42); ctx.lineTo(s*0.45,s*0.38); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#aaaaaa'; ctx.fillRect(s*0.42,s*0.08,s*0.06,s*0.34);
+});
+makeCard(document.getElementById('current'), 'Wood Sword', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.88); ctx.lineTo(s*0.5,s*0.62); ctx.stroke();
+  ctx.fillStyle = '#A0724A'; ctx.fillRect(s*0.35,s*0.58,s*0.3,s*0.06);
+  ctx.fillStyle = '#c4a060'; ctx.fillRect(s*0.44,s*0.12,s*0.12,s*0.48);
+  ctx.fillStyle = '#b0904a'; ctx.beginPath(); ctx.moveTo(s*0.44,s*0.12); ctx.lineTo(s*0.5,s*0.04); ctx.lineTo(s*0.56,s*0.12); ctx.closePath(); ctx.fill();
+});
+makeCard(document.getElementById('current'), 'Stone Sword', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.88); ctx.lineTo(s*0.5,s*0.62); ctx.stroke();
+  ctx.fillStyle = '#A0724A'; ctx.fillRect(s*0.35,s*0.58,s*0.3,s*0.06);
+  ctx.fillStyle = '#888888'; ctx.fillRect(s*0.44,s*0.12,s*0.12,s*0.48);
+  ctx.fillStyle = '#777777'; ctx.beginPath(); ctx.moveTo(s*0.44,s*0.12); ctx.lineTo(s*0.5,s*0.04); ctx.lineTo(s*0.56,s*0.12); ctx.closePath(); ctx.fill();
+});
+makeCard(document.getElementById('current'), 'Iron Sword', (ctx, s) => {
+  ctx.strokeStyle = '#8B5E3C'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.88); ctx.lineTo(s*0.5,s*0.62); ctx.stroke();
+  ctx.fillStyle = '#A0724A'; ctx.fillRect(s*0.35,s*0.58,s*0.3,s*0.06);
+  ctx.fillStyle = '#d4d4d4'; ctx.fillRect(s*0.44,s*0.12,s*0.12,s*0.48);
+  ctx.fillStyle = '#bbbbbb'; ctx.beginPath(); ctx.moveTo(s*0.44,s*0.12); ctx.lineTo(s*0.5,s*0.04); ctx.lineTo(s*0.56,s*0.12); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#eeeeee'; ctx.fillRect(s*0.47,s*0.18,s*0.04,s*0.1);
+});
+makeCard(document.getElementById('current'), 'Grass Essence', (ctx, s) => {
+  ctx.fillStyle = '#3aaa3a'; ctx.beginPath(); ctx.ellipse(s*0.5,s*0.5,s*0.3,s*0.35,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#5cdd5c'; ctx.beginPath(); ctx.ellipse(s*0.45,s*0.4,s*0.12,s*0.15,-0.3,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.beginPath(); ctx.ellipse(s*0.4,s*0.35,s*0.06,s*0.08,-0.4,0,Math.PI*2); ctx.fill();
+});
+
+
+// ===================== HELPERS =====================
+function drawHandle(ctx, s, x, topY, botY) {
+  ctx.fillStyle = '#6B4226';
+  ctx.fillRect(x - 1.5, topY, 3, botY - topY);
+  ctx.fillStyle = '#8B5E3C';
+  ctx.fillRect(x - 0.5, topY, 1, botY - topY);
+}
+
+// ===================== OPTION A: Clean Pixel-Art =====================
+
+// -- Pickaxes --
+function drawPickA(ctx, s, headColor, darkColor, lightColor) {
+  drawHandle(ctx, s, s*0.5, s*0.3, s*0.92);
+  // Head - wider with prongs
+  ctx.fillStyle = darkColor;
+  ctx.fillRect(s*0.14, s*0.12, s*0.72, s*0.06);
+  ctx.fillStyle = headColor;
+  ctx.fillRect(s*0.16, s*0.08, s*0.68, s*0.1);
+  // Left prong
+  ctx.fillStyle = headColor;
+  ctx.fillRect(s*0.1, s*0.06, s*0.1, s*0.16);
+  ctx.fillStyle = darkColor;
+  ctx.fillRect(s*0.08, s*0.1, s*0.04, s*0.12);
+  // Right prong
+  ctx.fillStyle = headColor;
+  ctx.fillRect(s*0.8, s*0.06, s*0.1, s*0.16);
+  ctx.fillStyle = darkColor;
+  ctx.fillRect(s*0.88, s*0.1, s*0.04, s*0.12);
+  // Bevel highlight
+  ctx.fillStyle = lightColor;
+  ctx.fillRect(s*0.18, s*0.08, s*0.64, s*0.03);
+  // Binding
+  ctx.fillStyle = '#555';
+  ctx.fillRect(s*0.44, s*0.2, s*0.12, s*0.04);
+}
+makeCard(document.getElementById('optionA'), 'Wood Pick', (ctx, s) => drawPickA(ctx, s, '#A0724A', '#7a5230', '#c4946a'));
+makeCard(document.getElementById('optionA'), 'Stone Pick', (ctx, s) => drawPickA(ctx, s, '#888888', '#606060', '#aaaaaa'));
+makeCard(document.getElementById('optionA'), 'Iron Pick', (ctx, s) => drawPickA(ctx, s, '#cccccc', '#999999', '#eeeeee'));
+
+// -- Axes --
+function drawAxeA(ctx, s, headColor, darkColor, lightColor) {
+  drawHandle(ctx, s, s*0.4, s*0.28, s*0.92);
+  // Axe head
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.4, s*0.06);
+  ctx.lineTo(s*0.4, s*0.36);
+  ctx.lineTo(s*0.88, s*0.38);
+  ctx.lineTo(s*0.9, s*0.28);
+  ctx.lineTo(s*0.88, s*0.18);
+  ctx.lineTo(s*0.6, s*0.06);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = headColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.42, s*0.08);
+  ctx.lineTo(s*0.42, s*0.34);
+  ctx.lineTo(s*0.84, s*0.36);
+  ctx.lineTo(s*0.86, s*0.28);
+  ctx.lineTo(s*0.84, s*0.2);
+  ctx.lineTo(s*0.58, s*0.08);
+  ctx.closePath();
+  ctx.fill();
+  // Edge highlight
+  ctx.fillStyle = lightColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.84, s*0.22);
+  ctx.lineTo(s*0.88, s*0.28);
+  ctx.lineTo(s*0.84, s*0.34);
+  ctx.lineTo(s*0.82, s*0.28);
+  ctx.closePath();
+  ctx.fill();
+  // Binding
+  ctx.fillStyle = '#555';
+  ctx.fillRect(s*0.36, s*0.26, s*0.1, s*0.04);
+}
+makeCard(document.getElementById('optionA'), 'Wood Axe', (ctx, s) => drawAxeA(ctx, s, '#A0724A', '#7a5230', '#c4946a'));
+makeCard(document.getElementById('optionA'), 'Stone Axe', (ctx, s) => drawAxeA(ctx, s, '#888888', '#606060', '#b0b0b0'));
+makeCard(document.getElementById('optionA'), 'Iron Axe', (ctx, s) => drawAxeA(ctx, s, '#cccccc', '#999999', '#f0f0f0'));
+
+// -- Swords --
+function drawSwordA(ctx, s, bladeColor, darkColor, lightColor, guardColor) {
+  // Handle
+  ctx.fillStyle = '#6B4226';
+  ctx.fillRect(s*0.46, s*0.68, s*0.08, s*0.24);
+  ctx.fillStyle = '#8B5E3C';
+  ctx.fillRect(s*0.48, s*0.7, s*0.04, s*0.2);
+  // Pommel
+  ctx.fillStyle = guardColor;
+  ctx.beginPath(); ctx.arc(s*0.5, s*0.92, 3, 0, Math.PI*2); ctx.fill();
+  // Guard
+  ctx.fillStyle = guardColor;
+  ctx.fillRect(s*0.3, s*0.64, s*0.4, s*0.05);
+  ctx.fillStyle = '#eedd55';
+  ctx.fillRect(s*0.46, s*0.64, s*0.08, s*0.05);
+  // Blade
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.42, s*0.64);
+  ctx.lineTo(s*0.58, s*0.64);
+  ctx.lineTo(s*0.56, s*0.14);
+  ctx.lineTo(s*0.5, s*0.04);
+  ctx.lineTo(s*0.44, s*0.14);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = bladeColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.44, s*0.62);
+  ctx.lineTo(s*0.56, s*0.62);
+  ctx.lineTo(s*0.54, s*0.16);
+  ctx.lineTo(s*0.5, s*0.06);
+  ctx.lineTo(s*0.46, s*0.16);
+  ctx.closePath();
+  ctx.fill();
+  // Edge shine
+  ctx.fillStyle = lightColor;
+  ctx.fillRect(s*0.48, s*0.18, s*0.02, s*0.35);
+}
+makeCard(document.getElementById('optionA'), 'Wood Sword', (ctx, s) => drawSwordA(ctx, s, '#c4a060', '#9a7a40', '#ddbb77', '#8B5E3C'));
+makeCard(document.getElementById('optionA'), 'Stone Sword', (ctx, s) => drawSwordA(ctx, s, '#999999', '#707070', '#bbbbbb', '#666666'));
+makeCard(document.getElementById('optionA'), 'Iron Sword', (ctx, s) => drawSwordA(ctx, s, '#d8d8d8', '#a0a0a0', '#f4f4f4', '#888888'));
+
+// -- Essence --
+makeCard(document.getElementById('optionA'), 'Grass Essence', (ctx, s) => {
+  // Bottle outline
+  ctx.fillStyle = '#2a7a2a';
+  ctx.beginPath(); ctx.ellipse(s*0.5, s*0.55, s*0.28, s*0.32, 0, 0, Math.PI*2); ctx.fill();
+  // Bottle fill
+  ctx.fillStyle = '#3aaa3a';
+  ctx.beginPath(); ctx.ellipse(s*0.5, s*0.55, s*0.24, s*0.28, 0, 0, Math.PI*2); ctx.fill();
+  // Inner glow
+  ctx.fillStyle = '#55cc55';
+  ctx.beginPath(); ctx.ellipse(s*0.46, s*0.48, s*0.12, s*0.14, -0.2, 0, Math.PI*2); ctx.fill();
+  // Shine
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath(); ctx.ellipse(s*0.38, s*0.4, 3, 5, -0.4, 0, Math.PI*2); ctx.fill();
+  // Neck
+  ctx.fillStyle = '#2a7a2a';
+  ctx.fillRect(s*0.42, s*0.18, s*0.16, s*0.1);
+  ctx.fillStyle = '#3aaa3a';
+  ctx.fillRect(s*0.44, s*0.18, s*0.12, s*0.1);
+  // Cork
+  ctx.fillStyle = '#aa8844';
+  ctx.fillRect(s*0.44, s*0.12, s*0.12, s*0.08);
+  ctx.fillStyle = '#ccaa66';
+  ctx.fillRect(s*0.46, s*0.13, s*0.08, s*0.06);
+  // Cross / plus sign
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(s*0.47, s*0.46, s*0.06, s*0.16);
+  ctx.fillRect(s*0.42, s*0.51, s*0.16, s*0.06);
+});
+
+
+// ===================== OPTION B: Chunky & Bold =====================
+
+function drawPickB(ctx, s, headColor, darkColor, lightColor) {
+  // Thick handle
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s*0.44, s*0.32, s*0.12, s*0.62);
+  ctx.fillStyle = '#7a5230';
+  ctx.fillRect(s*0.46, s*0.34, s*0.08, s*0.58);
+  // Big chunky head
+  ctx.fillStyle = '#111';
+  ctx.fillRect(s*0.06, s*0.04, s*0.88, s*0.24);
+  ctx.fillStyle = darkColor;
+  ctx.fillRect(s*0.08, s*0.06, s*0.84, s*0.2);
+  ctx.fillStyle = headColor;
+  ctx.fillRect(s*0.1, s*0.08, s*0.8, s*0.16);
+  // Prong tips
+  ctx.fillStyle = darkColor;
+  ctx.fillRect(s*0.04, s*0.08, s*0.1, s*0.18);
+  ctx.fillRect(s*0.86, s*0.08, s*0.1, s*0.18);
+  // Top highlight
+  ctx.fillStyle = lightColor;
+  ctx.fillRect(s*0.12, s*0.08, s*0.76, s*0.04);
+  // Binding wrap
+  ctx.fillStyle = '#aa8844';
+  ctx.fillRect(s*0.42, s*0.26, s*0.16, s*0.06);
+  ctx.fillRect(s*0.42, s*0.34, s*0.16, s*0.04);
+}
+makeCard(document.getElementById('optionB'), 'Wood Pick', (ctx, s) => drawPickB(ctx, s, '#B0825A', '#7a5230', '#d4a47a'));
+makeCard(document.getElementById('optionB'), 'Stone Pick', (ctx, s) => drawPickB(ctx, s, '#909090', '#606060', '#bbbbbb'));
+makeCard(document.getElementById('optionB'), 'Iron Pick', (ctx, s) => drawPickB(ctx, s, '#d0d0d0', '#909090', '#f0f0f0'));
+
+function drawAxeB(ctx, s, headColor, darkColor, lightColor) {
+  // Thick handle
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s*0.34, s*0.3, s*0.12, s*0.62);
+  ctx.fillStyle = '#7a5230';
+  ctx.fillRect(s*0.36, s*0.32, s*0.08, s*0.58);
+  // Huge axe head with outline
+  ctx.fillStyle = '#111';
+  ctx.beginPath();
+  ctx.moveTo(s*0.34, s*0.04);
+  ctx.lineTo(s*0.34, s*0.4);
+  ctx.lineTo(s*0.94, s*0.42);
+  ctx.lineTo(s*0.96, s*0.22);
+  ctx.lineTo(s*0.88, s*0.04);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.36, s*0.06);
+  ctx.lineTo(s*0.36, s*0.38);
+  ctx.lineTo(s*0.92, s*0.4);
+  ctx.lineTo(s*0.94, s*0.22);
+  ctx.lineTo(s*0.86, s*0.06);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = headColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.38, s*0.08);
+  ctx.lineTo(s*0.38, s*0.36);
+  ctx.lineTo(s*0.88, s*0.38);
+  ctx.lineTo(s*0.9, s*0.22);
+  ctx.lineTo(s*0.82, s*0.08);
+  ctx.closePath();
+  ctx.fill();
+  // Edge gleam
+  ctx.fillStyle = lightColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.88, s*0.2);
+  ctx.lineTo(s*0.92, s*0.28);
+  ctx.lineTo(s*0.88, s*0.36);
+  ctx.lineTo(s*0.86, s*0.28);
+  ctx.closePath();
+  ctx.fill();
+  // Binding
+  ctx.fillStyle = '#aa8844';
+  ctx.fillRect(s*0.3, s*0.28, s*0.16, s*0.06);
+}
+makeCard(document.getElementById('optionB'), 'Wood Axe', (ctx, s) => drawAxeB(ctx, s, '#B0825A', '#7a5230', '#d4a47a'));
+makeCard(document.getElementById('optionB'), 'Stone Axe', (ctx, s) => drawAxeB(ctx, s, '#909090', '#606060', '#c0c0c0'));
+makeCard(document.getElementById('optionB'), 'Iron Axe', (ctx, s) => drawAxeB(ctx, s, '#d0d0d0', '#909090', '#f0f0f0'));
+
+function drawSwordB(ctx, s, bladeColor, darkColor, lightColor) {
+  // Thick handle
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s*0.42, s*0.72, s*0.16, s*0.22);
+  ctx.fillStyle = '#7a5230';
+  ctx.fillRect(s*0.44, s*0.74, s*0.12, s*0.18);
+  // Pommel
+  ctx.fillStyle = '#888';
+  ctx.fillRect(s*0.4, s*0.9, s*0.2, s*0.06);
+  // Big guard
+  ctx.fillStyle = '#111';
+  ctx.fillRect(s*0.22, s*0.66, s*0.56, s*0.08);
+  ctx.fillStyle = '#777';
+  ctx.fillRect(s*0.24, s*0.68, s*0.52, s*0.04);
+  // Wide blade with outline
+  ctx.fillStyle = '#111';
+  ctx.beginPath();
+  ctx.moveTo(s*0.36, s*0.66); ctx.lineTo(s*0.64, s*0.66);
+  ctx.lineTo(s*0.62, s*0.14); ctx.lineTo(s*0.5, s*0.02);
+  ctx.lineTo(s*0.38, s*0.14); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.38, s*0.64); ctx.lineTo(s*0.62, s*0.64);
+  ctx.lineTo(s*0.6, s*0.16); ctx.lineTo(s*0.5, s*0.04);
+  ctx.lineTo(s*0.4, s*0.16); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = bladeColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.4, s*0.62); ctx.lineTo(s*0.58, s*0.62);
+  ctx.lineTo(s*0.56, s*0.18); ctx.lineTo(s*0.5, s*0.08);
+  ctx.lineTo(s*0.44, s*0.18); ctx.closePath(); ctx.fill();
+  // Center line
+  ctx.fillStyle = lightColor;
+  ctx.fillRect(s*0.48, s*0.14, s*0.04, s*0.44);
+}
+makeCard(document.getElementById('optionB'), 'Wood Sword', (ctx, s) => drawSwordB(ctx, s, '#c4a060', '#9a7a40', '#ddbb77'));
+makeCard(document.getElementById('optionB'), 'Stone Sword', (ctx, s) => drawSwordB(ctx, s, '#999999', '#707070', '#c0c0c0'));
+makeCard(document.getElementById('optionB'), 'Iron Sword', (ctx, s) => drawSwordB(ctx, s, '#dddddd', '#a8a8a8', '#f8f8f8'));
+
+makeCard(document.getElementById('optionB'), 'Grass Essence', (ctx, s) => {
+  // Big round potion with outline
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.ellipse(s*0.5, s*0.56, s*0.34, s*0.36, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#228822';
+  ctx.beginPath(); ctx.ellipse(s*0.5, s*0.56, s*0.3, s*0.32, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#33bb33';
+  ctx.beginPath(); ctx.ellipse(s*0.5, s*0.56, s*0.24, s*0.26, 0, 0, Math.PI*2); ctx.fill();
+  // Bright center
+  ctx.fillStyle = '#55dd55';
+  ctx.beginPath(); ctx.ellipse(s*0.46, s*0.5, s*0.1, s*0.12, 0, 0, Math.PI*2); ctx.fill();
+  // Shine
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.beginPath(); ctx.ellipse(s*0.38, s*0.42, 3, 5, -0.3, 0, Math.PI*2); ctx.fill();
+  // Thick neck
+  ctx.fillStyle = '#111';
+  ctx.fillRect(s*0.38, s*0.14, s*0.24, s*0.14);
+  ctx.fillStyle = '#228822';
+  ctx.fillRect(s*0.4, s*0.16, s*0.2, s*0.1);
+  // Cork
+  ctx.fillStyle = '#886633';
+  ctx.fillRect(s*0.4, s*0.08, s*0.2, s*0.1);
+  ctx.fillStyle = '#aa8844';
+  ctx.fillRect(s*0.42, s*0.09, s*0.16, s*0.08);
+  // Big cross
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(s*0.46, s*0.42, s*0.08, s*0.24);
+  ctx.fillRect(s*0.38, s*0.5, s*0.24, s*0.08);
+});
+
+
+// ===================== OPTION C: Sleek & Detailed =====================
+
+function drawPickC(ctx, s, headColor, darkColor, lightColor, accentColor) {
+  // Slim elegant handle
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s*0.48, s*0.3, s*0.04, s*0.62);
+  ctx.fillStyle = '#8B5E3C';
+  ctx.fillRect(s*0.485, s*0.32, s*0.03, s*0.58);
+  // Grip wrap
+  ctx.fillStyle = '#aa8844';
+  for (let i = 0; i < 4; i++) ctx.fillRect(s*0.46, s*0.7 + i*5, s*0.08, 2);
+  // Curved head
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.06, s*0.14);
+  ctx.quadraticCurveTo(s*0.06, s*0.04, s*0.2, s*0.06);
+  ctx.lineTo(s*0.48, s*0.16);
+  ctx.lineTo(s*0.52, s*0.16);
+  ctx.lineTo(s*0.8, s*0.06);
+  ctx.quadraticCurveTo(s*0.94, s*0.04, s*0.94, s*0.14);
+  ctx.lineTo(s*0.86, s*0.22);
+  ctx.lineTo(s*0.14, s*0.22);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = headColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.1, s*0.14);
+  ctx.quadraticCurveTo(s*0.1, s*0.07, s*0.22, s*0.08);
+  ctx.lineTo(s*0.48, s*0.17);
+  ctx.lineTo(s*0.52, s*0.17);
+  ctx.lineTo(s*0.78, s*0.08);
+  ctx.quadraticCurveTo(s*0.9, s*0.07, s*0.9, s*0.14);
+  ctx.lineTo(s*0.84, s*0.2);
+  ctx.lineTo(s*0.16, s*0.2);
+  ctx.closePath();
+  ctx.fill();
+  // Gradient shine on top
+  ctx.fillStyle = lightColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.16, s*0.12);
+  ctx.quadraticCurveTo(s*0.5, s*0.08, s*0.84, s*0.12);
+  ctx.lineTo(s*0.84, s*0.14);
+  ctx.quadraticCurveTo(s*0.5, s*0.1, s*0.16, s*0.14);
+  ctx.closePath();
+  ctx.fill();
+  // Tips accent
+  ctx.fillStyle = accentColor;
+  ctx.fillRect(s*0.06, s*0.12, s*0.06, s*0.06);
+  ctx.fillRect(s*0.88, s*0.12, s*0.06, s*0.06);
+}
+makeCard(document.getElementById('optionC'), 'Wood Pick', (ctx, s) => drawPickC(ctx, s, '#B08860', '#7a5535', '#d4b488', '#9a7040'));
+makeCard(document.getElementById('optionC'), 'Stone Pick', (ctx, s) => drawPickC(ctx, s, '#8a8a8a', '#5a5a5a', '#b0b0b0', '#707070'));
+makeCard(document.getElementById('optionC'), 'Iron Pick', (ctx, s) => drawPickC(ctx, s, '#cccccc', '#909090', '#eaeaea', '#aaaaaa'));
+
+function drawAxeC(ctx, s, headColor, darkColor, lightColor) {
+  // Slim handle
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s*0.38, s*0.3, s*0.04, s*0.62);
+  ctx.fillStyle = '#8B5E3C';
+  ctx.fillRect(s*0.385, s*0.32, s*0.03, s*0.58);
+  // Grip wrap
+  ctx.fillStyle = '#aa8844';
+  for (let i = 0; i < 4; i++) ctx.fillRect(s*0.36, s*0.7 + i*5, s*0.08, 2);
+  // Curved axe blade
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.38, s*0.06);
+  ctx.lineTo(s*0.38, s*0.38);
+  ctx.quadraticCurveTo(s*0.7, s*0.42, s*0.92, s*0.28);
+  ctx.quadraticCurveTo(s*0.94, s*0.2, s*0.92, s*0.12);
+  ctx.quadraticCurveTo(s*0.7, s*0.02, s*0.38, s*0.06);
+  ctx.fill();
+  ctx.fillStyle = headColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.4, s*0.08);
+  ctx.lineTo(s*0.4, s*0.36);
+  ctx.quadraticCurveTo(s*0.68, s*0.4, s*0.88, s*0.28);
+  ctx.quadraticCurveTo(s*0.9, s*0.2, s*0.88, s*0.14);
+  ctx.quadraticCurveTo(s*0.68, s*0.04, s*0.4, s*0.08);
+  ctx.fill();
+  // Edge shine
+  ctx.strokeStyle = lightColor;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(s*0.88, s*0.14);
+  ctx.quadraticCurveTo(s*0.92, s*0.22, s*0.88, s*0.3);
+  ctx.stroke();
+  // Inner detail arc
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(s*0.44, s*0.12);
+  ctx.quadraticCurveTo(s*0.6, s*0.08, s*0.78, s*0.18);
+  ctx.stroke();
+}
+makeCard(document.getElementById('optionC'), 'Wood Axe', (ctx, s) => drawAxeC(ctx, s, '#B08860', '#7a5535', '#d4b488'));
+makeCard(document.getElementById('optionC'), 'Stone Axe', (ctx, s) => drawAxeC(ctx, s, '#8a8a8a', '#5a5a5a', '#b8b8b8'));
+makeCard(document.getElementById('optionC'), 'Iron Axe', (ctx, s) => drawAxeC(ctx, s, '#cccccc', '#909090', '#eeeeee'));
+
+function drawSwordC(ctx, s, bladeColor, darkColor, lightColor, gemColor) {
+  // Slim handle
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s*0.46, s*0.72, s*0.08, s*0.2);
+  ctx.fillStyle = '#7a5230';
+  ctx.fillRect(s*0.47, s*0.74, s*0.06, s*0.16);
+  // Grip wrap
+  ctx.fillStyle = '#aa8844';
+  ctx.fillRect(s*0.44, s*0.76, s*0.12, s*0.02);
+  ctx.fillRect(s*0.44, s*0.82, s*0.12, s*0.02);
+  ctx.fillRect(s*0.44, s*0.88, s*0.12, s*0.02);
+  // Pommel
+  ctx.fillStyle = '#777';
+  ctx.beginPath(); ctx.arc(s*0.5, s*0.94, 2.5, 0, Math.PI*2); ctx.fill();
+  // Guard - elegant curved
+  ctx.fillStyle = '#888';
+  ctx.beginPath();
+  ctx.moveTo(s*0.22, s*0.7);
+  ctx.quadraticCurveTo(s*0.5, s*0.64, s*0.78, s*0.7);
+  ctx.quadraticCurveTo(s*0.5, s*0.74, s*0.22, s*0.7);
+  ctx.fill();
+  // Gem in guard center
+  ctx.fillStyle = gemColor;
+  ctx.beginPath(); ctx.arc(s*0.5, s*0.7, 2, 0, Math.PI*2); ctx.fill();
+  // Tapered blade
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.4, s*0.68); ctx.lineTo(s*0.6, s*0.68);
+  ctx.lineTo(s*0.56, s*0.16); ctx.lineTo(s*0.5, s*0.02);
+  ctx.lineTo(s*0.44, s*0.16); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = bladeColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.42, s*0.66); ctx.lineTo(s*0.58, s*0.66);
+  ctx.lineTo(s*0.54, s*0.18); ctx.lineTo(s*0.5, s*0.04);
+  ctx.lineTo(s*0.46, s*0.18); ctx.closePath(); ctx.fill();
+  // Fuller groove
+  ctx.fillStyle = darkColor;
+  ctx.fillRect(s*0.48, s*0.2, s*0.04, s*0.38);
+  ctx.fillStyle = bladeColor;
+  ctx.fillRect(s*0.485, s*0.22, s*0.03, s*0.34);
+  // Edge highlights
+  ctx.fillStyle = lightColor;
+  ctx.beginPath();
+  ctx.moveTo(s*0.44, s*0.58); ctx.lineTo(s*0.46, s*0.2);
+  ctx.lineTo(s*0.47, s*0.2); ctx.lineTo(s*0.45, s*0.58);
+  ctx.closePath(); ctx.fill();
+  // Tip shine
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.beginPath(); ctx.arc(s*0.5, s*0.06, 1.5, 0, Math.PI*2); ctx.fill();
+}
+makeCard(document.getElementById('optionC'), 'Wood Sword', (ctx, s) => drawSwordC(ctx, s, '#c4a060', '#9a7a40', '#ddcc88', '#88aa44'));
+makeCard(document.getElementById('optionC'), 'Stone Sword', (ctx, s) => drawSwordC(ctx, s, '#999999', '#707070', '#cccccc', '#6688aa'));
+makeCard(document.getElementById('optionC'), 'Iron Sword', (ctx, s) => drawSwordC(ctx, s, '#dddddd', '#a8a8a8', '#f8f8f8', '#4488dd'));
+
+makeCard(document.getElementById('optionC'), 'Grass Essence', (ctx, s) => {
+  // Outer glow
+  ctx.fillStyle = 'rgba(50,200,50,0.15)';
+  ctx.beginPath(); ctx.ellipse(s*0.5, s*0.52, s*0.4, s*0.44, 0, 0, Math.PI*2); ctx.fill();
+  // Teardrop bottle shape
+  ctx.fillStyle = '#1a6a1a';
+  ctx.beginPath();
+  ctx.moveTo(s*0.5, s*0.18);
+  ctx.quadraticCurveTo(s*0.82, s*0.38, s*0.78, s*0.62);
+  ctx.quadraticCurveTo(s*0.72, s*0.88, s*0.5, s*0.9);
+  ctx.quadraticCurveTo(s*0.28, s*0.88, s*0.22, s*0.62);
+  ctx.quadraticCurveTo(s*0.18, s*0.38, s*0.5, s*0.18);
+  ctx.fill();
+  // Inner liquid
+  ctx.fillStyle = '#33aa33';
+  ctx.beginPath();
+  ctx.moveTo(s*0.5, s*0.22);
+  ctx.quadraticCurveTo(s*0.76, s*0.4, s*0.72, s*0.6);
+  ctx.quadraticCurveTo(s*0.68, s*0.84, s*0.5, s*0.86);
+  ctx.quadraticCurveTo(s*0.32, s*0.84, s*0.28, s*0.6);
+  ctx.quadraticCurveTo(s*0.24, s*0.4, s*0.5, s*0.22);
+  ctx.fill();
+  // Magic sparkles
+  ctx.fillStyle = '#88ff88';
+  ctx.beginPath(); ctx.arc(s*0.42, s*0.5, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(s*0.58, s*0.62, 1.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(s*0.5, s*0.72, 1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(s*0.38, s*0.66, 1.5, 0, Math.PI*2); ctx.fill();
+  // Shine
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath(); ctx.ellipse(s*0.4, s*0.4, 3, 7, -0.3, 0, Math.PI*2); ctx.fill();
+  // Stopper
+  ctx.fillStyle = '#886633';
+  ctx.fillRect(s*0.44, s*0.1, s*0.12, s*0.1);
+  ctx.fillStyle = '#aa8844';
+  ctx.fillRect(s*0.45, s*0.11, s*0.1, s*0.08);
+  // Leaf on top
+  ctx.fillStyle = '#44aa44';
+  ctx.beginPath();
+  ctx.moveTo(s*0.5, s*0.08);
+  ctx.quadraticCurveTo(s*0.62, s*0.02, s*0.66, s*0.06);
+  ctx.quadraticCurveTo(s*0.6, s*0.12, s*0.5, s*0.12);
+  ctx.closePath();
+  ctx.fill();
+});
+
+</script>
+</body>
+</html>
