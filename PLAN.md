@@ -248,6 +248,17 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/data/items.js`, `src/data/recipes.js`, `src/entities/ThrownBomb.js`, `src/entities/Enemy.js`, `src/scenes/GameScene.js`, `src/systems/BlockBreakPlace.js`, `src/scenes/BootScene.js`
 
+## Phase 20: Passive Animals and Food (COMPLETED)
+
+- **Sheep, cow, pig** friendly mobs (Option C pixel style): wander, idle, random hops, auto-jump low ledges; `AnimalSpawner` uses low caps / long cooldowns, biome-weighted types (cows oak/forest, pigs birch, sheep jungle+desert, ~16% off-type each), desert included for sand-surface spawns
+- **Sword and bombs** damage animals; drops spawn as `DroppedItem` on death; despawn if over 1000px from player
+- **Sheep:** raw mutton + ~55% wool block drop; **cow:** 1–2 raw steak; **pig:** 1 raw porkchop
+- **Furnace:** smelt raw mutton → cooked mutton, raw steak → cooked steak, raw porkchop → cooked porkchop (same rules as iron: coal fuel, 3s)
+- **Consumables (RMB hold):** raw/cooked meats heal as specified; **bacon** (3 cooked porkchop at workbench) heals like cooked porkchop but uses shorter consume time (~0.65s)
+- **Wool** block: soft decoration tile with texture detail in `BootScene`
+
+**Key files:** `src/entities/Animal.js`, `src/systems/AnimalSpawner.js`, `src/data/items.js`, `src/data/blocks.js`, `src/data/recipes.js`, `src/systems/FurnaceManager.js`, `src/systems/BlockBreakPlace.js`, `src/entities/ThrownBomb.js`, `src/scenes/GameScene.js`, `src/scenes/BootScene.js`
+
 ## Controls Summary
 
 | Key | Action |

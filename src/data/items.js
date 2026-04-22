@@ -18,6 +18,13 @@ export const ItemTypes = {
   IRON_SWORD: 32,
   GUNPOWDER: 42,
   BOMB: 43,
+  RAW_MUTTON: 45,
+  COOKED_MUTTON: 46,
+  RAW_STEAK: 47,
+  COOKED_STEAK: 48,
+  RAW_PORKCHOP: 49,
+  COOKED_PORKCHOP: 50,
+  BACON: 51,
 };
 
 export const ItemData = {
@@ -110,6 +117,49 @@ export const ItemData = {
     throwable: true,
     damage: 40,
     explodeRadius: 3,
+  },
+  [ItemTypes.RAW_MUTTON]: {
+    name: 'Raw Mutton',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 4,
+  },
+  [ItemTypes.COOKED_MUTTON]: {
+    name: 'Cooked Mutton',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 15,
+  },
+  [ItemTypes.RAW_STEAK]: {
+    name: 'Raw Steak',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 7,
+  },
+  [ItemTypes.COOKED_STEAK]: {
+    name: 'Cooked Steak',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 23,
+  },
+  [ItemTypes.RAW_PORKCHOP]: {
+    name: 'Raw Porkchop',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 5,
+  },
+  [ItemTypes.COOKED_PORKCHOP]: {
+    name: 'Cooked Porkchop',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 17,
+  },
+  [ItemTypes.BACON]: {
+    name: 'Bacon',
+    stackSize: 99,
+    consumable: true,
+    healAmount: 17,
+    consumeTime: 650,
   },
 };
 

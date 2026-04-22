@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Animal Design Mockups — Sheep, Cow, Pig</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
+  h1 { text-align: center; color: #ccaa77; }
+  h2 { color: #88bb88; border-bottom: 1px solid #444; padding-bottom: 8px; margin-top: 48px; }
+  .desc { color: #999; font-size: 13px; margin-bottom: 16px; max-width: 900px; margin-left: auto; margin-right: auto; }
+  .row { display: flex; gap: 48px; justify-content: center; align-items: flex-end; flex-wrap: wrap; margin: 24px 0 40px; }
+  .card { text-align: center; }
+  .card canvas { border: 2px solid #444; background: #2a2a3e; image-rendering: pixelated; image-rendering: crisp-edges; }
+  .card p { margin: 10px 0 0; font-size: 14px; color: #ccc; }
+  .card .hint { font-size: 11px; color: #777; margin-top: 4px; }
+</style>
+</head>
+<body>
+<h1>Farm Animal Visual Mockups</h1>
+<p class="desc" style="text-align:center">32×64 pixel canvases (same footprint as enemies), scaled up. Three distinct art directions; each row shows Sheep, Cow, Pig.</p>
+
+<h2>Option A — Chunky side-view (Terraria-like)</h2>
+<p class="desc">Strong silhouettes, readable at 1× tile height. Side profile facing right; bold legs and snout/head shapes.</p>
+<div class="row" id="optionA"></div>
+
+<h2>Option B — Soft &amp; round (friendly Mobs)</h2>
+<p class="desc">Big rounded bodies, minimal outline, cute proportions — closer to plush toys than realism.</p>
+<div class="row" id="optionB"></div>
+
+<h2>Option C — Compact &amp; textured (wool spots / hide)</h2>
+<p class="desc">Slightly smaller on the canvas with extra surface detail: wool tufts, cow patches, pig bristle dots.</p>
+<div class="row" id="optionC"></div>
+
+<script>
+const W = 32;
+const H = 64;
+const SCALE = 4;
+
+function makeCard(parent, label, subtitle, drawFn) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  canvas.style.width = (W * SCALE) + 'px';
+  canvas.style.height = (H * SCALE) + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  drawFn(ctx);
+  div.appendChild(canvas);
+  const p = document.createElement('p');
+  p.textContent = label;
+  div.appendChild(p);
+  if (subtitle) {
+    const s = document.createElement('div');
+    s.className = 'hint';
+    s.textContent = subtitle;
+    div.appendChild(s);
+  }
+  parent.appendChild(div);
+}
+
+function rect(ctx, x, y, rw, rh, fill) {
+  ctx.fillStyle = fill;
+  ctx.fillRect(x | 0, y | 0, rw | 0, rh | 0);
+}
+
+// ---------- Option A: chunky side-view ----------
+function drawSheepA(ctx) {
+  // ground shadow
+  rect(ctx, 6, 58, 20, 2, '#0d0d18');
+  // back legs
+  rect(ctx, 8, 48, 3, 12, '#1a1a1a');
+  rect(ctx, 12, 48, 3, 12, '#1a1a1a');
+  // body wool
+  rect(ctx, 4, 32, 22, 20, '#f2f2f2');
+  rect(ctx, 2, 28, 26, 8, '#eaeaea');
+  rect(ctx, 6, 26, 18, 6, '#ffffff');
+  // wool bumps
+  rect(ctx, 3, 30, 4, 4, '#ffffff');
+  rect(ctx, 14, 24, 6, 6, '#ffffff');
+  rect(ctx, 22, 28, 5, 5, '#f5f5f5');
+  // belly
+  rect(ctx, 10, 44, 10, 6, '#e0e0e0');
+  // front legs
+  rect(ctx, 20, 50, 3, 10, '#1a1a1a');
+  rect(ctx, 24, 50, 3, 10, '#1a1a1a');
+  // head (black face)
+  rect(ctx, 22, 30, 8, 10, '#2a2a2a');
+  rect(ctx, 24, 28, 6, 4, '#2a2a2a');
+  // ear
+  rect(ctx, 20, 26, 3, 4, '#3a3a3a');
+  // eye
+  rect(ctx, 26, 32, 2, 2, '#ffffff');
+  rect(ctx, 27, 33, 1, 1, '#000000');
+  // snout
+  rect(ctx, 28, 34, 3, 3, '#1a1a1a');
+}
+
+function drawCowA(ctx) {
+  rect(ctx, 6, 58, 22, 2, '#0d0d18');
+  // legs
+  rect(ctx, 9, 48, 4, 12, '#3a2a22');
+  rect(ctx, 15, 48, 4, 12, '#3a2a22');
+  rect(ctx, 19, 50, 4, 10, '#3a2a22');
+  rect(ctx, 24, 50, 4, 10, '#3a2a22');
+  // body — holstein base
+  rect(ctx, 5, 30, 24, 22, '#f4f4f4');
+  rect(ctx, 6, 32, 10, 12, '#1a1a1a');
+  rect(ctx, 18, 36, 8, 6, '#1a1a1a');
+  rect(ctx, 10, 44, 6, 5, '#1a1a1a');
+  // udder
+  rect(ctx, 14, 50, 6, 4, '#e8a0b0');
+  rect(ctx, 15, 54, 1, 2, '#d08090');
+  rect(ctx, 18, 54, 1, 2, '#d08090');
+  // chest
+  rect(ctx, 22, 34, 8, 14, '#eaeaea');
+  rect(ctx, 24, 36, 5, 8, '#1a1a1a');
+  // head
+  rect(ctx, 24, 22, 8, 14, '#f0f0f0');
+  rect(ctx, 26, 24, 5, 8, '#1a1a1a');
+  // snout
+  rect(ctx, 28, 30, 5, 5, '#dcb0a8');
+  rect(ctx, 30, 31, 2, 2, '#2a1810');
+  // horns
+  rect(ctx, 24, 18, 2, 5, '#c9b896');
+  rect(ctx, 28, 17, 2, 5, '#c9b896');
+  // ear
+  rect(ctx, 22, 26, 3, 4, '#c8c8c8');
+  // eye
+  rect(ctx, 26, 26, 2, 2, '#111');
+  rect(ctx, 26, 26, 1, 1, '#fff');
+}
+
+function drawPigA(ctx) {
+  rect(ctx, 7, 58, 18, 2, '#0d0d18');
+  // legs — short
+  rect(ctx, 10, 50, 3, 8, '#c07080');
+  rect(ctx, 14, 50, 3, 8, '#c07080');
+  rect(ctx, 18, 50, 3, 8, '#c07080');
+  rect(ctx, 22, 50, 3, 8, '#c07080');
+  // hooves
+  rect(ctx, 10, 56, 3, 2, '#4a3030');
+  rect(ctx, 14, 56, 3, 2, '#4a3030');
+  rect(ctx, 18, 56, 3, 2, '#4a3030');
+  rect(ctx, 22, 56, 3, 2, '#4a3030');
+  // body
+  rect(ctx, 6, 34, 22, 18, '#e898a8');
+  rect(ctx, 8, 32, 18, 6, '#f0a8b8');
+  // darker back
+  rect(ctx, 6, 34, 6, 14, '#d87890');
+  // head
+  rect(ctx, 20, 26, 10, 12, '#f0a0b0');
+  // snout disk
+  rect(ctx, 26, 30, 6, 6, '#f8c0cc');
+  rect(ctx, 28, 32, 2, 2, '#4a2028');
+  rect(ctx, 30, 32, 2, 2, '#4a2028');
+  // ear
+  rect(ctx, 20, 24, 3, 4, '#e08090');
+  rect(ctx, 22, 22, 4, 3, '#e08090');
+  // eye
+  rect(ctx, 24, 29, 2, 2, '#1a1010');
+  // tail curl
+  rect(ctx, 4, 38, 2, 2, '#e08090');
+  rect(ctx, 2, 36, 2, 2, '#e08090');
+  rect(ctx, 2, 34, 2, 2, '#e08090');
+}
+
+// ---------- Option B: soft round ----------
+function drawSheepB(ctx) {
+  rect(ctx, 5, 58, 22, 2, '#0d0d18');
+  // one merged fluffy oval built from circles of rects
+  const wool = '#fafafa';
+  for (let row = 0; row < 6; row++) {
+    const y = 28 + row * 4;
+    const span = 4 + (row === 0 || row === 5 ? 2 : 4);
+    for (let col = 0; col < span; col++) {
+      const x = 16 - span * 2 + col * 4 + (row % 2) * 2;
+      rect(ctx, x, y, 5, 5, wool);
+    }
+  }
+  rect(ctx, 8, 36, 18, 16, '#f4f4f4');
+  rect(ctx, 10, 34, 14, 6, '#ffffff');
+  // tiny legs
+  rect(ctx, 11, 50, 3, 10, '#555');
+  rect(ctx, 18, 50, 3, 10, '#555');
+  // face blob
+  rect(ctx, 18, 30, 10, 10, '#3a3a3a');
+  rect(ctx, 20, 28, 8, 4, '#3a3a3a');
+  rect(ctx, 22, 32, 2, 2, '#fff');
+  rect(ctx, 24, 32, 2, 2, '#fff');
+  rect(ctx, 22, 36, 4, 2, '#222');
+  // pink cheek
+  rect(ctx, 20, 34, 2, 2, '#f8a0b0');
+}
+
+function drawCowB(ctx) {
+  rect(ctx, 5, 58, 22, 2, '#0d0d18');
+  // round body
+  rect(ctx, 6, 32, 20, 20, '#f5f5f5');
+  rect(ctx, 8, 30, 16, 8, '#eeeeee');
+  rect(ctx, 10, 34, 12, 14, '#1a1a1a');
+  rect(ctx, 8, 40, 6, 6, '#1a1a1a');
+  // legs stubby
+  rect(ctx, 10, 50, 4, 8, '#f5f5f5');
+  rect(ctx, 18, 50, 4, 8, '#f5f5f5');
+  rect(ctx, 11, 56, 3, 2, '#333');
+  rect(ctx, 19, 56, 3, 2, '#333');
+  // round head
+  rect(ctx, 16, 20, 12, 14, '#f0f0f0');
+  rect(ctx, 18, 22, 8, 8, '#1a1a1a');
+  rect(ctx, 18, 28, 3, 3, '#dcb0a8');
+  rect(ctx, 22, 28, 3, 3, '#dcb0a8');
+  rect(ctx, 19, 24, 2, 2, '#fff');
+  rect(ctx, 23, 24, 2, 2, '#fff');
+  // tiny horns
+  rect(ctx, 17, 18, 2, 3, '#e8d8b8');
+  rect(ctx, 25, 18, 2, 3, '#e8d8b8');
+  // pink udder hint
+  rect(ctx, 14, 48, 8, 4, '#f0a0b8');
+}
+
+function drawPigB(ctx) {
+  rect(ctx, 6, 58, 20, 2, '#0d0d18');
+  // big pink ball body
+  rect(ctx, 5, 34, 22, 18, '#ffb0c0');
+  rect(ctx, 7, 32, 18, 8, '#ffc8d4');
+  rect(ctx, 9, 36, 6, 12, '#f090a8');
+  // legs
+  rect(ctx, 10, 50, 3, 8, '#f090a8');
+  rect(ctx, 19, 50, 3, 8, '#f090a8');
+  rect(ctx, 10, 56, 3, 2, '#5a3038');
+  rect(ctx, 19, 56, 3, 2, '#5a3038');
+  // head merged
+  rect(ctx, 16, 22, 12, 14, '#ffb8c8');
+  rect(ctx, 22, 26, 8, 8, '#ffd0dc'); // snout
+  rect(ctx, 26, 28, 2, 2, '#4a2028');
+  rect(ctx, 28, 28, 2, 2, '#4a2028');
+  rect(ctx, 18, 26, 2, 2, '#222');
+  rect(ctx, 22, 24, 2, 2, '#222');
+  // ears flap
+  rect(ctx, 15, 22, 4, 3, '#f898a8');
+  rect(ctx, 25, 22, 4, 3, '#f898a8');
+}
+
+// ---------- Option C: compact textured ----------
+function drawSheepC(ctx) {
+  rect(ctx, 7, 58, 18, 2, '#0d0d18');
+  // legs
+  rect(ctx, 10, 50, 2, 10, '#222');
+  rect(ctx, 13, 50, 2, 10, '#222');
+  rect(ctx, 19, 50, 2, 10, '#222');
+  rect(ctx, 22, 50, 2, 10, '#222');
+  // body smaller
+  rect(ctx, 8, 34, 16, 18, '#ececec');
+  // wool texture pixels
+  const tufts = [[9,33],[12,32],[15,33],[18,32],[11,37],[14,36],[17,37],[10,41],[16,41],[13,44]];
+  tufts.forEach(([x, y]) => rect(ctx, x, y, 2, 2, '#ffffff'));
+  rect(ctx, 9, 38, 14, 2, '#d8d8d8');
+  // head
+  rect(ctx, 20, 30, 7, 9, '#2f2f2f');
+  rect(ctx, 22, 28, 5, 3, '#2f2f2f');
+  rect(ctx, 19, 31, 2, 3, '#4a4a4a');
+  rect(ctx, 23, 32, 2, 2, '#eee');
+  rect(ctx, 25, 33, 1, 1, '#000');
+}
+
+function drawCowC(ctx) {
+  rect(ctx, 6, 58, 20, 2, '#0d0d18');
+  rect(ctx, 9, 50, 3, 10, '#4a3a32');
+  rect(ctx, 14, 50, 3, 10, '#4a3a32');
+  rect(ctx, 18, 50, 3, 10, '#4a3a32');
+  rect(ctx, 23, 50, 3, 10, '#4a3a32');
+  rect(ctx, 7, 34, 18, 18, '#f2f2f2');
+  // patches detail
+  rect(ctx, 8, 36, 7, 9, '#1f1f1f');
+  rect(ctx, 16, 40, 5, 4, '#1f1f1f');
+  rect(ctx, 10, 46, 4, 3, '#1f1f1f');
+  rect(ctx, 18, 44, 4, 5, '#1f1f1f');
+  // muscle line
+  rect(ctx, 14, 38, 1, 10, '#d0d0d0');
+  // head compact
+  rect(ctx, 20, 24, 8, 12, '#eaeaea');
+  rect(ctx, 21, 26, 5, 6, '#222');
+  rect(ctx, 22, 30, 5, 4, '#caa898');
+  rect(ctx, 24, 31, 2, 2, '#111');
+  rect(ctx, 20, 22, 2, 4, '#d8c8a0');
+  rect(ctx, 24, 21, 2, 4, '#d8c8a0');
+  // ear tags
+  rect(ctx, 19, 28, 2, 3, '#b8b8b8');
+}
+
+function drawPigC(ctx) {
+  rect(ctx, 7, 58, 18, 2, '#0d0d18');
+  rect(ctx, 10, 50, 2, 8, '#c87888');
+  rect(ctx, 14, 50, 2, 8, '#c87888');
+  rect(ctx, 18, 50, 2, 8, '#c87888');
+  rect(ctx, 22, 50, 2, 8, '#c87888');
+  rect(ctx, 8, 36, 16, 16, '#e88898');
+  // bristle / mud specks
+  const specks = [[9,38],[12,40],[15,37],[18,39],[11,44],[17,45],[10,48]];
+  specks.forEach(([x, y]) => rect(ctx, x, y, 1, 1, '#a05060'));
+  rect(ctx, 7, 40, 3, 3, '#8a5048'); // mud patch
+  // head
+  rect(ctx, 18, 28, 10, 10, '#f098a8');
+  rect(ctx, 24, 30, 6, 5, '#f8b8c4');
+  rect(ctx, 26, 31, 2, 2, '#3a1820');
+  rect(ctx, 28, 31, 2, 2, '#3a1820');
+  rect(ctx, 20, 30, 2, 2, '#1a1010');
+  rect(ctx, 17, 27, 3, 3, '#d07080');
+  rect(ctx, 22, 26, 4, 2, '#d07080');
+  // tail
+  rect(ctx, 6, 40, 2, 2, '#e08090');
+  rect(ctx, 4, 38, 2, 2, '#e08090');
+  rect(ctx, 4, 36, 2, 2, '#e08090');
+}
+
+const A = document.getElementById('optionA');
+makeCard(A, 'Sheep', 'Fluffy body, dark face, four thin legs', drawSheepA);
+makeCard(A, 'Cow', 'Holstein patches, horns, udder', drawCowA);
+makeCard(A, 'Pig', 'Pink, disk snout, curly tail', drawPigA);
+
+const B = document.getElementById('optionB');
+makeCard(B, 'Sheep', 'Cloud wool, big face, stub legs', drawSheepB);
+makeCard(B, 'Cow', 'Round patches, tiny horns', drawCowB);
+makeCard(B, 'Pig', 'Big round pink mass', drawPigB);
+
+const C = document.getElementById('optionC');
+makeCard(C, 'Sheep', 'Tufted wool pixels, compact', drawSheepC);
+makeCard(C, 'Cow', 'High-contrast patches, lean', drawCowC);
+makeCard(C, 'Pig', 'Mud specks + bristle texture', drawPigC);
+</script>
+</body>
+</html>

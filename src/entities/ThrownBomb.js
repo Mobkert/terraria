@@ -1,10 +1,11 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
 
 export default class ThrownBomb {
-  constructor(scene, x, y, vx, vy, damage, explodeRadius, tileManager, enemies) {
+  constructor(scene, x, y, vx, vy, damage, explodeRadius, tileManager, enemies, animals) {
     this.scene = scene;
     this.tileManager = tileManager;
     this.enemies = enemies;
+    this.animals = animals || [];
     this.damage = damage;
     this.explodeRadius = explodeRadius;
 
@@ -64,6 +65,16 @@ export default class ThrownBomb {
         return;
       }
     }
+    for (const animal of this.animals) {
+      if (animal.dead) continue;
+      const dx = animal.x - this.x;
+      const dy = (animal.y - animal.height / 2) - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 22) {
+        this.explode(player);
+        return;
+      }
+    }
 
     this.lifetime -= delta;
     if (this.lifetime <= 0) {
@@ -100,6 +111,16 @@ export default class ThrownBomb {
       if (dist < (r + 2) * TILE_SIZE) {
         const knockDir = dx !== 0 ? dx / Math.abs(dx) : 1;
         enemy.takeDamage(this.damage, knockDir);
+      }
+    }
+    for (const animal of this.animals) {
+      if (animal.dead) continue;
+      const dx = animal.x - this.x;
+      const dy = (animal.y - animal.height / 2) - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < (r + 2) * TILE_SIZE) {
+        const knockDir = dx !== 0 ? dx / Math.abs(dx) : 1;
+        animal.takeDamage(this.damage, knockDir);
       }
     }
 

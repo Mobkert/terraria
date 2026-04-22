@@ -2,6 +2,9 @@ import { ItemTypes } from '../data/items.js';
 
 const SMELT_RECIPES = [
   { input: ItemTypes.RAW_IRON, output: ItemTypes.IRON_INGOT, count: 1 },
+  { input: ItemTypes.RAW_MUTTON, output: ItemTypes.COOKED_MUTTON, count: 1 },
+  { input: ItemTypes.RAW_STEAK, output: ItemTypes.COOKED_STEAK, count: 1 },
+  { input: ItemTypes.RAW_PORKCHOP, output: ItemTypes.COOKED_PORKCHOP, count: 1 },
 ];
 
 const SMELT_TIME = 3000;

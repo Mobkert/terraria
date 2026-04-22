@@ -14,6 +14,7 @@ import BlockBreakPlace from '../systems/BlockBreakPlace.js';
 import ChestManager from '../systems/ChestManager.js';
 import FurnaceManager from '../systems/FurnaceManager.js';
 import EnemySpawner from '../systems/EnemySpawner.js';
+import AnimalSpawner from '../systems/AnimalSpawner.js';
 import AdvancementTracker from '../systems/AdvancementTracker.js';
 import Arrow from '../entities/Arrow.js';
 import DroppedItem from '../entities/DroppedItem.js';
@@ -65,9 +66,11 @@ export default class GameScene extends Phaser.Scene {
     this.furnaceManager = new FurnaceManager();
 
     this.enemies = [];
+    this.animals = [];
     this.arrows = [];
     this.thrownBombs = [];
     this.enemySpawner = new EnemySpawner(this, this.tileManager, this.worldData);
+    this.animalSpawner = new AnimalSpawner(this, this.tileManager, this.worldData);
 
     this.blockSystem = new BlockBreakPlace(
       this,
@@ -78,6 +81,7 @@ export default class GameScene extends Phaser.Scene {
       this.furnaceManager,
     );
     this.blockSystem.enemies = this.enemies;
+    this.blockSystem.animals = this.animals;
     this.blockSystem.spawnBombFn = (x, y, vx, vy, dmg, radius) => {
       this.spawnBomb(x, y, vx, vy, dmg, radius);
     };
@@ -165,7 +169,9 @@ export default class GameScene extends Phaser.Scene {
     this.blockSystem.update(delta);
     this.furnaceManager.update(delta);
     this.enemySpawner.update(delta, this.player, this.enemies);
+    this.animalSpawner.update(delta, this.player, this.animals);
     this.updateEnemies(delta);
+    this.updateAnimals(delta);
     this.updateArrows(delta);
     this.updateBombs(delta);
     this.tileManager.update();
@@ -188,6 +194,30 @@ export default class GameScene extends Phaser.Scene {
   spawnArrow(x, y, angle, damage) {
     const arrow = new Arrow(this, x, y, angle, damage, this.tileManager);
     this.arrows.push(arrow);
+  }
+
+  updateAnimals(delta) {
+    for (let i = this.animals.length - 1; i >= 0; i--) {
+      const animal = this.animals[i];
+      animal.update(delta);
+
+      if (animal.dead) {
+        for (const drop of animal.pendingDrops) {
+          const item = new DroppedItem(this, drop.x, drop.y, drop.type, this.tileManager);
+          this.blockSystem.droppedItems.push(item);
+        }
+        this.animals.splice(i, 1);
+        continue;
+      }
+
+      const dx = this.player.x - animal.x;
+      const dy = this.player.y - animal.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 1000) {
+        animal.die();
+        this.animals.splice(i, 1);
+      }
+    }
   }
 
   updateEnemies(delta) {
@@ -225,7 +255,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   spawnBomb(x, y, vx, vy, damage, radius) {
-    const bomb = new ThrownBomb(this, x, y, vx, vy, damage, radius, this.tileManager, this.enemies);
+    const bomb = new ThrownBomb(this, x, y, vx, vy, damage, radius, this.tileManager, this.enemies, this.animals);
     this.thrownBombs.push(bomb);
   }
 

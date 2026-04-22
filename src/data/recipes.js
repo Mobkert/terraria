@@ -153,4 +153,9 @@ export const Recipes = [
     ],
     workbench: false,
   },
+  {
+    result: { type: ItemTypes.BACON, count: 1 },
+    ingredients: [{ type: ItemTypes.COOKED_PORKCHOP, count: 3 }],
+    workbench: true,
+  },
 ];

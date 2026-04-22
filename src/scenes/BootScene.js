@@ -13,6 +13,7 @@ export default class BootScene extends Phaser.Scene {
     this.generatePlayerTexture();
     this.generateItemTextures();
     this.generateEnemyTextures();
+    this.generateAnimalTextures();
     this.generateSkyGradient();
     this.scene.start('LoadingScene');
   }
@@ -283,6 +284,19 @@ export default class BootScene extends Phaser.Scene {
         }
         break;
       }
+      case BlockTypes.WOOL: {
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        const tufts = [[9, 5], [12, 4], [15, 5], [18, 4], [11, 9], [14, 8], [17, 9], [10, 13], [16, 13], [13, 16]];
+        for (const [x, y] of tufts) {
+          ctx.fillRect(x, y, 2, 2);
+        }
+        ctx.fillStyle = 'rgba(0,0,0,0.06)';
+        ctx.fillRect(9, 14, 14, 2);
+        ctx.fillStyle = 'rgba(200,200,220,0.25)';
+        ctx.fillRect(4, 20, 4, 8);
+        ctx.fillRect(24, 18, 3, 10);
+        break;
+      }
     }
   }
 
@@ -481,6 +495,56 @@ export default class BootScene extends Phaser.Scene {
         const px = s * (0.32 + Math.random() * 0.36);
         const py = s * (0.4 + Math.random() * 0.3);
         ctx.beginPath(); ctx.arc(px, py, 1, 0, Math.PI * 2); ctx.fill();
+      }
+    });
+
+    const meatRaw = (ctx, fill, edge) => {
+      ctx.fillStyle = edge;
+      ctx.fillRect(s * 0.28, s * 0.42, s * 0.48, s * 0.36);
+      ctx.fillStyle = fill;
+      ctx.fillRect(s * 0.3, s * 0.44, s * 0.44, s * 0.32);
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillRect(s * 0.32, s * 0.46, s * 0.2, s * 0.08);
+    };
+    const meatCooked = (ctx, fill, edge, sear) => {
+      meatRaw(ctx, fill, edge);
+      ctx.fillStyle = sear;
+      ctx.fillRect(s * 0.34, s * 0.58, s * 0.32, s * 0.06);
+      ctx.fillRect(s * 0.52, s * 0.48, s * 0.08, s * 0.1);
+    };
+
+    this.makeItemTexture(ItemTypes.RAW_MUTTON, (ctx) => {
+      meatRaw(ctx, '#c87888', '#8a5060');
+    });
+    this.makeItemTexture(ItemTypes.COOKED_MUTTON, (ctx) => {
+      meatCooked(ctx, '#a06050', '#6a3830', '#4a2820');
+    });
+    this.makeItemTexture(ItemTypes.RAW_STEAK, (ctx) => {
+      meatRaw(ctx, '#c07070', '#7a3038');
+    });
+    this.makeItemTexture(ItemTypes.COOKED_STEAK, (ctx) => {
+      meatCooked(ctx, '#8a4030', '#5a2018', '#3a1810');
+    });
+    this.makeItemTexture(ItemTypes.RAW_PORKCHOP, (ctx) => {
+      meatRaw(ctx, '#e8a0b0', '#b06078');
+      ctx.fillStyle = '#f0c0c8';
+      ctx.fillRect(s * 0.42, s * 0.5, s * 0.2, s * 0.14);
+    });
+    this.makeItemTexture(ItemTypes.COOKED_PORKCHOP, (ctx) => {
+      meatCooked(ctx, '#c07058', '#804038', '#502820');
+      ctx.fillStyle = '#e89880';
+      ctx.fillRect(s * 0.4, s * 0.52, s * 0.22, s * 0.12);
+    });
+    this.makeItemTexture(ItemTypes.BACON, (ctx) => {
+      ctx.fillStyle = '#6a3028';
+      ctx.fillRect(s * 0.22, s * 0.48, s * 0.56, s * 0.28);
+      ctx.fillStyle = '#c05848';
+      ctx.fillRect(s * 0.24, s * 0.5, s * 0.52, s * 0.22);
+      ctx.fillStyle = '#f0a090';
+      ctx.fillRect(s * 0.26, s * 0.52, s * 0.48, s * 0.06);
+      ctx.fillStyle = '#4a2018';
+      for (let i = 0; i < 5; i++) {
+        ctx.fillRect(s * (0.28 + i * 0.1), s * 0.62, s * 0.04, 2);
       }
     });
 
@@ -825,6 +889,89 @@ export default class BootScene extends Phaser.Scene {
     ac.fillRect(0, 1, 2, 4);
     ac.fillRect(2, 0, 1, 6);
     this.textures.addCanvas('arrow', arrowCanvas);
+  }
+
+  generateAnimalTextures() {
+    const w = TILE_SIZE;
+    const h = TILE_SIZE * 2;
+    const R = (ctx, x, y, rw, rh, c) => {
+      ctx.fillStyle = c;
+      ctx.fillRect(x, y, rw, rh);
+    };
+
+    const sheepC = document.createElement('canvas');
+    sheepC.width = w;
+    sheepC.height = h;
+    const sh = sheepC.getContext('2d');
+    sh.imageSmoothingEnabled = false;
+    R(sh, 7, 58, 18, 2, '#0d0d18');
+    R(sh, 10, 50, 2, 10, '#222222');
+    R(sh, 13, 50, 2, 10, '#222222');
+    R(sh, 19, 50, 2, 10, '#222222');
+    R(sh, 22, 50, 2, 10, '#222222');
+    R(sh, 8, 34, 16, 18, '#ececec');
+    [
+      [9, 33], [12, 32], [15, 33], [18, 32], [11, 37], [14, 36], [17, 37], [10, 41], [16, 41], [13, 44],
+    ].forEach(([x, y]) => R(sh, x, y, 2, 2, '#ffffff'));
+    R(sh, 9, 38, 14, 2, '#d8d8d8');
+    R(sh, 20, 30, 7, 9, '#2f2f2f');
+    R(sh, 22, 28, 5, 3, '#2f2f2f');
+    R(sh, 19, 31, 2, 3, '#4a4a4a');
+    R(sh, 23, 32, 2, 2, '#eeeeee');
+    R(sh, 25, 33, 1, 1, '#000000');
+    this.textures.addCanvas('animal_sheep', sheepC);
+
+    const cowC = document.createElement('canvas');
+    cowC.width = w;
+    cowC.height = h;
+    const co = cowC.getContext('2d');
+    co.imageSmoothingEnabled = false;
+    R(co, 6, 58, 20, 2, '#0d0d18');
+    R(co, 9, 50, 3, 10, '#4a3a32');
+    R(co, 14, 50, 3, 10, '#4a3a32');
+    R(co, 18, 50, 3, 10, '#4a3a32');
+    R(co, 23, 50, 3, 10, '#4a3a32');
+    R(co, 7, 34, 18, 18, '#f2f2f2');
+    R(co, 8, 36, 7, 9, '#1f1f1f');
+    R(co, 16, 40, 5, 4, '#1f1f1f');
+    R(co, 10, 46, 4, 3, '#1f1f1f');
+    R(co, 18, 44, 4, 5, '#1f1f1f');
+    R(co, 14, 38, 1, 10, '#d0d0d0');
+    R(co, 20, 24, 8, 12, '#eaeaea');
+    R(co, 21, 26, 5, 6, '#222222');
+    R(co, 22, 30, 5, 4, '#caa898');
+    R(co, 24, 31, 2, 2, '#111111');
+    R(co, 20, 22, 2, 4, '#d8c8a0');
+    R(co, 24, 21, 2, 4, '#d8c8a0');
+    R(co, 19, 28, 2, 3, '#b8b8b8');
+    this.textures.addCanvas('animal_cow', cowC);
+
+    const pigC = document.createElement('canvas');
+    pigC.width = w;
+    pigC.height = h;
+    const pi = pigC.getContext('2d');
+    pi.imageSmoothingEnabled = false;
+    R(pi, 7, 58, 18, 2, '#0d0d18');
+    R(pi, 10, 50, 2, 8, '#c87888');
+    R(pi, 14, 50, 2, 8, '#c87888');
+    R(pi, 18, 50, 2, 8, '#c87888');
+    R(pi, 22, 50, 2, 8, '#c87888');
+    R(pi, 8, 36, 16, 16, '#e88898');
+    [
+      [9, 38], [12, 40], [15, 37], [18, 39], [11, 44], [17, 45], [10, 48],
+    ].forEach(([x, y]) => R(pi, x, y, 1, 1, '#a05060'));
+    R(pi, 7, 40, 3, 3, '#8a5048');
+    R(pi, 18, 28, 10, 10, '#f098a8');
+    R(pi, 24, 30, 6, 5, '#f8b8c4');
+    R(pi, 26, 31, 2, 2, '#3a1820');
+    R(pi, 28, 31, 2, 2, '#3a1820');
+    R(pi, 20, 30, 2, 2, '#1a1010');
+    R(pi, 17, 27, 3, 3, '#d07080');
+    R(pi, 22, 26, 4, 2, '#d07080');
+    R(pi, 6, 40, 2, 2, '#e08090');
+    R(pi, 4, 38, 2, 2, '#e08090');
+    R(pi, 4, 36, 2, 2, '#e08090');
+    this.textures.addCanvas('animal_pig', pigC);
   }
 
   generateSkyGradient() {

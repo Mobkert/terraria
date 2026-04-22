@@ -29,6 +29,7 @@ export const BlockTypes = {
   OAK_SLAB: 39,
   BIRCH_SLAB: 40,
   SANDSTONE_SLAB: 41,
+  WOOL: 44,
 };
 
 export const BlockData = {
@@ -221,5 +222,11 @@ export const BlockData = {
     hardness: 1.5,
     tool: 'pickaxe',
     halfHeight: true,
+  },
+  [BlockTypes.WOOL]: {
+    name: 'Wool',
+    color: 0xe8e8f0,
+    hardness: 0.4,
+    tool: 'none',
   },
 };

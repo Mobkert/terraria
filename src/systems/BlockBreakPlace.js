@@ -30,6 +30,7 @@ export default class BlockBreakPlace {
     this.consumeOverlay = null;
 
     this.enemies = [];
+    this.animals = [];
     this.attackCooldown = 0;
     this.ATTACK_DELAY = 400;
     this.ATTACK_RANGE = 60;
@@ -402,7 +403,8 @@ export default class BlockBreakPlace {
     this.consumeProgress += delta;
     this.drawConsumeBar();
 
-    if (this.consumeProgress >= this.CONSUME_TIME) {
+    const need = consumable.consumeTime ?? this.CONSUME_TIME;
+    if (this.consumeProgress >= need) {
       this.player.heal(consumable.healAmount);
       this.inventory.consumeSelected(1);
       this.resetConsuming();
@@ -429,7 +431,10 @@ export default class BlockBreakPlace {
     const barH = 8;
     const barX = cam.width / 2 - barW / 2;
     const barY = cam.height / 2 + 40;
-    const ratio = this.consumeProgress / this.CONSUME_TIME;
+    const selected = this.inventory.getSelectedItem();
+    const c = selected ? getConsumableData(selected.type) : null;
+    const need = c?.consumeTime ?? this.CONSUME_TIME;
+    const ratio = this.consumeProgress / need;
 
     this.consumeOverlay.fillStyle(0x000000, 0.6);
     this.consumeOverlay.fillRect(barX, barY, barW, barH);
@@ -466,6 +471,20 @@ export default class BlockBreakPlace {
 
       if (dist < this.ATTACK_RANGE && dx * dir >= 0) {
         enemy.takeDamage(tool.damage, dir);
+        this.attackCooldown = this.ATTACK_DELAY;
+        return;
+      }
+    }
+
+    for (const animal of this.animals) {
+      if (animal.dead) continue;
+      const ax = animal.x;
+      const ay = animal.y - animal.height / 2;
+      const dx = ax - px;
+      const dy = ay - py;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < this.ATTACK_RANGE && dx * dir >= 0) {
+        animal.takeDamage(tool.damage, dir);
         this.attackCooldown = this.ATTACK_DELAY;
         return;
       }
