@@ -2,17 +2,17 @@ import { TILE_SIZE } from '../data/blocks.js';
 import Animal from '../entities/Animal.js';
 
 /** Hard cap — keeps herds from growing huge near the player. */
-const MAX_ANIMALS = 5;
+const MAX_ANIMALS = 7;
 
 /** Base time between spawn attempts (ms). */
-const SPAWN_COOLDOWN_MIN = 16000;
-const SPAWN_COOLDOWN_MAX = 28000;
+const SPAWN_COOLDOWN_MIN = 9000;
+const SPAWN_COOLDOWN_MAX = 16000;
 
 /** Extra delay per animal already alive (soft throttle). */
-const EXTRA_MS_PER_ANIMAL = 3500;
+const EXTRA_MS_PER_ANIMAL = 1800;
 
-const MIN_DIST_TILES = 14;
-const MAX_DIST_TILES = 30;
+const MIN_DIST_TILES = 12;
+const MAX_DIST_TILES = 28;
 
 const SPAWN_BIOMES = new Set(['forest', 'jungle', 'birch', 'desert']);
 
@@ -45,7 +45,7 @@ export default class AnimalSpawner {
     this.scene = scene;
     this.tileManager = tileManager;
     this.worldData = worldData;
-    this.timer = 8000;
+    this.timer = 3500;
   }
 
   scheduleNextSpawn(animalsLen) {
@@ -103,7 +103,7 @@ export default class AnimalSpawner {
       return;
     }
 
-    if (animals.length >= 3 && Math.random() < 0.45) {
+    if (animals.length >= 4 && Math.random() < 0.22) {
       this.scheduleNextSpawn(animals.length);
       return;
     }
