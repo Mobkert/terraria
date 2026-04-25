@@ -2,7 +2,7 @@ import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
 import { getItemTexture, getToolData } from '../data/items.js';
 
 export default class Player {
-  constructor(scene, x, y, tileManager, inventory) {
+  constructor(scene, x, y, tileManager, inventory, options = {}) {
     this.scene = scene;
     this.tileManager = tileManager;
     this.inventory = inventory;
@@ -26,6 +26,10 @@ export default class Player {
     this.dead = false;
     this.invincibleTimer = 0;
     this.fallStartY = null;
+    this.creativeMode = options.creativeMode === true;
+    this.isFlying = false;
+    this.flightTapTimer = 0;
+    this.flightTapWindow = 280;
 
     this.spawnX = x;
     this.spawnY = y;
@@ -39,6 +43,7 @@ export default class Player {
       left: 'A',
       right: 'D',
       jump: 'SPACE',
+      down: 'SHIFT',
     });
 
     this.jumpPressed = false;
@@ -68,6 +73,7 @@ export default class Player {
     if (this.dead) return;
 
     const dt = delta / 1000;
+    if (this.flightTapTimer > 0) this.flightTapTimer -= delta;
 
     if (this.invincibleTimer > 0) {
       this.invincibleTimer -= dt;
@@ -76,18 +82,36 @@ export default class Player {
     }
 
     this.vx = 0;
+    const justPressedJump = this.keys.jump.isDown && !this.jumpPressed;
+    if (this.creativeMode && justPressedJump) {
+      if (this.flightTapTimer > 0) {
+        this.isFlying = !this.isFlying;
+        this.flightTapTimer = 0;
+        this.vy = 0;
+        this.fallStartY = null;
+      } else {
+        this.flightTapTimer = this.flightTapWindow;
+      }
+    }
+
     if (!this.inventory.isOpen) {
       if (this.keys.left.isDown) this.vx = -this.MOVE_SPEED;
       if (this.keys.right.isDown) this.vx = this.MOVE_SPEED;
 
-      if (this.keys.jump.isDown && this.onGround && !this.jumpPressed) {
+      if (this.creativeMode && this.isFlying) {
+        this.vy = 0;
+        if (this.keys.jump.isDown) this.vy = -this.MOVE_SPEED;
+        else if (this.keys.down.isDown) this.vy = this.MOVE_SPEED;
+      } else if (this.keys.jump.isDown && this.onGround && !this.jumpPressed) {
         this.vy = -this.JUMP_SPEED;
       }
     }
     this.jumpPressed = this.keys.jump.isDown;
 
-    this.vy += this.GRAVITY * dt;
-    if (this.vy > this.MAX_FALL) this.vy = this.MAX_FALL;
+    if (!(this.creativeMode && this.isFlying)) {
+      this.vy += this.GRAVITY * dt;
+      if (this.vy > this.MAX_FALL) this.vy = this.MAX_FALL;
+    }
 
     const wasOnGround = this.onGround;
 
@@ -97,9 +121,9 @@ export default class Player {
 
     this.moveAxis(dt);
 
-    this.onGround = this.collidesAt(this.x, this.y + 1);
+    this.onGround = (this.creativeMode && this.isFlying) ? false : this.collidesAt(this.x, this.y + 1);
 
-    if (this.onGround && !wasOnGround && this.fallStartY !== null) {
+      if (!this.creativeMode && this.onGround && !wasOnGround && this.fallStartY !== null) {
       const fallDist = (this.y - this.fallStartY) / TILE_SIZE;
       if (fallDist > 6) {
         const damage = Math.floor((fallDist - 6) * 7);
@@ -108,7 +132,7 @@ export default class Player {
       this.fallStartY = null;
     }
 
-    if (this.onGround) {
+      if (this.onGround || (this.creativeMode && this.isFlying)) {
       this.fallStartY = null;
     }
 
@@ -148,6 +172,7 @@ export default class Player {
   }
 
   takeDamage(amount) {
+    if (this.creativeMode) return;
     if (this.invincibleTimer > 0 || this.dead) return;
     this.health = Math.max(0, this.health - amount);
     this.invincibleTimer = 1;
@@ -300,7 +325,7 @@ export default class Player {
     const dx = this.vx * dt;
     if (dx !== 0) {
       const newX = this.x + dx;
-      if (!this.collidesAt(newX, this.y)) {
+      if ((this.creativeMode && this.isFlying) || !this.collidesAt(newX, this.y)) {
         this.x = newX;
       } else {
         if (dx > 0) {
@@ -317,7 +342,7 @@ export default class Player {
     const dy = this.vy * dt;
     if (dy !== 0) {
       const newY = this.y + dy;
-      if (!this.collidesAt(this.x, newY)) {
+      if ((this.creativeMode && this.isFlying) || !this.collidesAt(this.x, newY)) {
         this.y = newY;
       } else {
         if (dy > 0) {

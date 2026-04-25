@@ -1,4 +1,4 @@
-import { TILE_SIZE } from '../data/blocks.js';
+import { TILE_SIZE, BlockData } from '../data/blocks.js';
 import { getItemName } from '../data/items.js';
 import {
   generateWorld,
@@ -35,6 +35,25 @@ const BIOME_TINTS = {
   birch: { color: 0xcc8844, alpha: 0.04 },
 };
 
+const GAME_MODE_NAMES = {
+  survival: 'Survival',
+  creative: 'Creative',
+};
+
+const DIFFICULTY_NAMES = {
+  peaceful: 'Peaceful',
+  easy: 'Easy',
+  normal: 'Normal',
+  hard: 'Hard',
+};
+
+const WORLD_TYPE_NAMES = {
+  default: 'Default',
+  superflat: 'Superflat',
+  bigger_biomes: 'Bigger Biomes',
+  hilly: 'Hilly',
+};
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
@@ -42,10 +61,13 @@ export default class GameScene extends Phaser.Scene {
 
   init(data) {
     this.seed = (data && data.seed) || 42;
+    this.gameMode = data?.gameMode || 'survival';
+    this.difficulty = data?.difficulty || 'normal';
+    this.worldType = data?.worldType || 'default';
   }
 
   create() {
-    this.worldData = generateWorld(this.seed);
+    this.worldData = generateWorld(this.seed, { worldType: this.worldType });
     this.tileManager = new TileManager(this, this.worldData);
 
     const worldPxW = WORLD_WIDTH * TILE_SIZE;
@@ -61,7 +83,13 @@ export default class GameScene extends Phaser.Scene {
     const spawnY = this.worldData.surfaceHeights[spawn.x] * TILE_SIZE;
 
     this.inventory = new Inventory();
-    this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory);
+    if (this.gameMode === 'creative') {
+      const allBlocks = Object.keys(BlockData).map(Number);
+      this.inventory.enableCreativeMode(allBlocks);
+    }
+    this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory, {
+      creativeMode: this.gameMode === 'creative',
+    });
     this.chestManager = new ChestManager(this.worldData, mulberry32(this.seed + 999));
     this.furnaceManager = new FurnaceManager();
 
@@ -69,7 +97,9 @@ export default class GameScene extends Phaser.Scene {
     this.animals = [];
     this.arrows = [];
     this.thrownBombs = [];
-    this.enemySpawner = new EnemySpawner(this, this.tileManager, this.worldData);
+    this.enemySpawner = new EnemySpawner(this, this.tileManager, this.worldData, {
+      difficulty: this.difficulty,
+    });
     this.animalSpawner = new AnimalSpawner(this, this.tileManager, this.worldData);
 
     this.blockSystem = new BlockBreakPlace(
@@ -187,7 +217,7 @@ export default class GameScene extends Phaser.Scene {
     const selected = this.inventory.getSelectedItem();
     const itemName = selected ? getItemName(selected.type) : 'Empty';
     this.infoText.setText(
-      `Pos: ${tx},${ty} | Biome: ${biomeName} | Hand: ${itemName}`,
+      `Pos: ${tx},${ty} | ${GAME_MODE_NAMES[this.gameMode]} | ${DIFFICULTY_NAMES[this.difficulty]} | ${WORLD_TYPE_NAMES[this.worldType]} | Biome: ${biomeName} | Hand: ${itemName}`,
     );
   }
 

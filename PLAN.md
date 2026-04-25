@@ -259,13 +259,36 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/entities/Animal.js`, `src/systems/AnimalSpawner.js`, `src/data/items.js`, `src/data/blocks.js`, `src/data/recipes.js`, `src/systems/FurnaceManager.js`, `src/systems/BlockBreakPlace.js`, `src/entities/ThrownBomb.js`, `src/scenes/GameScene.js`, `src/scenes/BootScene.js`
 
+## Phase 21: World Creation Presets and Creative Mode (COMPLETED)
+
+- Added a **Create World Settings** screen before generation with three selectors:
+  - Game Mode: Survival or Creative
+  - Difficulty: Peaceful / Easy / Normal / Hard
+  - World Type: Default / Superflat / Bigger Biomes / Hilly
+- **Creative mode** now enables player flight, no damage taken, and a dedicated creative inventory browser.
+- Creative flight now uses a **double-tap SPACE toggle** (on/off), with `SHIFT` to descend while flying.
+- Creative inventory supports category filtering (`All`, `Building`, `Natural`, `Utility`, `Combat`, `Food`, `Materials`) and quick granting:
+  - click = add 1
+  - shift-click = add full stack
+- **Difficulty scaling** now controls hostile mob spawn pressure via the enemy spawner:
+  - Peaceful disables hostile spawns
+  - Easy lowers spawn cap/rate
+  - Hard increases spawn cap/rate
+- **World types** now alter generation behavior:
+  - Superflat: fixed-height grass world, no caves/ores/structures/trees
+  - Bigger Biomes: lower biome noise frequency for larger biome regions
+  - Hilly: higher terrain amplitude for stronger hills and mountains
+
+**Key files:** `src/scenes/MenuScene.js`, `src/scenes/GameScene.js`, `src/world/WorldGenerator.js`, `src/entities/Player.js`, `src/systems/Inventory.js`, `src/systems/EnemySpawner.js`
+
 ## Controls Summary
 
 | Key | Action |
 |-----|--------|
 | A | Move left |
 | D | Move right |
-| SPACE | Jump |
+| SPACE | Jump (double-tap in Creative to toggle fly mode; hold while flying to go up) |
+| SHIFT | Fly down (while flying in Creative) |
 | LMB | Break block / sword attack / throw bomb |
 | RMB | Place block / interact / use consumable (hold 2s) |
 | E | Open inventory / crafting |

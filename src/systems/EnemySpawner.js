@@ -8,14 +8,31 @@ const MAX_SPAWN_DIST = 25;
 const UNDERGROUND_DEPTH = 5;
 
 export default class EnemySpawner {
-  constructor(scene, tileManager, worldData) {
+  constructor(scene, tileManager, worldData, options = {}) {
     this.scene = scene;
     this.tileManager = tileManager;
     this.worldData = worldData;
-    this.timer = SPAWN_COOLDOWN;
+    this.difficulty = options.difficulty || 'normal';
+    this.spawningEnabled = this.difficulty !== 'peaceful';
+    this.spawnSettings = this.getSpawnSettings(this.difficulty);
+    this.timer = this.spawnSettings.baseCooldown;
+  }
+
+  getSpawnSettings(difficulty) {
+    switch (difficulty) {
+      case 'easy':
+        return { maxEnemies: 4, baseCooldown: 5200, cooldownVariance: 2600 };
+      case 'hard':
+        return { maxEnemies: 10, baseCooldown: 2600, cooldownVariance: 1400 };
+      case 'peaceful':
+        return { maxEnemies: 0, baseCooldown: SPAWN_COOLDOWN, cooldownVariance: 0 };
+      default:
+        return { maxEnemies: MAX_ENEMIES, baseCooldown: SPAWN_COOLDOWN, cooldownVariance: 2000 };
+    }
   }
 
   update(delta, player, enemies) {
+    if (!this.spawningEnabled) return;
     if (player.dead) return;
 
     const px = player.getTileX();
@@ -26,11 +43,13 @@ export default class EnemySpawner {
 
     if (py < surfaceY + UNDERGROUND_DEPTH) return;
 
-    if (enemies.length >= MAX_ENEMIES) return;
+    if (enemies.length >= this.spawnSettings.maxEnemies) return;
 
     this.timer -= delta;
     if (this.timer > 0) return;
-    this.timer = SPAWN_COOLDOWN + Math.random() * 2000;
+    this.timer =
+      this.spawnSettings.baseCooldown +
+      Math.random() * this.spawnSettings.cooldownVariance;
 
     const dir = Math.random() < 0.5 ? -1 : 1;
     const dist = MIN_SPAWN_DIST + Math.floor(Math.random() * (MAX_SPAWN_DIST - MIN_SPAWN_DIST));

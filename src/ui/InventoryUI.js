@@ -1,11 +1,14 @@
-import { BlockData, TILE_SIZE } from '../data/blocks.js';
-import { getItemTexture } from '../data/items.js';
+import { BlockData, BlockTypes } from '../data/blocks.js';
+import { ItemData, getItemTexture, getMaxStack } from '../data/items.js';
 
 const SLOT = 44;
 const GAP = 4;
 const ICON = 30;
 const COLS = 9;
 const INV_ROWS = 3;
+const CREATIVE_COLS = 5;
+const CREATIVE_ROWS = 4;
+const CREATIVE_PANEL_H = 290;
 
 export default class InventoryUI {
   constructor(scene, inventory) {
@@ -19,8 +22,37 @@ export default class InventoryUI {
     this.container.setVisible(false);
 
     this.slotObjects = [];
+    this.creativeSlots = [];
+    this.creativeCategoryButtons = [];
+    this.creativeCategory = 'all';
+    this.creativeScrollOffset = 0;
+    this.creativeItems = [];
+
+    this.creativeCategories = [
+      { id: 'all', label: 'All' },
+      { id: 'building', label: 'Building' },
+      { id: 'natural', label: 'Natural' },
+      { id: 'utility', label: 'Utility' },
+      { id: 'tools', label: 'Tools' },
+      { id: 'combat', label: 'Combat' },
+      { id: 'food', label: 'Food' },
+      { id: 'materials', label: 'Materials' },
+    ];
+
     this.build();
     this.createCursorIcon();
+
+    this.scrollHandler = (pointer, _gos, _dx, dy) => {
+      if (!this.isOpen || !this.inventory.creativeMode || !this.creativeGridBounds) return;
+      const px = pointer.x;
+      const py = pointer.y;
+      const b = this.creativeGridBounds;
+      if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
+        if (dy > 0) this.scrollCreative(1);
+        else if (dy < 0) this.scrollCreative(-1);
+      }
+    };
+    this.scene.input.on('wheel', this.scrollHandler);
   }
 
   build() {
@@ -40,8 +72,11 @@ export default class InventoryUI {
 
     const panelW = gridW + panelPad * 2;
     const panelH = totalH + panelPad * 2;
+    const creativePanelH = this.inventory.creativeMode ? CREATIVE_PANEL_H : 0;
+    const creativeGap = this.inventory.creativeMode ? 10 : 0;
+    const fullH = panelH + creativePanelH + creativeGap;
     const panelX = (sw - panelW) / 2;
-    const panelY = (sh - panelH) / 2;
+    const panelY = (sh - fullH) / 2 + creativePanelH + creativeGap;
 
     const panel = this.scene.add.graphics();
     panel.fillStyle(0x1a1a2e, 0.92);
@@ -73,6 +108,10 @@ export default class InventoryUI {
     for (let col = 0; col < COLS; col++) {
       const x = gridX + col * (SLOT + GAP);
       this.createSlot(x, hotbarY, 'hotbar', col);
+    }
+
+    if (this.inventory.creativeMode) {
+      this.createCreativePanel(panelX, panelY - creativeGap - creativePanelH);
     }
   }
 
@@ -124,6 +163,115 @@ export default class InventoryUI {
     this.slotObjects.push({ bg, icon, count, section, idx });
   }
 
+  createCreativePanel(x, y) {
+    const panelW = 328;
+    const panelH = CREATIVE_PANEL_H;
+    this.creativePanel = { x, y, w: panelW, h: panelH };
+
+    const panel = this.scene.add.graphics();
+    panel.fillStyle(0x1a1a2e, 0.92);
+    panel.fillRoundedRect(x, y, panelW, panelH, 8);
+    panel.lineStyle(2, 0x444466, 1);
+    panel.strokeRoundedRect(x, y, panelW, panelH, 8);
+    this.container.add(panel);
+
+    const title = this.scene.add.text(x + panelW / 2, y + 6, 'Creative Inventory', {
+      fontSize: '13px',
+      color: '#aaaacc',
+    });
+    title.setOrigin(0.5, 0);
+    this.container.add(title);
+
+    this.createCreativeCategoryButtons(x + 8, y + 28, panelW - 16);
+    this.createCreativeGrid(x + 10, y + 88);
+  }
+
+  createCreativeCategoryButtons(startX, startY, width) {
+    const cols = 4;
+    const btnGap = 4;
+    const btnW = Math.floor((width - btnGap * (cols - 1)) / cols);
+    const btnH = 24;
+
+    for (let i = 0; i < this.creativeCategories.length; i++) {
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      const x = startX + col * (btnW + btnGap);
+      const y = startY + row * (btnH + btnGap);
+      const cat = this.creativeCategories[i];
+
+      const bg = this.scene.add.rectangle(x + btnW / 2, y + btnH / 2, btnW, btnH, 0x2a2a3e, 1);
+      bg.setStrokeStyle(1, 0x555577);
+      bg.setInteractive({ useHandCursor: true });
+      this.container.add(bg);
+
+      const text = this.scene.add.text(x + btnW / 2, y + btnH / 2, cat.label, {
+        fontSize: '10px',
+        color: '#ddddee',
+      }).setOrigin(0.5);
+      this.container.add(text);
+
+      bg.on('pointerdown', () => {
+        this.creativeCategory = cat.id;
+        this.creativeScrollOffset = 0;
+        this.refreshCreativeCategoryStyles();
+        this.refreshCreativeSlots();
+      });
+
+      bg.on('pointerover', () => bg.setStrokeStyle(1, 0xaaaacc));
+      bg.on('pointerout', () => this.refreshCreativeCategoryStyles());
+
+      this.creativeCategoryButtons.push({ bg, text, id: cat.id });
+    }
+  }
+
+  createCreativeGrid(startX, startY) {
+    for (let row = 0; row < CREATIVE_ROWS; row++) {
+      for (let col = 0; col < CREATIVE_COLS; col++) {
+        const x = startX + col * (SLOT + GAP);
+        const y = startY + row * (SLOT + GAP);
+
+        const bg = this.scene.add.rectangle(x + SLOT / 2, y + SLOT / 2, SLOT, SLOT, 0x2a2a3e, 1);
+        bg.setStrokeStyle(1, 0x555577);
+        bg.setInteractive({ useHandCursor: true });
+        this.container.add(bg);
+
+        const icon = this.scene.add.image(x + SLOT / 2, y + SLOT / 2, 'player');
+        icon.setDisplaySize(ICON, ICON);
+        icon.setVisible(false);
+        this.container.add(icon);
+
+        const count = this.scene.add.text(x + SLOT - 4, y + SLOT - 4, '', {
+          fontSize: '12px',
+          color: '#ffffff',
+          fontStyle: 'bold',
+          stroke: '#000000',
+          strokeThickness: 2,
+        }).setOrigin(1, 1);
+        this.container.add(count);
+
+        bg.on('pointerdown', (pointer) => {
+          const entry = this.creativeSlots.find((slot) => slot.bg === bg);
+          if (!entry || entry.type == null) return;
+          const amount = pointer.event.shiftKey ? getMaxStack(entry.type) : 1;
+          this.giveCreativeItem(entry.type, amount);
+          this.inventory.dirty = true;
+        });
+
+        bg.on('pointerover', () => bg.setStrokeStyle(1, 0xaaaacc));
+        bg.on('pointerout', () => bg.setStrokeStyle(1, 0x555577));
+
+        this.creativeSlots.push({ bg, icon, count, type: null });
+      }
+    }
+
+    this.creativeGridBounds = {
+      x: startX,
+      y: startY,
+      w: CREATIVE_COLS * SLOT + (CREATIVE_COLS - 1) * GAP,
+      h: CREATIVE_ROWS * SLOT + (CREATIVE_ROWS - 1) * GAP,
+    };
+  }
+
   createCursorIcon() {
     this.cursorIcon = this.scene.add.image(0, 0, 'player');
     this.cursorIcon.setDisplaySize(ICON, ICON);
@@ -144,6 +292,129 @@ export default class InventoryUI {
 
   getSlotArray(section) {
     return section === 'hotbar' ? this.inventory.hotbar : this.inventory.slots;
+  }
+
+  getCreativeItems() {
+    const blockIds = Object.keys(BlockData).map(Number).filter((t) => t !== BlockTypes.AIR);
+    const itemIds = Object.keys(ItemData).map(Number);
+    return [...blockIds, ...itemIds];
+  }
+
+  getCreativeItemsByCategory() {
+    const all = this.getCreativeItems();
+
+    if (this.creativeCategory === 'all') return all;
+
+    if (this.creativeCategory === 'building') {
+      const set = new Set([
+        BlockTypes.STONE,
+        BlockTypes.DEEPSLATE,
+        BlockTypes.SANDSTONE,
+        BlockTypes.PLANKS,
+        BlockTypes.BIRCH_PLANKS,
+        BlockTypes.STONE_SLAB,
+        BlockTypes.DEEPSLATE_SLAB,
+        BlockTypes.OAK_SLAB,
+        BlockTypes.BIRCH_SLAB,
+        BlockTypes.SANDSTONE_SLAB,
+        BlockTypes.WOOL,
+      ]);
+      return all.filter((t) => set.has(t));
+    }
+
+    if (this.creativeCategory === 'natural') {
+      const set = new Set([
+        BlockTypes.GRASS,
+        BlockTypes.DIRT,
+        BlockTypes.STONE,
+        BlockTypes.DEEPSLATE,
+        BlockTypes.SAND,
+        BlockTypes.SANDSTONE,
+        BlockTypes.WOOD,
+        BlockTypes.LEAVES,
+        BlockTypes.JUNGLE_GRASS,
+        BlockTypes.CACTUS,
+        BlockTypes.VINE,
+        BlockTypes.BIRCH_WOOD,
+        BlockTypes.BIRCH_LEAVES,
+        BlockTypes.BIRCH_GRASS,
+      ]);
+      return all.filter((t) => set.has(t));
+    }
+
+    if (this.creativeCategory === 'utility') {
+      const set = new Set([BlockTypes.WORKBENCH, BlockTypes.CHEST, BlockTypes.FURNACE, BlockTypes.TORCH]);
+      return all.filter((t) => set.has(t));
+    }
+
+    if (this.creativeCategory === 'tools') {
+      return all.filter((t) => {
+        const toolType = ItemData[t]?.toolType;
+        return toolType === 'pickaxe' || toolType === 'axe';
+      });
+    }
+
+    if (this.creativeCategory === 'combat') {
+      return all.filter((t) => ItemData[t]?.toolType === 'sword' || ItemData[t]?.throwable === true);
+    }
+
+    if (this.creativeCategory === 'food') {
+      return all.filter((t) => ItemData[t]?.consumable === true);
+    }
+
+    if (this.creativeCategory === 'materials') {
+      return all.filter((t) => {
+        if (BlockData[t]) return false;
+        const item = ItemData[t];
+        if (!item) return false;
+        return !item.toolType && !item.throwable && !item.consumable;
+      });
+    }
+
+    return all;
+  }
+
+  giveCreativeItem(type, amount) {
+    if (this.inventory.addItem(type, amount)) return;
+    this.inventory.hotbar[this.inventory.selectedSlot] = { type, count: amount };
+  }
+
+  scrollCreative(dir) {
+    const maxOffset = Math.max(0, this.creativeItems.length - this.creativeSlots.length);
+    this.creativeScrollOffset = Math.max(0, Math.min(maxOffset, this.creativeScrollOffset + dir));
+    this.refreshCreativeSlots();
+  }
+
+  refreshCreativeCategoryStyles() {
+    if (!this.inventory.creativeMode) return;
+    for (const btn of this.creativeCategoryButtons) {
+      const isActive = btn.id === this.creativeCategory;
+      btn.bg.setFillStyle(isActive ? 0x3f5f92 : 0x2a2a3e, 1);
+      btn.bg.setStrokeStyle(1, isActive ? 0xbcd8ff : 0x555577);
+      btn.text.setColor(isActive ? '#ffffff' : '#ddddee');
+    }
+  }
+
+  refreshCreativeSlots() {
+    if (!this.inventory.creativeMode) return;
+
+    this.creativeItems = this.getCreativeItemsByCategory();
+    for (let i = 0; i < this.creativeSlots.length; i++) {
+      const slot = this.creativeSlots[i];
+      const type = this.creativeItems[this.creativeScrollOffset + i];
+      slot.type = type ?? null;
+
+      if (type != null) {
+        slot.icon.setTexture(getItemTexture(type));
+        slot.icon.setDisplaySize(ICON, ICON);
+        slot.icon.setVisible(true);
+        const stack = getMaxStack(type);
+        slot.count.setText(stack > 1 ? String(stack) : '');
+      } else {
+        slot.icon.setVisible(false);
+        slot.count.setText('');
+      }
+    }
   }
 
   leftClick(section, idx) {
@@ -236,6 +507,11 @@ export default class InventoryUI {
     this.container.setVisible(this.isOpen);
     this.inventory.isOpen = this.isOpen;
 
+    if (this.isOpen && this.inventory.creativeMode) {
+      this.refreshCreativeCategoryStyles();
+      this.refreshCreativeSlots();
+    }
+
     if (!this.isOpen) {
       if (this.cursorItem) {
         this.inventory.addItem(this.cursorItem.type, this.cursorItem.count);
@@ -253,6 +529,7 @@ export default class InventoryUI {
 
     if (this.inventory.dirty) {
       this.refreshSlots();
+      if (this.inventory.creativeMode) this.refreshCreativeSlots();
     }
 
     const pointer = this.scene.input.activePointer;
@@ -290,6 +567,10 @@ export default class InventoryUI {
         s.icon.setVisible(false);
         s.count.setText('');
       }
+    }
+
+    if (this.inventory.creativeMode) {
+      this.refreshCreativeCategoryStyles();
     }
   }
 }

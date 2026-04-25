@@ -12,6 +12,14 @@ export default class Inventory {
     this.craftingRequest = null;
     this.chestRequest = null;
     this.furnaceRequest = null;
+    this.creativeMode = false;
+  }
+
+  enableCreativeMode(_blockTypes = []) {
+    this.creativeMode = true;
+    this.hotbar.fill(null);
+    this.slots.fill(null);
+    this.dirty = true;
   }
 
   addItem(type, count = 1) {
@@ -92,6 +100,7 @@ export default class Inventory {
   consumeSelected(count = 1) {
     const item = this.hotbar[this.selectedSlot];
     if (!item || item.count < count) return false;
+    if (this.creativeMode) return true;
     item.count -= count;
     if (item.count <= 0) this.hotbar[this.selectedSlot] = null;
     this.dirty = true;

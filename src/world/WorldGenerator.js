@@ -69,8 +69,80 @@ function getSubSurfaceBlock(biome) {
   }
 }
 
-export function generateWorld(seed = Date.now()) {
+function getWorldTypeSettings(worldType) {
+  switch (worldType) {
+    case 'superflat':
+      return {
+        biomeScale: 0,
+        terrainScale1: 0,
+        terrainScale2: 0,
+        terrainScale3: 0,
+        amp1: 0,
+        amp2: 0,
+        amp3: 0,
+        flatSurfaceY: SURFACE_BASE_Y,
+        generateCaves: false,
+        generateOres: false,
+        generateTrees: false,
+        generateCacti: false,
+        generateVines: false,
+        generateChests: false,
+      };
+    case 'bigger_biomes':
+      return {
+        biomeScale: 0.0008,
+        terrainScale1: 0.006,
+        terrainScale2: 0.025,
+        terrainScale3: 0.08,
+        amp1: 25,
+        amp2: 8,
+        amp3: 3,
+        generateCaves: true,
+        generateOres: true,
+        generateTrees: true,
+        generateCacti: true,
+        generateVines: true,
+        generateChests: true,
+      };
+    case 'hilly':
+      return {
+        biomeScale: 0.002,
+        terrainScale1: 0.0048,
+        terrainScale2: 0.017,
+        terrainScale3: 0.055,
+        amp1: 45,
+        amp2: 16,
+        amp3: 7,
+        generateCaves: true,
+        generateOres: true,
+        generateTrees: true,
+        generateCacti: true,
+        generateVines: true,
+        generateChests: true,
+      };
+    default:
+      return {
+        biomeScale: 0.002,
+        terrainScale1: 0.006,
+        terrainScale2: 0.025,
+        terrainScale3: 0.08,
+        amp1: 25,
+        amp2: 8,
+        amp3: 3,
+        generateCaves: true,
+        generateOres: true,
+        generateTrees: true,
+        generateCacti: true,
+        generateVines: true,
+        generateChests: true,
+      };
+  }
+}
+
+export function generateWorld(seed = Date.now(), options = {}) {
   const rng = mulberry32(seed);
+  const worldType = options.worldType || 'default';
+  const cfg = getWorldTypeSettings(worldType);
 
   const terrainNoise = createNoise2D(rng);
   const biomeNoise = createNoise2D(rng);
@@ -81,13 +153,15 @@ export function generateWorld(seed = Date.now()) {
   const biomes = new Array(WORLD_WIDTH);
 
   for (let x = 0; x < WORLD_WIDTH; x++) {
-    const bn = biomeNoise(x * 0.002, 0.5);
-    biomes[x] = selectBiome(bn);
+    const bn = cfg.biomeScale > 0 ? biomeNoise(x * cfg.biomeScale, 0.5) : 0;
+    biomes[x] = worldType === 'superflat' ? Biomes.FOREST : selectBiome(bn);
 
-    const h1 = terrainNoise(x * 0.006, 0) * 25;
-    const h2 = detailNoise(x * 0.025, 0) * 8;
-    const h3 = detailNoise(x * 0.08, 50) * 3;
-    surfaceHeights[x] = Math.floor(SURFACE_BASE_Y + h1 + h2 + h3);
+    const h1 = terrainNoise(x * cfg.terrainScale1, 0) * cfg.amp1;
+    const h2 = detailNoise(x * cfg.terrainScale2, 0) * cfg.amp2;
+    const h3 = detailNoise(x * cfg.terrainScale3, 50) * cfg.amp3;
+    surfaceHeights[x] = worldType === 'superflat'
+      ? cfg.flatSurfaceY
+      : Math.floor(SURFACE_BASE_Y + h1 + h2 + h3);
 
     const sy = surfaceHeights[x];
     const blendBiome = getTransitionBlend(bn, rng);
@@ -98,6 +172,11 @@ export function generateWorld(seed = Date.now()) {
 
       if (depth < 0) {
         tiles[y * WORLD_WIDTH + x] = BlockTypes.AIR;
+      } else if (worldType === 'superflat') {
+        if (depth === 0) tiles[y * WORLD_WIDTH + x] = BlockTypes.GRASS;
+        else if (depth <= 4) tiles[y * WORLD_WIDTH + x] = BlockTypes.DIRT;
+        else if (depth <= 75) tiles[y * WORLD_WIDTH + x] = BlockTypes.STONE;
+        else tiles[y * WORLD_WIDTH + x] = BlockTypes.DEEPSLATE;
       } else if (depth === 0) {
         tiles[y * WORLD_WIDTH + x] = getSurfaceBlock(surfaceBiome, rng);
       } else if (depth <= 15) {
@@ -110,12 +189,12 @@ export function generateWorld(seed = Date.now()) {
     }
   }
 
-  generateCaves(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
-  placeOres(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
-  placeTrees(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
-  placeCacti(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
-  placeVines(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
-  placeChests(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
+  if (cfg.generateCaves) generateCaves(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
+  if (cfg.generateOres) placeOres(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
+  if (cfg.generateTrees) placeTrees(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
+  if (cfg.generateCacti) placeCacti(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
+  if (cfg.generateVines) placeVines(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, biomes, rng);
+  if (cfg.generateChests) placeChests(tiles, WORLD_WIDTH, WORLD_HEIGHT, surfaceHeights, rng);
 
   const bgTiles = new Uint8Array(WORLD_WIDTH * WORLD_HEIGHT);
 
