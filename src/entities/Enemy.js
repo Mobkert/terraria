@@ -236,6 +236,18 @@ export default class Enemy {
     }
   }
 
+  applyDaylightDamage(amount) {
+    if (this.dead || amount <= 0) return;
+    this.health -= amount;
+    this.hurtFlash = Math.max(this.hurtFlash, 0.05);
+    if (this.health <= 0) {
+      if (this.type === 'BOMB_ZOMBIE' && !this.fusing && Math.random() < 0.80) {
+        this.pendingDrops.push({ type: ItemTypes.GUNPOWDER, x: this.x, y: this.y });
+      }
+      this.die();
+    }
+  }
+
   die() {
     this.dead = true;
     this.sprite.destroy();

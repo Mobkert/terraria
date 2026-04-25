@@ -25,6 +25,7 @@ export const ItemTypes = {
   RAW_PORKCHOP: 49,
   COOKED_PORKCHOP: 50,
   BACON: 51,
+  TIME_SWITCHER: 52,
 };
 
 export const ItemData = {
@@ -160,6 +161,11 @@ export const ItemData = {
     consumable: true,
     healAmount: 17,
     consumeTime: 650,
+  },
+  [ItemTypes.TIME_SWITCHER]: {
+    name: 'Time Switcher',
+    stackSize: 1,
+    timeToggle: true,
   },
 };
 

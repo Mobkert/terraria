@@ -91,9 +91,14 @@ export default class BlockBreakPlace {
 
     if (pointer.rightButtonDown() && this.placeCooldown <= 0) {
       const selected = this.inventory.getSelectedItem();
+      const selectedInfo = selected ? ItemData[selected.type] : null;
       const consumable = selected ? getConsumableData(selected.type) : null;
 
-      if (consumable && this.player.health < this.player.maxHealth) {
+      if (selectedInfo && selectedInfo.timeToggle) {
+        this.resetConsuming();
+        this.scene.toggleDayNight?.();
+        this.placeCooldown = this.PLACE_DELAY;
+      } else if (consumable && this.player.health < this.player.maxHealth) {
         this.handleConsuming(delta, consumable);
       } else {
         this.resetConsuming();

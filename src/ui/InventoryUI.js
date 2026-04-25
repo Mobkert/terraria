@@ -1,5 +1,5 @@
 import { BlockData, BlockTypes } from '../data/blocks.js';
-import { ItemData, getItemTexture, getMaxStack } from '../data/items.js';
+import { ItemData, ItemTypes, getItemTexture, getMaxStack } from '../data/items.js';
 
 const SLOT = 44;
 const GAP = 4;
@@ -343,7 +343,13 @@ export default class InventoryUI {
     }
 
     if (this.creativeCategory === 'utility') {
-      const set = new Set([BlockTypes.WORKBENCH, BlockTypes.CHEST, BlockTypes.FURNACE, BlockTypes.TORCH]);
+      const set = new Set([
+        BlockTypes.WORKBENCH,
+        BlockTypes.CHEST,
+        BlockTypes.FURNACE,
+        BlockTypes.TORCH,
+        ItemTypes.TIME_SWITCHER,
+      ]);
       return all.filter((t) => set.has(t));
     }
 

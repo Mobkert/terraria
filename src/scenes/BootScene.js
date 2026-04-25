@@ -595,6 +595,45 @@ export default class BootScene extends Phaser.Scene {
       ctx.fillStyle = '#ffaa22';
       ctx.beginPath(); ctx.arc(s * 0.65, s * 0.08, 1.5, 0, Math.PI * 2); ctx.fill();
     });
+
+    this.makeItemTexture(ItemTypes.TIME_SWITCHER, (ctx) => {
+      // Gold-rimmed dial with split day/night face.
+      ctx.fillStyle = '#7a5a1a';
+      ctx.beginPath();
+      ctx.arc(s * 0.5, s * 0.5, s * 0.34, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#c9a24a';
+      ctx.beginPath();
+      ctx.arc(s * 0.5, s * 0.5, s * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#4a8fd6';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.5);
+      ctx.arc(s * 0.5, s * 0.5, s * 0.24, Math.PI, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#141a30';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.5, s * 0.5);
+      ctx.arc(s * 0.5, s * 0.5, s * 0.24, 0, Math.PI);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#ffe17a';
+      ctx.beginPath();
+      ctx.arc(s * 0.41, s * 0.44, s * 0.05, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#dce9ff';
+      ctx.beginPath();
+      ctx.arc(s * 0.59, s * 0.58, s * 0.045, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1f293f';
+      ctx.fillRect(s * 0.49, s * 0.36, 2, s * 0.14);
+      ctx.fillRect(s * 0.5, s * 0.5, s * 0.11, 2);
+    });
   }
 
   drawPickC(ctx, s, headColor, darkColor, lightColor, accentColor) {

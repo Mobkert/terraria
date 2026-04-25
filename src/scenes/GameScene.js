@@ -54,6 +54,14 @@ const WORLD_TYPE_NAMES = {
   hilly: 'Hilly',
 };
 
+const DAY_DURATION_MS = 10 * 60 * 1000;
+const NIGHT_DURATION_MS = 9 * 60 * 1000;
+const FULL_CYCLE_MS = DAY_DURATION_MS + NIGHT_DURATION_MS;
+const DAYLIGHT_ENEMY_DAMAGE_PER_SEC = 3;
+const SUNSET_START_RATIO = 0.9;
+const DAWN_START_RATIO = 0.9;
+const TIME_SWITCH_TRANSITION_MS = 3500;
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
@@ -77,6 +85,7 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#0a1628');
 
     this.createBackground(worldPxW, worldPxH);
+    this.initDayNightCycle();
 
     const spawn = findSpawnPoint(this.worldData);
     const spawnX = spawn.x * TILE_SIZE + TILE_SIZE / 2;
@@ -163,8 +172,49 @@ export default class GameScene extends Phaser.Scene {
     this.skyBg.setScrollFactor(0, 0);
     this.skyBg.setDepth(-10);
 
+    this.skyTintOverlay = this.add.rectangle(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      0x66b5ff,
+      0,
+    );
+    this.skyTintOverlay.setScrollFactor(0);
+    this.skyTintOverlay.setDepth(-9);
+
+    this.sunSprite = this.add.ellipse(0, 0, 78, 52, 0xffd86a, 0.95);
+    this.sunSprite.setScrollFactor(0);
+    this.sunSprite.setDepth(-8);
+
+    this.moonSprite = this.add.ellipse(0, 0, 68, 46, 0xd8e5ff, 0.95);
+    this.moonSprite.setScrollFactor(0);
+    this.moonSprite.setDepth(-8);
+
     this.createMountainLayer(worldPxW, 0.15, 0x2a3a4a, 0.5, -8, 120);
     this.createMountainLayer(worldPxW, 0.3, 0x3a4a3a, 0.6, -7, 80);
+  }
+
+  initDayNightCycle() {
+    // Start at bright morning as requested.
+    this.timeOfDayMs = 0;
+    this.isNight = false;
+    this.nightIntensity = 0;
+    this.timeTransition = null;
+    this.skyLightApplyDelayMs = 0;
+    this.currentSkyLightLevel = 15;
+    this.tileManager.setSkyLightLevel(this.currentSkyLightLevel);
+    this.updateDayNightVisuals(0);
+  }
+
+  toggleDayNight() {
+    const targetTime = this.isNight ? 0 : DAY_DURATION_MS;
+    this.timeTransition = {
+      from: this.timeOfDayMs,
+      to: targetTime,
+      elapsed: 0,
+      duration: TIME_SWITCH_TRANSITION_MS,
+    };
   }
 
   createMountainLayer(worldPxW, scrollFactorX, color, alpha, depth, heightScale) {
@@ -195,6 +245,7 @@ export default class GameScene extends Phaser.Scene {
 
   update(time, delta) {
     if (delta > 50) delta = 50;
+    this.updateDayNightVisuals(delta);
     this.player.update(delta);
     this.blockSystem.update(delta);
     this.furnaceManager.update(delta);
@@ -217,8 +268,96 @@ export default class GameScene extends Phaser.Scene {
     const selected = this.inventory.getSelectedItem();
     const itemName = selected ? getItemName(selected.type) : 'Empty';
     this.infoText.setText(
-      `Pos: ${tx},${ty} | ${GAME_MODE_NAMES[this.gameMode]} | ${DIFFICULTY_NAMES[this.difficulty]} | ${WORLD_TYPE_NAMES[this.worldType]} | Biome: ${biomeName} | Hand: ${itemName}`,
+      `Pos: ${tx},${ty} | ${GAME_MODE_NAMES[this.gameMode]} | ${DIFFICULTY_NAMES[this.difficulty]} | ${WORLD_TYPE_NAMES[this.worldType]} | ${this.isNight ? 'Night' : 'Day'} | Biome: ${biomeName} | Hand: ${itemName}`,
     );
+  }
+
+  updateDayNightVisuals(delta) {
+    let transitionEndedThisFrame = false;
+    if (this.timeTransition) {
+      this.timeTransition.elapsed += delta;
+      const raw = Phaser.Math.Clamp(this.timeTransition.elapsed / this.timeTransition.duration, 0, 1);
+      const eased = Phaser.Math.Easing.Cubic.InOut(raw);
+      this.timeOfDayMs = Phaser.Math.Linear(this.timeTransition.from, this.timeTransition.to, eased);
+      if (raw >= 1) {
+        this.timeTransition = null;
+        transitionEndedThisFrame = true;
+        this.skyLightApplyDelayMs = 0;
+      }
+    } else {
+      this.timeOfDayMs = (this.timeOfDayMs + delta) % FULL_CYCLE_MS;
+    }
+
+    const inDay = this.timeOfDayMs < DAY_DURATION_MS;
+    this.isNight = !inDay;
+
+    let t;
+    let skyLight;
+    let tintColor;
+    let tintAlpha;
+
+    if (inDay) {
+      t = this.timeOfDayMs / DAY_DURATION_MS;
+      if (t < SUNSET_START_RATIO) {
+        skyLight = 15;
+        tintColor = 0x66b5ff; // bright morning/day blue
+        tintAlpha = 0;
+      } else {
+        const s = (t - SUNSET_START_RATIO) / (1 - SUNSET_START_RATIO);
+        skyLight = Phaser.Math.Linear(15, 7, s);
+        tintColor = 0xff9b47; // sunset orange
+        tintAlpha = Phaser.Math.Linear(0.0, 0.28, s);
+      }
+      this.nightIntensity = 0;
+    } else {
+      t = (this.timeOfDayMs - DAY_DURATION_MS) / NIGHT_DURATION_MS;
+      if (t < DAWN_START_RATIO) {
+        const n = t / DAWN_START_RATIO;
+        skyLight = Phaser.Math.Linear(7, 3, n);
+        tintColor = 0x0b1430; // dark blue to near black
+        tintAlpha = Phaser.Math.Linear(0.35, 0.58, n);
+        this.nightIntensity = Phaser.Math.Clamp(n, 0, 1);
+      } else {
+        const d = (t - DAWN_START_RATIO) / (1 - DAWN_START_RATIO); // dawn
+        skyLight = Phaser.Math.Linear(3, 10, d);
+        tintColor = 0xffa25c;
+        tintAlpha = Phaser.Math.Linear(0.5, 0.15, d);
+        this.nightIntensity = Phaser.Math.Clamp(1 - d, 0, 1);
+      }
+    }
+
+    const nextSky = Math.max(0, Math.min(15, Math.round(skyLight)));
+    // Full light-map recalculation is expensive; throttle updates to avoid hitches.
+    this.skyLightApplyDelayMs = Math.max(0, this.skyLightApplyDelayMs - delta);
+    const canApplySkyLight =
+      transitionEndedThisFrame ||
+      (!this.timeTransition && this.skyLightApplyDelayMs <= 0);
+    if (canApplySkyLight && nextSky !== this.currentSkyLightLevel) {
+      this.currentSkyLightLevel = nextSky;
+      this.tileManager.setSkyLightLevel(nextSky);
+      this.skyLightApplyDelayMs = 900;
+    }
+
+    this.skyTintOverlay.setFillStyle(tintColor, tintAlpha);
+    this.updateSunMoonPositions(inDay);
+  }
+
+  updateSunMoonPositions(inDay) {
+    const cw = this.cameras.main.width;
+    const x = cw - 88;
+    const y = 74;
+
+    if (inDay) {
+      this.sunSprite.setVisible(true);
+      this.sunSprite.setPosition(x, y);
+      this.sunSprite.setAlpha(0.92);
+      this.moonSprite.setVisible(false);
+    } else {
+      this.moonSprite.setVisible(true);
+      this.moonSprite.setPosition(x, y);
+      this.moonSprite.setAlpha(0.95);
+      this.sunSprite.setVisible(false);
+    }
   }
 
   spawnArrow(x, y, angle, damage) {
@@ -252,10 +391,14 @@ export default class GameScene extends Phaser.Scene {
 
   updateEnemies(delta) {
     const spawnArrowFn = (x, y, angle, dmg) => this.spawnArrow(x, y, angle, dmg);
+    const daylightDamage = this.isNight ? 0 : (delta / 1000) * DAYLIGHT_ENEMY_DAMAGE_PER_SEC;
 
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const enemy = this.enemies[i];
       enemy.update(delta, this.player, this.enemies, spawnArrowFn);
+      if (daylightDamage > 0) {
+        enemy.applyDaylightDamage(daylightDamage);
+      }
 
       if (enemy.dead) {
         for (const drop of enemy.pendingDrops) {

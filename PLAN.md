@@ -290,6 +290,27 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Additional key file:** `src/world/CaveGenerator.js`
 
+## Phase 22: Day/Night Cycle and Time Switcher (COMPLETED)
+
+- Added a full world time cycle that starts at **morning**:
+  - **Day** lasts 10 minutes
+  - **Night** lasts 9 minutes
+- Sky lighting and tint now shift by time segment:
+  - Bright blue day
+  - Orange sunset near the end of day
+  - Dark blue/near-black night
+- Added oval **sun** (day) and oval **moon** (night) background bodies.
+- Sun/moon display is now pinned to the top-right of the camera view so it follows player movement.
+- Lighting system now supports dynamic skylight intensity so night becomes darker while torches still illuminate nearby areas.
+- Hostile mobs now spawn only at night and are blocked from spawning near torches.
+- Hostile mobs now take gradual daylight damage during daytime, causing them to burn out over time after sunrise.
+- Nighttime spawn pressure is now higher: first spawns begin faster after dusk and cooldowns shrink more as night deepens.
+- Time Switcher now transitions smoothly between day/night over a short fade instead of instant snapping.
+- Added a new item, **Time Switcher** (`ItemTypes.TIME_SWITCHER`), intended for creative inventory use, that toggles day/night on right-click.
+- Updated the Game Encyclopedia pages to include the Time Switcher item entry and texture.
+
+**Key files:** `src/scenes/GameScene.js`, `src/world/TileManager.js`, `src/systems/EnemySpawner.js`, `src/systems/BlockBreakPlace.js`, `src/data/items.js`, `src/scenes/BootScene.js`, `src/ui/InventoryUI.js`, `item-inventory.html`, `public/item-inventory.html`
+
 ## Controls Summary
 
 | Key | Action |
@@ -299,7 +320,7 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 | SPACE | Jump (double-tap in Creative to toggle fly mode; hold while flying to go up) |
 | SHIFT | Fly down (while flying in Creative) |
 | LMB | Break block / sword attack / throw bomb |
-| RMB | Place block / interact / use consumable (hold 2s) |
+| RMB | Place block / interact / use consumable (hold 2s) / use Time Switcher |
 | E | Open inventory / crafting |
 | 1-9 | Select hotbar slot |
 | P | Open advancements |

@@ -14,6 +14,7 @@ export default class TileManager {
     this.bgPool = [];
     this.lastBounds = null;
     this.BUFFER = 3;
+    this.skyLightLevel = 15;
 
     this.lightMap = new Uint8Array(this.w * this.h);
     this.darknessGfx = scene.add.graphics();
@@ -38,8 +39,16 @@ export default class TileManager {
   }
 
   getLight(x, y) {
-    if (x < 0 || x >= this.w || y < 0 || y >= this.h) return 15;
+    if (x < 0 || x >= this.w || y < 0 || y >= this.h) return this.skyLightLevel;
     return this.lightMap[y * this.w + x];
+  }
+
+  setSkyLightLevel(level) {
+    const next = Math.max(0, Math.min(15, Math.round(level)));
+    if (next === this.skyLightLevel) return;
+    this.skyLightLevel = next;
+    this.calculateAllLight();
+    this.lastDarkBounds = null;
   }
 
   setBlock(x, y, type) {
@@ -74,15 +83,15 @@ export default class TileManager {
 
       for (let y = 0; y <= sy && y < this.h; y++) {
         const idx = y * this.w + x;
-        this.lightMap[idx] = 15;
-        queue.push(x, y, 15);
+        this.lightMap[idx] = this.skyLightLevel;
+        queue.push(x, y, this.skyLightLevel);
       }
 
       for (let y = sy + 1; y < this.h; y++) {
         if (this.isSolid(x, y)) break;
         const idx = y * this.w + x;
-        this.lightMap[idx] = 15;
-        queue.push(x, y, 15);
+        this.lightMap[idx] = this.skyLightLevel;
+        queue.push(x, y, this.skyLightLevel);
       }
 
       for (let d = 1; d <= SUB_SURFACE_DEPTH; d++) {
@@ -184,8 +193,8 @@ export default class TileManager {
         }
 
         if (skyLit) {
-          this.lightMap[y * this.w + x] = 15;
-          queue.push(x, y, 15);
+          this.lightMap[y * this.w + x] = this.skyLightLevel;
+          queue.push(x, y, this.skyLightLevel);
         } else if (ambient > 0) {
           this.lightMap[y * this.w + x] = ambient;
           queue.push(x, y, ambient);

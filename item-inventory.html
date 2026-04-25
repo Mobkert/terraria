@@ -64,8 +64,8 @@
 
 <div class="stat-bar">
   <div class="stat-box"><div class="num">24</div><div class="label">Blocks</div></div>
-  <div class="stat-box"><div class="num">14</div><div class="label">Items</div></div>
-  <div class="stat-box"><div class="num">38</div><div class="label">Total</div></div>
+  <div class="stat-box"><div class="num">15</div><div class="label">Items</div></div>
+  <div class="stat-box"><div class="num">39</div><div class="label">Total</div></div>
   <div class="stat-box"><div class="num">21</div><div class="label">Recipes</div></div>
 </div>
 
@@ -113,7 +113,7 @@ function addSlabDetail(ctx, s) {
 
 // Block textures
 const BlockTypes = { AIR:0,GRASS:1,DIRT:2,STONE:3,DEEPSLATE:4,SAND:5,SANDSTONE:6,WOOD:7,LEAVES:8,JUNGLE_GRASS:9,PLANKS:10,WORKBENCH:11,CHEST:12,CACTUS:16,VINE:17,TORCH:21,COAL_ORE:23,IRON_ORE:24,FURNACE:25,BIRCH_WOOD:33,BIRCH_LEAVES:34,BIRCH_PLANKS:35,BIRCH_GRASS:36,STONE_SLAB:37,DEEPSLATE_SLAB:38,OAK_SLAB:39,BIRCH_SLAB:40,SANDSTONE_SLAB:41 };
-const ItemTypes = { STICK:13,WOODEN_PICKAXE:14,WOODEN_AXE:15,STONE_PICKAXE:18,STONE_AXE:19,GRASS_ESSENCE:20,COAL:22,RAW_IRON:26,IRON_INGOT:27,IRON_PICKAXE:28,IRON_AXE:29,WOODEN_SWORD:30,STONE_SWORD:31,IRON_SWORD:32,GUNPOWDER:42,BOMB:43 };
+const ItemTypes = { STICK:13,WOODEN_PICKAXE:14,WOODEN_AXE:15,STONE_PICKAXE:18,STONE_AXE:19,GRASS_ESSENCE:20,COAL:22,RAW_IRON:26,IRON_INGOT:27,IRON_PICKAXE:28,IRON_AXE:29,WOODEN_SWORD:30,STONE_SWORD:31,IRON_SWORD:32,GUNPOWDER:42,BOMB:43,TIME_SWITCHER:52 };
 
 const BlockData = {
   1:{name:'Grass',color:0x4a8c2a,topColor:0x5cb338,hardness:1,tool:'shovel'},
@@ -431,6 +431,15 @@ function generateItemTexture(id) {
       ctx.fillStyle='#ff6622'; ctx.beginPath(); ctx.arc(s*0.65,s*0.08,3,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#ffaa22'; ctx.beginPath(); ctx.arc(s*0.65,s*0.08,1.5,0,Math.PI*2); ctx.fill();
       break;
+    case 52: // TIME_SWITCHER
+      ctx.fillStyle='#7a5a1a'; ctx.beginPath(); ctx.arc(s*0.5,s*0.5,s*0.34,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#c9a24a'; ctx.beginPath(); ctx.arc(s*0.5,s*0.5,s*0.3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#4a8fd6'; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.5); ctx.arc(s*0.5,s*0.5,s*0.24,Math.PI,0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#141a30'; ctx.beginPath(); ctx.moveTo(s*0.5,s*0.5); ctx.arc(s*0.5,s*0.5,s*0.24,0,Math.PI); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#ffe17a'; ctx.beginPath(); ctx.arc(s*0.41,s*0.44,s*0.05,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#dce9ff'; ctx.beginPath(); ctx.arc(s*0.59,s*0.58,s*0.045,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#1f293f'; ctx.fillRect(s*0.49,s*0.36,2,s*0.14); ctx.fillRect(s*0.5,s*0.5,s*0.11,2);
+      break;
   }
   return c;
 }
@@ -609,6 +618,7 @@ const matItems = [
   {id:26,name:'Raw Iron',details:'Stack: 99<br><span class="drop-info">Source: Iron Ore (Stone Pickaxe+)</span>'},
   {id:27,name:'Iron Ingot',details:'Stack: 99<div class="recipe">1 Raw Iron + 1 Coal <span class="arrow">\u2192</span> 1 Ingot <span class="tag tag-furnace">Furnace</span></div>'},
   {id:42,name:'Gunpowder',details:'Stack: 99<br><span class="drop-info">Source: Bomb Zombie (65% on explode, 80% on kill)</span>'},
+  {id:52,name:'Time Switcher',details:'Stack: 1<br><span class="drop-info">Creative-only item</span><br><span class="drop-info">Right click to swap Day/Night instantly</span>'},
 ];
 for (const t of matItems) addItemCard(mats.grid, t.id, t);
 

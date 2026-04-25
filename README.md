@@ -47,6 +47,16 @@ When you click **Create World**, you can choose:
   - `All`, `Building`, `Natural`, `Utility`, `Combat`, `Food`, `Materials`
 - Click an entry to add **1** item.
 - **Shift-click** an entry to add a **full stack**.
+- The creative `Utility` category includes a **Time Switcher** item:
+  - Right-click while holding it to toggle **day <-> night**.
+
+## Day/Night Cycle
+
+- Worlds start in **morning**.
+- **Day** length: 10 minutes.
+- **Night** length: 9 minutes.
+- Sunset tint appears near the end of day.
+- Hostile mobs spawn at night and avoid bright torch-lit areas.
 
 ## Controls
 
@@ -57,7 +67,7 @@ When you click **Create World**, you can choose:
 | SPACE | Jump (double-tap in Creative to toggle fly mode; hold while flying to go up) |
 | SHIFT | Fly down (while flying in Creative) |
 | LMB | Break block |
-| RMB | Place block / interact |
+| RMB | Place block / interact / use Time Switcher |
 | E | Open inventory / crafting |
 | 1-9 | Select hotbar slot |
 | Scroll | Cycle hotbar |
