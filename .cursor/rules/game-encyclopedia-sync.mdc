@@ -1,0 +1,28 @@
+---
+description: Keep Game Encyclopedia in sync when adding blocks or items
+alwaysApply: true
+---
+
+# Sync New Blocks/Items to Game Encyclopedia
+
+When adding or removing any block or item content, keep the Game Encyclopedia updated in the same change.
+
+## Required Updates
+
+- Update data definitions (for example `src/data/blocks.js`, `src/data/items.js`).
+- Update runtime/generated textures if needed (for example `src/scenes/BootScene.js`).
+- Update encyclopedia pages:
+  - `item-inventory.html`
+  - `public/item-inventory.html`
+- Ensure the new/changed entry appears in the correct section with:
+  - name
+  - visual/icon
+  - details/tags (tool type, hardness, drop/recipe, etc.)
+
+## Completion Check
+
+Before finishing, confirm:
+
+- No new block/item exists only in gameplay code.
+- No new block/item exists only in encyclopedia pages.
+- Encyclopedia entries match actual in-game behavior and visuals.
