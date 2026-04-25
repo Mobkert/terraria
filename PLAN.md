@@ -281,6 +281,15 @@ A 2D open-world sandbox game built with **Phaser 3** and **Vite**, running in th
 
 **Key files:** `src/scenes/MenuScene.js`, `src/scenes/GameScene.js`, `src/world/WorldGenerator.js`, `src/entities/Player.js`, `src/systems/Inventory.js`, `src/systems/EnemySpawner.js`
 
+- Cave generation tuning:
+  - Cave worm starts are now weighted by terrain ruggedness, so mountains generate caves more often.
+  - Flat terrain still has baseline cave generation chance.
+  - Added occasional cave-to-surface openings so some caves are visible above ground.
+  - Surface entrances now use multiple shapes (vertical shafts, diagonal cuts, and side-tunnel openings) so not all entrances are straight pits.
+  - Surface openings are now limited to caves that are relatively near the surface, and opening tunnels explicitly carve through dirt/surface layers for more natural hillside entrances.
+
+**Additional key file:** `src/world/CaveGenerator.js`
+
 ## Controls Summary
 
 | Key | Action |
