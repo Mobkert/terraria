@@ -11,6 +11,7 @@ export default class CustomizeScene extends Phaser.Scene {
     this.customization = data.customization
       ? { ...data.customization }
       : { ...DefaultCustomization };
+    this.mods = data && data.mods ? { ...data.mods } : undefined;
   }
 
   create() {
@@ -185,12 +186,18 @@ export default class CustomizeScene extends Phaser.Scene {
     const y = sh * 0.90;
 
     this.createButton(sw * 0.35, y, 'Back', () => {
-      this.scene.start('MenuScene', { customization: this.customization });
+      this.scene.start('MenuScene', {
+        customization: this.customization,
+        mods: this.mods,
+      });
     });
 
     this.createButton(sw * 0.65, y, 'Save & Back', () => {
       this.applyCustomization();
-      this.scene.start('MenuScene', { customization: this.customization });
+      this.scene.start('MenuScene', {
+        customization: this.customization,
+        mods: this.mods,
+      });
     });
   }
 

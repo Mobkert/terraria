@@ -1,5 +1,6 @@
 import { BlockTypes, BlockData, TILE_SIZE } from '../data/blocks.js';
 import { getToolData, getConsumableData, ItemData } from '../data/items.js';
+import { getRandomDropPool, pickRandomFromPool } from '../data/mods.js';
 import DroppedItem from '../entities/DroppedItem.js';
 
 export default class BlockBreakPlace {
@@ -97,6 +98,10 @@ export default class BlockBreakPlace {
       if (selectedInfo && selectedInfo.timeToggle) {
         this.resetConsuming();
         this.scene.toggleDayNight?.();
+        this.placeCooldown = this.PLACE_DELAY;
+      } else if (selectedInfo && selectedInfo.weatherToggle) {
+        this.resetConsuming();
+        this.scene.toggleCreativeWeather?.(selectedInfo.weatherToggle);
         this.placeCooldown = this.PLACE_DELAY;
       } else if (consumable && this.player.health < this.player.maxHealth) {
         this.handleConsuming(delta, consumable);
@@ -311,29 +316,42 @@ export default class BlockBreakPlace {
     }
 
     const blockData = BlockData[blockType];
-    const dropType =
-      blockData.drops !== undefined ? blockData.drops : blockType;
+    const randomDrops = !!(this.scene.mods && this.scene.mods.randomDrops);
+    const useRandom = randomDrops && !this.inventory.bgMode;
 
-    if (dropType !== BlockTypes.AIR && dropType !== 0) {
-      const item = new DroppedItem(
-        this.scene,
-        dropX,
-        dropY,
-        dropType,
-        this.tileManager,
-      );
-      this.droppedItems.push(item);
-    }
+    if (useRandom) {
+      const pool = getRandomDropPool();
+      const dropType = pickRandomFromPool(pool);
+      if (dropType !== BlockTypes.AIR && dropType !== 0) {
+        this.droppedItems.push(
+          new DroppedItem(this.scene, dropX, dropY, dropType, this.tileManager),
+        );
+      }
+    } else {
+      const dropType =
+        blockData.drops !== undefined ? blockData.drops : blockType;
 
-    if (blockData.extraDrop && Math.random() < (blockData.extraDropChance || 0)) {
-      const extra = new DroppedItem(
-        this.scene,
-        dropX + (Math.random() - 0.5) * 8,
-        dropY,
-        blockData.extraDrop,
-        this.tileManager,
-      );
-      this.droppedItems.push(extra);
+      if (dropType !== BlockTypes.AIR && dropType !== 0) {
+        const item = new DroppedItem(
+          this.scene,
+          dropX,
+          dropY,
+          dropType,
+          this.tileManager,
+        );
+        this.droppedItems.push(item);
+      }
+
+      if (blockData.extraDrop && Math.random() < (blockData.extraDropChance || 0)) {
+        const extra = new DroppedItem(
+          this.scene,
+          dropX + (Math.random() - 0.5) * 8,
+          dropY,
+          blockData.extraDrop,
+          this.tileManager,
+        );
+        this.droppedItems.push(extra);
+      }
     }
   }
 

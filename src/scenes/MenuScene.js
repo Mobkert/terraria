@@ -1,5 +1,6 @@
 import { BlockTypes, TILE_SIZE } from '../data/blocks.js';
 import { DefaultCustomization } from '../data/customization.js';
+import { defaultModsState, loadMods, saveMods } from '../data/mods.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
@@ -10,6 +11,10 @@ export default class MenuScene extends Phaser.Scene {
     this.customization = (data && data.customization)
       ? { ...data.customization }
       : { ...DefaultCustomization };
+    this.modsState =
+      data && data.mods != null
+        ? { ...defaultModsState(), ...data.mods }
+        : loadMods();
   }
 
   create() {
@@ -38,12 +43,16 @@ export default class MenuScene extends Phaser.Scene {
       color: '#aabbcc',
     }).setOrigin(0.5);
 
-    this.createButton(width / 2, height * 0.48, 'Create World', () => {
+    this.createButton(width / 2, height * 0.42, 'Create World', () => {
       this.showCreateWorldMenu();
     });
 
-    this.createButton(width / 2, height * 0.60, 'Customize', () => {
-      this.scene.start('CustomizeScene', { customization: this.customization });
+    this.createButton(width / 2, height * 0.54, 'Mods', () => {
+      this.showModsMenu();
+    });
+
+    this.createButton(width / 2, height * 0.66, 'Customize', () => {
+      this.scene.start('CustomizeScene', { customization: this.customization, mods: this.modsState });
     });
   }
 
@@ -112,6 +121,151 @@ export default class MenuScene extends Phaser.Scene {
     this.createSmallButton(width / 2 + 120, py + 350, 'Create', () => {
       const seed = Math.floor(Math.random() * 2147483647);
       this.showLoadingWorld(seed, this.worldSettings);
+    });
+  }
+
+  showModsMenu() {
+    const { width, height } = this.cameras.main;
+    this.children.removeAll(true);
+    this.cameras.main.setBackgroundColor('#0a1628');
+    this.drawBackground(width, height);
+
+    const panelW = 720;
+    const panelH = 400;
+    const px = width / 2 - panelW / 2;
+    const py = height / 2 - panelH / 2;
+
+    const panel = this.add.graphics();
+    panel.fillStyle(0x0f1f3a, 0.95);
+    panel.fillRoundedRect(px, py, panelW, panelH, 12);
+    panel.lineStyle(2, 0x4d7ab3, 1);
+    panel.strokeRoundedRect(px, py, panelW, panelH, 12);
+
+    this.add.text(width / 2, py + 32, 'Mods', {
+      fontSize: '36px',
+      fontFamily: 'Arial',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 4,
+    }).setOrigin(0.5);
+
+    this.add.text(width / 2, py + 72, 'Enabled mods apply to new worlds until you turn them off.', {
+      fontSize: '15px',
+      fontFamily: 'Arial',
+      color: '#9aaec4',
+    }).setOrigin(0.5);
+
+    const rows = [
+      {
+        key: 'randomDrops',
+        title: 'Random Drops',
+        desc: 'Broken blocks drop a random block or item (can be unobtainable).',
+      },
+      {
+        key: 'acidRain',
+        title: 'Acid Rain',
+        desc: 'Random acid storms (0.5% base chance). Hurts under open sky. Normal rain is always in the game.',
+      },
+    ];
+
+    let y = py + 140;
+    for (const row of rows) {
+      this.createModToggleRow(width / 2, y, row.key, row.title, row.desc);
+      y += 120;
+    }
+
+    this.createSmallButton(width / 2, py + panelH - 44, 'Back', () => {
+      saveMods(this.modsState);
+      this.renderMainMenu();
+    }, 200, 48);
+  }
+
+  /**
+   * @param {string} key
+   * @param {string} title
+   * @param {string} desc
+   */
+  createModToggleRow(cx, cy, key, title, desc) {
+    this.add.text(cx - 300, cy - 28, title, {
+      fontSize: '22px',
+      fontFamily: 'Arial',
+      color: '#e8f0ff',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0, 0.5);
+
+    this.add.text(cx - 300, cy + 8, desc, {
+      fontSize: '13px',
+      fontFamily: 'Arial',
+      color: '#8a9bb0',
+      wordWrap: { width: 420 },
+    }).setOrigin(0, 0);
+
+    const trackW = 88;
+    const trackH = 36;
+    const switchX = cx + 260;
+    const trackY = cy - trackH / 2;
+
+    const drawSwitch = (on) => {
+      track.clear();
+      track.fillStyle(on ? 0x3a9e5a : 0x555566, 1);
+      track.fillRoundedRect(switchX - trackW / 2, trackY, trackW, trackH, trackH / 2);
+      track.lineStyle(2, on ? 0x66dd88 : 0x778899, 1);
+      track.strokeRoundedRect(switchX - trackW / 2, trackY, trackW, trackH, trackH / 2);
+      knob.setX(on ? switchX + trackW / 2 - 20 : switchX - trackW / 2 + 20);
+      label.setText(on ? 'ON' : 'OFF');
+      label.setStyle({ fill: on ? '#ccffdd' : '#ccccdd' });
+    };
+
+    const track = this.add.graphics();
+    const knob = this.add.circle(switchX, cy, 14, 0xf0f4ff, 1);
+    knob.setStrokeStyle(2, 0x222233);
+    knob.setDepth(1);
+    track.setDepth(0);
+    const label = this.add.text(switchX, cy + 32, '', {
+      fontSize: '14px',
+      fontFamily: 'Arial',
+    }).setOrigin(0.5);
+
+    const refresh = () => drawSwitch(!!this.modsState[key]);
+    refresh();
+
+    const zone = this.add.zone(switchX, cy, trackW + 24, trackH + 24).setInteractive({ useHandCursor: true });
+    zone.on('pointerdown', () => {
+      const next = !this.modsState[key];
+      if (next) {
+        this.showModEnablingOverlay(() => {
+          this.modsState[key] = true;
+          saveMods(this.modsState);
+          refresh();
+        });
+      } else {
+        this.modsState[key] = false;
+        saveMods(this.modsState);
+        refresh();
+      }
+    });
+  }
+
+  showModEnablingOverlay(done) {
+    const { width, height } = this.cameras.main;
+    const overlay = this.add.graphics();
+    overlay.fillStyle(0x000000, 0.75);
+    overlay.fillRect(0, 0, width, height);
+    overlay.setDepth(500);
+
+    const txt = this.add.text(width / 2, height / 2, 'Loading...', {
+      fontSize: '40px',
+      fontFamily: 'Arial',
+      color: '#ffffff',
+    }).setOrigin(0.5).setDepth(501);
+
+    this.input.enabled = false;
+    this.time.delayedCall(1000, () => {
+      overlay.destroy();
+      txt.destroy();
+      this.input.enabled = true;
+      done();
     });
   }
 
@@ -202,6 +356,7 @@ export default class MenuScene extends Phaser.Scene {
         gameMode: settings.gameMode || 'survival',
         difficulty: settings.difficulty || 'normal',
         worldType: settings.worldType || 'default',
+        mods: { ...this.modsState },
       });
     });
   }

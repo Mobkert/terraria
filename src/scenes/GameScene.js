@@ -1,5 +1,6 @@
-import { TILE_SIZE, BlockData } from '../data/blocks.js';
-import { getItemName } from '../data/items.js';
+import { TILE_SIZE, BlockData, BlockTypes } from '../data/blocks.js';
+import { defaultModsState, loadMods } from '../data/mods.js';
+import { getItemName, ItemTypes } from '../data/items.js';
 import {
   generateWorld,
   findSpawnPoint,
@@ -19,7 +20,6 @@ import AdvancementTracker from '../systems/AdvancementTracker.js';
 import Arrow from '../entities/Arrow.js';
 import DroppedItem from '../entities/DroppedItem.js';
 import ThrownBomb from '../entities/ThrownBomb.js';
-import { ItemTypes } from '../data/items.js';
 
 const BIOME_NAMES = {
   forest: 'Forest',
@@ -62,6 +62,24 @@ const SUNSET_START_RATIO = 0.9;
 const DAWN_START_RATIO = 0.9;
 const TIME_SWITCH_TRANSITION_MS = 3500;
 
+const WEATHER_MULT_MS = 5 * 60 * 1000;
+/** Every 5 minutes while dry, rain / acid odds double (cap below). */
+const WEATHER_CHANCE_MULT = 2;
+/** How often we roll for automatic rain (lower = less frequent storms). */
+const WEATHER_ROLL_MS = 30 * 1000;
+/** Max chance per roll so long dry streaks do not become near-guaranteed rain every tick. */
+const WEATHER_CHANCE_CAP = 0.35;
+const WEATHER_RAIN_P0 = 0.01;
+const WEATHER_ACID_P0 = 0.005;
+const WEATHER_DURATION_MIN_MS = 2 * 60 * 1000;
+const WEATHER_DURATION_MAX_MS = 10 * 60 * 1000;
+
+function blockIsSolidForRain(block) {
+  if (block === BlockTypes.AIR) return false;
+  const data = BlockData[block];
+  return !data || data.solid !== false;
+}
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
@@ -72,6 +90,10 @@ export default class GameScene extends Phaser.Scene {
     this.gameMode = data?.gameMode || 'survival';
     this.difficulty = data?.difficulty || 'normal';
     this.worldType = data?.worldType || 'default';
+    const base = defaultModsState();
+    const fromLaunch = data?.mods && typeof data.mods === 'object' ? data.mods : null;
+    this.mods = { ...base, ...(fromLaunch || loadMods()) };
+    delete this.mods.rain;
   }
 
   create() {
@@ -95,6 +117,10 @@ export default class GameScene extends Phaser.Scene {
     if (this.gameMode === 'creative') {
       const allBlocks = Object.keys(BlockData).map(Number);
       this.inventory.enableCreativeMode(allBlocks);
+      this.inventory.addItem(ItemTypes.RAIN_CALLER, 1);
+      if (this.mods.acidRain) {
+        this.inventory.addItem(ItemTypes.ACID_RAIN_CALLER, 1);
+      }
     }
     this.player = new Player(this, spawnX, spawnY, this.tileManager, this.inventory, {
       creativeMode: this.gameMode === 'creative',
@@ -158,6 +184,161 @@ export default class GameScene extends Phaser.Scene {
       })
       .setScrollFactor(0)
       .setDepth(100);
+
+    this.initWeather();
+  }
+
+  initWeather() {
+    this.activeWeather = null;
+    this.weatherEndsAt = 0;
+    this.weatherManualHold = false;
+    this.rainChanceP = WEATHER_RAIN_P0;
+    this.acidChanceP = WEATHER_ACID_P0;
+    this.msSinceDryForMultiply = 0;
+    this.weatherRollTimer = 0;
+    this.acidDamageTimer = 0;
+    this.rainAnimT = 0;
+
+    this.rainGfx = this.add.graphics();
+    this.rainGfx.setScrollFactor(0);
+    this.rainGfx.setDepth(103);
+
+    this.rainDarkOverlay = this.add.rectangle(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      0x223344,
+      0,
+    );
+    this.rainDarkOverlay.setScrollFactor(0);
+    this.rainDarkOverlay.setDepth(101);
+  }
+
+  /** Player tile column has no solid ceiling up to y=0. */
+  isPlayerUnderOpenSky() {
+    const tx = this.player.getTileX();
+    const topTy = Math.floor((this.player.y - this.player.height) / TILE_SIZE);
+    for (let ty = topTy; ty >= 0; ty--) {
+      const b = this.tileManager.getBlock(tx, ty);
+      if (blockIsSolidForRain(b)) return false;
+    }
+    return true;
+  }
+
+  resetWeatherChances() {
+    this.rainChanceP = WEATHER_RAIN_P0;
+    this.acidChanceP = WEATHER_ACID_P0;
+  }
+
+  /**
+   * @param {'rain'|'acid'} kind
+   * @param {{ manual?: boolean }} [options]
+   */
+  startWeather(kind, options = {}) {
+    this.activeWeather = kind;
+    this.weatherManualHold = !!options.manual;
+    if (this.weatherManualHold) {
+      this.weatherEndsAt = Number.MAX_SAFE_INTEGER;
+    } else {
+      const dur = Phaser.Math.Between(WEATHER_DURATION_MIN_MS, WEATHER_DURATION_MAX_MS);
+      this.weatherEndsAt = this.time.now + dur;
+    }
+    this.resetWeatherChances();
+    this.msSinceDryForMultiply = 0;
+  }
+
+  endWeather() {
+    this.activeWeather = null;
+    this.weatherEndsAt = 0;
+    this.weatherManualHold = false;
+    this.msSinceDryForMultiply = 0;
+  }
+
+  /** Creative items: right-click to start/stop that weather type (manual until toggled). */
+  toggleCreativeWeather(kind) {
+    if (kind === 'acid' && !this.mods.acidRain) return;
+    if (this.activeWeather === kind) {
+      this.endWeather();
+      return;
+    }
+    this.endWeather();
+    this.startWeather(kind, { manual: true });
+  }
+
+  updateWeather(delta) {
+    const now = this.time.now;
+    const cam = this.cameras.main;
+    const raining = this.activeWeather === 'rain' || this.activeWeather === 'acid';
+
+    if (raining && !this.weatherManualHold && now >= this.weatherEndsAt) {
+      this.endWeather();
+    }
+
+    if (!this.activeWeather) {
+      this.msSinceDryForMultiply += delta;
+      if (this.msSinceDryForMultiply >= WEATHER_MULT_MS) {
+        this.msSinceDryForMultiply = 0;
+        this.rainChanceP = Math.min(this.rainChanceP * WEATHER_CHANCE_MULT, WEATHER_CHANCE_CAP);
+        if (this.mods.acidRain) {
+          this.acidChanceP = Math.min(this.acidChanceP * WEATHER_CHANCE_MULT, WEATHER_CHANCE_CAP);
+        }
+      }
+
+      this.weatherRollTimer += delta;
+      if (this.weatherRollTimer >= WEATHER_ROLL_MS) {
+        this.weatherRollTimer = 0;
+        const rollA = this.mods.acidRain && Math.random() < this.acidChanceP;
+        const rollR = Math.random() < this.rainChanceP;
+        if (rollA && rollR) {
+          this.startWeather(Math.random() < 0.5 ? 'acid' : 'rain');
+        } else if (rollA) {
+          this.startWeather('acid');
+        } else if (rollR) {
+          this.startWeather('rain');
+        }
+      }
+    }
+
+    const active = this.activeWeather;
+    if (!active) {
+      this.rainGfx.clear();
+      this.rainDarkOverlay.setAlpha(0);
+      return;
+    }
+
+    this.rainDarkOverlay.setAlpha(active === 'acid' ? 0.12 : 0.08);
+    this.rainDarkOverlay.setFillStyle(active === 'acid' ? 0x113311 : 0x223344);
+
+    if (active === 'acid' && this.isPlayerUnderOpenSky()) {
+      this.acidDamageTimer += delta;
+      if (this.acidDamageTimer >= 1200) {
+        this.acidDamageTimer = 0;
+        this.player.takeDamage(2);
+      }
+    } else {
+      this.acidDamageTimer = 0;
+    }
+
+    this.rainAnimT += delta * 0.0012;
+    const color = active === 'acid' ? 0x55ee88 : 0xaaccff;
+    const w = cam.width;
+    const h = cam.height;
+    const g = this.rainGfx;
+    g.clear();
+    const streaks = Math.floor((w * h) / 9000);
+    const slant = active === 'acid' ? 0.35 : 0.22;
+    for (let i = 0; i < streaks; i++) {
+      const seed = i * 9973 + Math.floor(this.rainAnimT * 60);
+      const x = (seed * 73 % w) + (this.rainAnimT * 420 + i * 17) % w;
+      const y = (seed * 31 % h) + (this.rainAnimT * 880 + i * 41) % (h + 80) - 40;
+      const len = active === 'acid' ? 22 : 18;
+      g.lineStyle(2, color, active === 'acid' ? 0.55 : 0.45);
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x - len * slant, y + len);
+      g.strokePath();
+    }
   }
 
   createBackground(worldPxW, worldPxH) {
@@ -260,6 +441,8 @@ export default class GameScene extends Phaser.Scene {
     this.updateSkyPosition();
     this.updateBiomeTint();
 
+    this.updateWeather(delta);
+
     const tx = this.player.getTileX();
     const ty = this.player.getTileY();
     const biome = this.worldData.biomes[tx] || '?';
@@ -267,8 +450,13 @@ export default class GameScene extends Phaser.Scene {
     this.advancementTracker.update(biome);
     const selected = this.inventory.getSelectedItem();
     const itemName = selected ? getItemName(selected.type) : 'Empty';
+    const wx = !this.activeWeather
+      ? ''
+      : this.activeWeather === 'acid'
+        ? ' | Acid rain'
+        : ' | Raining';
     this.infoText.setText(
-      `Pos: ${tx},${ty} | ${GAME_MODE_NAMES[this.gameMode]} | ${DIFFICULTY_NAMES[this.difficulty]} | ${WORLD_TYPE_NAMES[this.worldType]} | ${this.isNight ? 'Night' : 'Day'} | Biome: ${biomeName} | Hand: ${itemName}`,
+      `Pos: ${tx},${ty} | ${GAME_MODE_NAMES[this.gameMode]} | ${DIFFICULTY_NAMES[this.difficulty]} | ${WORLD_TYPE_NAMES[this.worldType]} | ${this.isNight ? 'Night' : 'Day'} | Biome: ${biomeName} | Hand: ${itemName}${wx}`,
     );
   }
 

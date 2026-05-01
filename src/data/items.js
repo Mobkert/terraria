@@ -26,6 +26,10 @@ export const ItemTypes = {
   COOKED_PORKCHOP: 50,
   BACON: 51,
   TIME_SWITCHER: 52,
+  /** Creative: right-click toggles normal rain on/off (until toggled again). */
+  RAIN_CALLER: 53,
+  /** Creative + acid rain mod: right-click toggles acid rain on/off. */
+  ACID_RAIN_CALLER: 54,
 };
 
 export const ItemData = {
@@ -166,6 +170,16 @@ export const ItemData = {
     name: 'Time Switcher',
     stackSize: 1,
     timeToggle: true,
+  },
+  [ItemTypes.RAIN_CALLER]: {
+    name: 'Rain Caller',
+    stackSize: 1,
+    weatherToggle: 'rain',
+  },
+  [ItemTypes.ACID_RAIN_CALLER]: {
+    name: 'Acid Rain Caller',
+    stackSize: 1,
+    weatherToggle: 'acid',
   },
 };
 

@@ -596,6 +596,40 @@ export default class BootScene extends Phaser.Scene {
       ctx.beginPath(); ctx.arc(s * 0.65, s * 0.08, 1.5, 0, Math.PI * 2); ctx.fill();
     });
 
+    this.makeItemTexture(ItemTypes.RAIN_CALLER, (ctx) => {
+      ctx.fillStyle = '#3a5a8a';
+      ctx.beginPath();
+      ctx.arc(s * 0.5, s * 0.5, s * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#88bbee';
+      for (let i = 0; i < 5; i++) {
+        const x = s * (0.35 + i * 0.07);
+        ctx.fillRect(x, s * 0.22, 2, s * 0.45);
+      }
+      ctx.fillStyle = '#aaddff';
+      ctx.beginPath();
+      ctx.ellipse(s * 0.5, s * 0.38, s * 0.12, s * 0.08, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    this.makeItemTexture(ItemTypes.ACID_RAIN_CALLER, (ctx) => {
+      ctx.fillStyle = '#2a5a3a';
+      ctx.beginPath();
+      ctx.arc(s * 0.5, s * 0.5, s * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#55ee88';
+      for (let i = 0; i < 5; i++) {
+        const x = s * (0.35 + i * 0.07);
+        ctx.fillRect(x, s * 0.22, 2, s * 0.45);
+      }
+      ctx.fillStyle = '#88ffaa';
+      ctx.beginPath();
+      ctx.ellipse(s * 0.5, s * 0.38, s * 0.12, s * 0.08, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(200,255,120,0.35)';
+      ctx.fillRect(s * 0.25, s * 0.62, s * 0.5, 3);
+    });
+
     this.makeItemTexture(ItemTypes.TIME_SWITCHER, (ctx) => {
       // Gold-rimmed dial with split day/night face.
       ctx.fillStyle = '#7a5a1a';
